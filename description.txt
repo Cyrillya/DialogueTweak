@@ -1,0 +1,6 @@
+This mod will make your NPC dialogue window better and more detailed, just like mobile version.
+It completely overhauled NPC Dialogue Panel UI. Mods that also modified NPC dialogue panel might not work with this mod.
+If issues happend, please leave a comment on this mod's Steam Workshop page. 
+本Mod优化了NPC对话框，使其更加美观，设计基于手机版UI但有所改善。
+其完全重置了NPC对话框UI，也就是说同样修改了NPC对话框的Mod可能和此Mod不兼容。
+如果使用过程中遇到问题请在Steam创意工坊页面下留言。
