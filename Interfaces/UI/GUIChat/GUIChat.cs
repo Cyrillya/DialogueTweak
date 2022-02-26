@@ -203,7 +203,8 @@
                 int i = Main.LocalPlayer.sign;
                 if (Main.sign[i] is null || !WorldGen.InWorld(Main.sign[i].x, Main.sign[i].y) || !Main.tile[Main.sign[i].x, Main.sign[i].y].HasTile)
                     return;
-                // 顶部显示的文本，算是名字
+
+                // 名字与图像
                 var tile = Main.tile[Main.sign[i].x, Main.sign[i].y];
                 string text = Lang._mapLegendCache.FromTile(Main.Map[Main.sign[i].x, Main.sign[i].y], Main.sign[i].x, Main.sign[i].y);
                 WorldGen.KillTile_GetItemDrops(Main.sign[i].x, Main.sign[i].y, tile, out int dropItem, out int _, out _, out int _); // 获取物品
@@ -212,9 +213,10 @@
                     Main.instance.LoadItem(dropItem);
                     value = TextureAssets.Item[dropItem].Value;
                     var item = new Item();
-                    item.SetDefaults(dropItem);
+                    item.netDefaults(dropItem);
                     text = item.Name;
                 }
+
                 var position = new Vector2(ScreenWidth / 2 - PortraitPanel.Width() / 2, 115f) + new Vector2(62f, 50f);
                 // 重新开启spriteBatch，以去掉不明觉厉的UI绘制的一层模糊滤镜
                 spriteBatch.End();
