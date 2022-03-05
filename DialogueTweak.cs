@@ -43,7 +43,7 @@ namespace DialogueTweak
 
 				if (args[0] is string msg) {
 					switch (msg) {
-						case "OverrideExtraButtonIcon":
+						case "ReplaceExtraButtonIcon":
 							if (args.Length <= 3) {
 								HandleAssets.IconInfos.Add(new IconInfo(
 									IconType.Extra, // This icon is for extra button.
@@ -60,7 +60,7 @@ namespace DialogueTweak
 									));
 							}
 							return true;
-						case "OverrideShopButtonIcon":
+						case "ReplaceShopButtonIcon":
 							if (args.Length <= 3) {
 								HandleAssets.IconInfos.Add(new IconInfo(
 									IconType.Shop, // This icon is for shop button.
@@ -77,6 +77,9 @@ namespace DialogueTweak
 									));
 							}
 							return true;
+						default:
+							Logger.Error($"Replacement type \"{msg}\" not found.");
+							return false;
 					}
 				}
 			}

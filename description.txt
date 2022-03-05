@@ -1,10 +1,15 @@
-This mod will make your NPC dialogue window better and more detailed, just like mobile version.
-It completely overhauled NPC Dialogue Panel UI.
+This mod completely reworked NPC dialogue panel and sign editing panel. Inspired by the mobile version.
 Mods that also modified NPC dialogue panel might not work with this mod.
 If issues happend, please leave a comment on this mod's Steam Workshop page.
-本Mod优化了NPC对话框，使其更加美观，设计基于手机版UI但有所改善。
-其完全重置了NPC对话框UI。
+
+Mods can custom the button icons displayed for their NPCs easily. Use Mod.Call in PostSetupContent.
+For more information, visit the mod's github page below and read the README.md
+
+本Mod完全重制了NPC对话框UI，设计基于手机版UI但有所改善。
 同样修改了NPC对话框的Mod可能和此Mod不兼容。
 如果使用过程中遇到问题请在Steam创意工坊页面下留言。
+
+其他Mod可以用Mod.Call简单地为他们的NPC自定义按钮图标。
+参见本Mod的Github页面并阅读README-zhCN.md来获取更多信息
 
 Github: https://github.com/Crapsky233/DialogueTweak
