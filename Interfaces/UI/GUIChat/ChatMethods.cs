@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.GameContent;
@@ -94,20 +95,23 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                 Extra = Main.npcHeadTexture[head];
             }
 
-            // Special
-            switch (type) {
-                case NPCID.Guide:
-                    Shop = DialogueTweak.HelpIcon;
-                    Extra = DialogueTweak.HammerIcon;
-                    break;
-                case NPCID.OldMan:
-                    Shop = DialogueTweak.OldManIcon;
-                    break;
-                case NPCID.TaxCollector:
-                case NPCID.Angler:
-                case NPCID.Nurse:
-                    Shop = Main.npcHeadTexture[head];
-                    break;
+            foreach (var info in from a in DialogueTweak.IconInfos where a.npcType == type && a.available() && a.texture != "" select a) {
+                if (info.iconType == IconType.Shop) {
+                    if (info.texture == "Head") {
+                        Shop = Main.npcHeadTexture[head];
+                    }
+                    else {
+                        Shop = ModContent.GetTexture(info.texture);
+                    }
+                }
+                if (info.iconType == IconType.Extra) {
+                    if (info.texture == "Head") {
+                        Extra = Main.npcHeadTexture[head];
+                    }
+                    else {
+                        Extra = ModContent.GetTexture(info.texture);
+                    }
+                }
             }
         }
 

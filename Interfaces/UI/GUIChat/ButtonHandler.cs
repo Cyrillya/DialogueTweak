@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
+using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -119,20 +120,23 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                 Main.PlaySound(SoundID.MenuTick);
             }
             // 还有一个文字提示
+            shopText = shopText.Trim();
             DynamicSpriteFont value = Main.fontMouseText;
-            Vector2 stringSize = ChatManager.GetStringSize(value, shopText, Vector2.One);
+            float scale = DecideTextScale(shopText, value, buttonRectangle.Width - 50); // 减少值是为了给icon腾出空间
             Color shadowColor = (!moveOnShopButton) ? Color.Black : Color.Brown;
             Vector2 buttonOrigin = new Vector2(buttonRectangle.Width, buttonRectangle.Height) / 2f;
-            Vector2 offset = new Vector2(0f, 4f);
-            ChatManager.DrawColorCodedStringShadow(baseColor: shadowColor, spriteBatch: SpriteBatch, font: value, text: shopText, position: pos + buttonOrigin + offset, rotation: 0f, origin: stringSize * 0.5f, baseScale: Vector2.One);
-            ChatManager.DrawColorCodedString(SpriteBatch, value, shopText, pos + buttonOrigin + offset, chatColor, 0f, stringSize * 0.5f, Vector2.One);
+            DrawButtonText(shopText, moveOnShopButton ? 2 : 1.5f, value, buttonOrigin, shadowColor, chatColor, scale, pos, out Vector2 drawCenter);
+            if (scale <= 0.7f && moveOnShopButton) { // 缩放程度太高的放在上面时会在面板下方显示文本
+                Vector2 bottom = new Vector2(ScreenWidth / 2, statY + asset.Height + 30);
+                DrawButtonText(shopText, 1.5f, value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
+            }
 
             // 手柄支持，这个是最右边
-            UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat2, pos + buttonOrigin + offset);
+            UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat2, drawCenter);
             UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = true;
             // 原版的奇妙操作，无论怎样NPC都会同时存在NPCChat0和NPCChat1的选项，这里用特判让第二个按钮定位到此按钮
             if (!UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle) {
-                UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat1, pos + buttonOrigin + offset);
+                UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat1, drawCenter);
                 UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = true;
                 UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = false;
             }
@@ -164,22 +168,41 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                 Main.PlaySound(SoundID.MenuTick);
             }
             // 还有一个文字提示
+            shopText = shopText.Trim();
             DynamicSpriteFont value = Main.fontMouseText;
-            Vector2 stringSize = ChatManager.GetStringSize(value, shopText, Vector2.One);
+            float scale = DecideTextScale(shopText, value, buttonRectangle.Width - 50); // 减少值是为了给icon腾出空间
             Color shadowColor = (!moveOnExtraButton) ? Color.Black : Color.Brown;
             Vector2 buttonOrigin = new Vector2(buttonRectangle.Width, buttonRectangle.Height) / 2f;
-            Vector2 offset = new Vector2(0f, 4f);
-            ChatManager.DrawColorCodedStringShadow(baseColor: shadowColor, spriteBatch: SpriteBatch, font: value, text: shopText, position: pos + buttonOrigin + offset, rotation: 0f, origin: stringSize * 0.5f, baseScale: Vector2.One);
-            ChatManager.DrawColorCodedString(SpriteBatch, value, shopText, pos + buttonOrigin + offset, chatColor, 0f, stringSize * 0.5f, Vector2.One);
+            DrawButtonText(shopText, moveOnExtraButton ? 2 : 1.5f, value, buttonOrigin, shadowColor, chatColor, scale, pos, out Vector2 drawCenter);
+            if (scale <= 0.7f && moveOnExtraButton) { // 缩放程度太高的放在上面时会在面板下方显示文本
+                Vector2 bottom = new Vector2(ScreenWidth / 2, statY + asset.Height + 30);
+                DrawButtonText(shopText, 1.5f, value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
+            }
             // 手柄支持，这个是右中
-            UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat2, pos + buttonOrigin + offset);
+            UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat2, drawCenter);
             UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = true;
             // 原版的奇妙操作，无论怎样NPC都会同时存在NPCChat0和NPCChat1的选项，这里用特判让第二个按钮定位到此按钮
             if (!UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle) {
-                UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat1, pos + buttonOrigin + offset);
+                UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat1, drawCenter);
                 UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = true;
                 UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = false;
             }
+        }
+
+        private static float DecideTextScale(string text, DynamicSpriteFont font, float maxWidth) {
+            Vector2 stringSize = ChatManager.GetStringSize(font, text, Vector2.One); // 先计算出一般情况下(即scale为1)的大小
+            if (stringSize.X <= maxWidth) return 1f; // 能容纳的直接给过
+            return Math.Max(1f * (maxWidth / stringSize.X), 0.5f); // 不能容纳的进行缩放，最小不能超过0.5
+        }
+
+        private static void DrawButtonText(string text, float spread, DynamicSpriteFont font, Vector2 buttonOrigin, Color shadowColor, Color chatColor, float sizeScale, Vector2 basePos, out Vector2 pos) {
+            var scale = new Vector2(sizeScale, 1f);
+            var stringSize = ChatManager.GetStringSize(font, text, scale); // 获取文本真正大小，只进行X轴上的缩放
+            Vector2 offset = new Vector2(MathHelper.Lerp(-12f, 4f, sizeScale), 4f); // 根据文本长度调整位置，根据缩放的大小可以让文本往左靠一点，尽量避免脱离按钮，sizeScale为[0.5-1]的值
+            if (sizeScale >= 0.9f && stringSize.X >= 90f) offset.X = 12f; // 给不需要缩放但比较长的文本向右调整，以远离icon
+            pos = basePos + buttonOrigin + offset;
+            ChatManager.DrawColorCodedStringShadow(SpriteBatch, font, text, pos, shadowColor, 0f, stringSize * 0.5f, scale, -1, spread);
+            ChatManager.DrawColorCodedString(SpriteBatch, font, text, pos, chatColor, 0f, stringSize * 0.5f, scale);
         }
     }
 }
