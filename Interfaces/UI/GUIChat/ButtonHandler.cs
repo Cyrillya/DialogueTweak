@@ -140,7 +140,7 @@
 
                 if (Main.mouseLeft && Main.mouseLeftRelease) {
                     if (Main.LocalPlayer.sign == -1)
-                        ChatMethods.HandleShop(Main.npc[Main.LocalPlayer.talkNPC].type);
+                        ChatMethods.HandleShop(Main.npc[Main.LocalPlayer.talkNPC]);
                     else {
                         if (Main.editSign)
                             Main.SubmitSignText();
@@ -191,7 +191,7 @@
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Main.mouseLeft && Main.mouseLeftRelease) {
-                    ChatMethods.HandleExtraButtonClicled(talkNPC.type);
+                    ChatMethods.HandleExtraButtonClicled(talkNPC);
                 }
             }
             else if (moveOnExtraButton) {

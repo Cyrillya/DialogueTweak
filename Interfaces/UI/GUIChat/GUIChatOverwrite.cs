@@ -3,7 +3,7 @@
     // 专门用于拦截原版NPC对话的ModSystem
     public class GUIChatOverwrite : ModSystem
     {
-        public GUIChat MobileChat = new();
+        public static GUIChat MobileChat = new();
 
         public override void Load() {
             base.Load();

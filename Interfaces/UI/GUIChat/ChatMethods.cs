@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using Terraria.DataStructures;
 using Terraria.GameContent.Achievements;
+using Terraria.ID;
 
 namespace DialogueTweak.Interfaces.UI.GUIChat
 {
@@ -153,34 +155,34 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
         }
 
         // 第二按钮被按下的行动
-        public static void HandleExtraButtonClicled(int npcType) {
+        public static void HandleExtraButtonClicled(NPC talkNPC) {
             if (!NPCLoader.PreChatButtonClicked(false))
                 return;
 
             NPCLoader.OnChatButtonClicked(false);
-            if (npcType == 20) {
+            if (talkNPC.type == NPCID.Dryad) {
                 SoundEngine.PlaySound(12);
                 Main.npcChatText = Lang.GetDryadWorldStatusDialog();
             }
 
-            else if (npcType == 22) {
+            else if (talkNPC.type == NPCID.Guide) {
                 Main.playerInventory = true;
                 Main.npcChatText = "";
                 SoundEngine.PlaySound(12);
                 Main.InGuideCraftMenu = true;
                 UILinkPointNavigator.GoToDefaultPage();
             }
-            else if (npcType == 107) {
+            else if (talkNPC.type == NPCID.GoblinTinkerer) {
                 Main.playerInventory = true;
                 Main.npcChatText = "";
                 SoundEngine.PlaySound(12);
                 Main.InReforgeMenu = true;
                 UILinkPointNavigator.GoToDefaultPage();
             }
-            else if (npcType == 353) {
+            else if (talkNPC.type == NPCID.Stylist) {
                 Main.OpenHairWindow();
             }
-            else if (npcType == 207) {
+            else if (talkNPC.type == NPCID.DyeTrader) {
                 Main.npcChatCornerItem = 0;
                 SoundEngine.PlaySound(12);
                 bool gotDye = false;
@@ -192,17 +194,17 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
 
                     gotDye = true;
                     SoundEngine.PlaySound(24);
-                    Main.LocalPlayer.GetDyeTraderReward();
+                    Main.LocalPlayer.GetDyeTraderReward(talkNPC);
                 }
 
                 Main.npcChatText = Lang.DyeTraderQuestChat(gotDye);
             }
-            else if (npcType == NPCID.DD2Bartender) {
+            else if (talkNPC.type == NPCID.DD2Bartender) {
                 SoundEngine.PlaySound(12);
                 HelpText();
-                Main.npcChatText = Lang.BartenderHelpText(Main.npc[Main.LocalPlayer.talkNPC]);
+                Main.npcChatText = Lang.BartenderHelpText(talkNPC);
             }
-            else if (npcType == NPCID.PartyGirl) {
+            else if (talkNPC.type == NPCID.PartyGirl) {
                 SoundEngine.PlaySound(12);
                 Main.npcChatText = Language.GetTextValue("PartyGirlSpecialText.Music" + Main.rand.Next(1, 4));
                 // 利用反射获取设为private static的Main.swapMusic字段并修改
@@ -331,9 +333,9 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
         }
 
         // 第一按钮被按下的行动
-        public static void HandleShop(int npcType) {
-            if (NPCID.Sets.IsTownPet[npcType]) {
-                Main.LocalPlayer.PetAnimal(Main.LocalPlayer.talkNPC);
+        public static void HandleShop(NPC talkNPC) {
+            if (NPCID.Sets.IsTownPet[talkNPC.type]) {
+                Main.LocalPlayer.PetAnimal(talkNPC.whoAmI);
                 return;
             }
 
@@ -343,7 +345,7 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
             NPCLoader.OnChatButtonClicked(true);
 
             ChatMethods methods = new ChatMethods();
-            switch (npcType) {
+            switch (talkNPC.type) {
                 case NPCID.Angler: {
                         Main.npcChatCornerItem = 0;
                         SoundEngine.PlaySound(12);
@@ -358,7 +360,7 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                                 flag3 = true;
                                 SoundEngine.PlaySound(24);
                                 Main.LocalPlayer.anglerQuestsFinished++;
-                                Main.LocalPlayer.GetAnglerReward();
+                                Main.LocalPlayer.GetAnglerReward(talkNPC);
                             }
                         }
 
@@ -376,7 +378,7 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                     }
                 case NPCID.OldMan:
                     if (Main.netMode == NetmodeID.SinglePlayer)
-                        NPC.SpawnSkeletron();
+                        NPC.SpawnSkeletron(Main.myPlayer);
                     else
                         NetMessage.SendData(MessageID.MiscDataSync, -1, -1, null, Main.myPlayer, 1f);
 
@@ -391,10 +393,11 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                             int taxMoney3 = Main.LocalPlayer.taxMoney;
                             taxMoney3 = (int)((double)taxMoney3 / Main.LocalPlayer.currentShoppingSettings.PriceAdjustment);
                             while (taxMoney3 > 0) {
+                                EntitySource_Gift source = new EntitySource_Gift(talkNPC);
                                 if (taxMoney3 > 1000000) {
                                     int num20 = taxMoney3 / 1000000;
                                     taxMoney3 -= 1000000 * num20;
-                                    int number = Item.NewItem((int)Main.LocalPlayer.position.X, (int)Main.LocalPlayer.position.Y, Main.LocalPlayer.width, Main.LocalPlayer.height, 74, num20);
+                                    int number = Item.NewItem(source, (int)Main.LocalPlayer.position.X, (int)Main.LocalPlayer.position.Y, Main.LocalPlayer.width, Main.LocalPlayer.height, 74, num20);
                                     if (Main.netMode == NetmodeID.MultiplayerClient)
                                         NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number, 1f);
 
@@ -404,7 +407,7 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                                 if (taxMoney3 > 10000) {
                                     int num21 = taxMoney3 / 10000;
                                     taxMoney3 -= 10000 * num21;
-                                    int number2 = Item.NewItem((int)Main.LocalPlayer.position.X, (int)Main.LocalPlayer.position.Y, Main.LocalPlayer.width, Main.LocalPlayer.height, 73, num21);
+                                    int number2 = Item.NewItem(source, (int)Main.LocalPlayer.position.X, (int)Main.LocalPlayer.position.Y, Main.LocalPlayer.width, Main.LocalPlayer.height, 73, num21);
                                     if (Main.netMode == NetmodeID.MultiplayerClient)
                                         NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number2, 1f);
 
@@ -414,7 +417,7 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                                 if (taxMoney3 > 100) {
                                     int num22 = taxMoney3 / 100;
                                     taxMoney3 -= 100 * num22;
-                                    int number3 = Item.NewItem((int)Main.LocalPlayer.position.X, (int)Main.LocalPlayer.position.Y, Main.LocalPlayer.width, Main.LocalPlayer.height, 72, num22);
+                                    int number3 = Item.NewItem(source, (int)Main.LocalPlayer.position.X, (int)Main.LocalPlayer.position.Y, Main.LocalPlayer.width, Main.LocalPlayer.height, 72, num22);
                                     if (Main.netMode == NetmodeID.MultiplayerClient)
                                         NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number3, 1f);
 
@@ -426,7 +429,7 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                                     num23 = 1;
 
                                 taxMoney3 -= num23;
-                                int number4 = Item.NewItem((int)Main.LocalPlayer.position.X, (int)Main.LocalPlayer.position.Y, Main.LocalPlayer.width, Main.LocalPlayer.height, 71, num23);
+                                int number4 = Item.NewItem(source, (int)Main.LocalPlayer.position.X, (int)Main.LocalPlayer.position.Y, Main.LocalPlayer.width, Main.LocalPlayer.height, 71, num23);
                                 if (Main.netMode == NetmodeID.MultiplayerClient)
                                     NetMessage.SendData(MessageID.SyncItem, -1, -1, null, number4, 1f);
                             }
@@ -735,694 +738,8 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
         public static bool IsChineseOrSymbols(char a) => IsChinese(a) || ChineseSymbols.Exists(t => t == a);
 
         internal static void HelpText() {
-            Player[] player = Main.player;
-            Player LocalPlayer = Main.LocalPlayer;
-            NPC[] npc = Main.npc;
-
-            bool flag = false;
-            if (player[myPlayer].statLifeMax > 100)
-                flag = true;
-
-            bool flag2 = false;
-            if (player[myPlayer].statManaMax > 20)
-                flag2 = true;
-
-            bool flag3 = true;
-            bool flag4 = false;
-            bool flag5 = false;
-            bool flag6 = false;
-            bool flag7 = false;
-            bool flag8 = false;
-            bool flag9 = false;
-            bool flag10 = false;
-            bool flag11 = false;
-            bool flag12 = false;
-            bool flag13 = false;
-            for (int i = 0; i < 58; i++) {
-                if (player[myPlayer].inventory[i].pick > 0 && player[myPlayer].inventory[i].Name != "Copper Pickaxe")
-                    flag3 = false;
-
-                if (player[myPlayer].inventory[i].axe > 0 && player[myPlayer].inventory[i].Name != "Copper Axe")
-                    flag3 = false;
-
-                if (player[myPlayer].inventory[i].hammer > 0)
-                    flag3 = false;
-
-                if (player[myPlayer].inventory[i].type == ItemID.IronOre || player[myPlayer].inventory[i].type == ItemID.CopperOre || player[myPlayer].inventory[i].type == ItemID.GoldOre || player[myPlayer].inventory[i].type == ItemID.SilverOre || player[myPlayer].inventory[i].type == ItemID.TinOre || player[myPlayer].inventory[i].type == ItemID.LeadOre || player[myPlayer].inventory[i].type == ItemID.TungstenOre || player[myPlayer].inventory[i].type == ItemID.PlatinumOre)
-                    flag4 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.GoldBar || player[myPlayer].inventory[i].type == ItemID.CopperBar || player[myPlayer].inventory[i].type == ItemID.SilverBar || player[myPlayer].inventory[i].type == ItemID.IronBar || player[myPlayer].inventory[i].type == ItemID.TinBar || player[myPlayer].inventory[i].type == ItemID.LeadBar || player[myPlayer].inventory[i].type == ItemID.TungstenBar || player[myPlayer].inventory[i].type == ItemID.PlatinumBar)
-                    flag5 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.FallenStar)
-                    flag6 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.Lens)
-                    flag7 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.RottenChunk || player[myPlayer].inventory[i].type == ItemID.WormFood || player[myPlayer].inventory[i].type == ItemID.Vertebrae || player[myPlayer].inventory[i].type == ItemID.BloodySpine || player[myPlayer].inventory[i].type == ItemID.VilePowder || player[myPlayer].inventory[i].type == ItemID.ViciousPowder)
-                    flag8 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.GrapplingHook || player[myPlayer].inventory[i].type == ItemID.AmethystHook || player[myPlayer].inventory[i].type == ItemID.TopazHook || player[myPlayer].inventory[i].type == ItemID.SapphireHook || player[myPlayer].inventory[i].type == ItemID.EmeraldHook || player[myPlayer].inventory[i].type == ItemID.RubyHook || player[myPlayer].inventory[i].type == ItemID.DiamondHook || player[myPlayer].inventory[i].type == ItemID.WebSlinger || player[myPlayer].inventory[i].type == ItemID.SkeletronHand || player[myPlayer].inventory[i].type == ItemID.SlimeHook || player[myPlayer].inventory[i].type == ItemID.FishHook || player[myPlayer].inventory[i].type == ItemID.IvyWhip || player[myPlayer].inventory[i].type == ItemID.BatHook || player[myPlayer].inventory[i].type == ItemID.CandyCaneHook)
-                    flag9 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.DesertFossil)
-                    flag10 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.Hellstone)
-                    flag11 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.TempleKey)
-                    flag12 = true;
-
-                if (player[myPlayer].inventory[i].type == ItemID.JungleKey || player[myPlayer].inventory[i].type == ItemID.CorruptionKey || player[myPlayer].inventory[i].type == ItemID.CrimsonKey || player[myPlayer].inventory[i].type == ItemID.HallowedKey || player[myPlayer].inventory[i].type == ItemID.FrozenKey || player[myPlayer].inventory[i].type == 4714)
-                    flag13 = true;
-            }
-
-            bool flag14 = false;
-            bool flag15 = false;
-            bool flag16 = false;
-            bool flag17 = false;
-            bool flag18 = false;
-            bool flag19 = false;
-            bool flag20 = false;
-            bool flag21 = false;
-            bool flag22 = false;
-            bool flag23 = false;
-            bool flag24 = false;
-            bool flag25 = false;
-            bool flag26 = false;
-            bool flag27 = false;
-            bool flag28 = false;
-            bool flag29 = false;
-            bool flag30 = false;
-            bool flag31 = false;
-            bool flag32 = false;
-            bool flag33 = false;
-            bool flag34 = false;
-            bool flag35 = false;
-            bool flag36 = false;
-            bool flag37 = false;
-            bool flag38 = false;
-            int num = 0;
-            for (int j = 0; j < 200; j++) {
-                if (npc[j].active) {
-                    if (npc[j].townNPC && npc[j].type != NPCID.OldMan)
-                        num++;
-
-                    if (npc[j].type == NPCID.Merchant)
-                        flag14 = true;
-
-                    if (npc[j].type == NPCID.Nurse)
-                        flag15 = true;
-
-                    if (npc[j].type == NPCID.ArmsDealer)
-                        flag17 = true;
-
-                    if (npc[j].type == NPCID.Dryad)
-                        flag16 = true;
-
-                    if (npc[j].type == NPCID.Clothier)
-                        flag22 = true;
-
-                    if (npc[j].type == NPCID.Mechanic)
-                        flag19 = true;
-
-                    if (npc[j].type == NPCID.Demolitionist)
-                        flag18 = true;
-
-                    if (npc[j].type == NPCID.Wizard)
-                        flag20 = true;
-
-                    if (npc[j].type == NPCID.GoblinTinkerer)
-                        flag21 = true;
-
-                    if (npc[j].type == NPCID.WitchDoctor)
-                        flag23 = true;
-
-                    if (npc[j].type == NPCID.Steampunker)
-                        flag24 = true;
-
-                    if (npc[j].type == NPCID.Cyborg)
-                        flag25 = true;
-
-                    if (npc[j].type == NPCID.Stylist)
-                        flag26 = true;
-
-                    if (npc[j].type == 633)
-                        flag38 = true;
-
-                    if (npc[j].type == NPCID.Angler)
-                        flag27 = true;
-
-                    if (npc[j].type == NPCID.TaxCollector)
-                        flag28 = true;
-
-                    if (npc[j].type == NPCID.Pirate)
-                        flag29 = true;
-
-                    if (npc[j].type == NPCID.DyeTrader)
-                        flag30 = true;
-
-                    if (npc[j].type == NPCID.Truffle)
-                        flag31 = true;
-
-                    if (npc[j].type == 588)
-                        flag32 = true;
-
-                    if (npc[j].type == NPCID.Painter)
-                        flag33 = true;
-
-                    if (npc[j].type == NPCID.PartyGirl)
-                        flag34 = true;
-
-                    if (npc[j].type == NPCID.DD2Bartender)
-                        flag35 = true;
-
-                    if (npc[j].type == NPCID.TravellingMerchant)
-                        flag36 = true;
-
-                    if (npc[j].type == NPCID.SkeletonMerchant)
-                        flag37 = true;
-                }
-            }
-
-            object obj = Lang.CreateDialogSubstitutionObject();
-            while (true) {
-                Main.helpText++;
-                if (Language.Exists("GuideMain.helpText.Help_" + Main.helpText)) {
-                    LocalizedText text = Language.GetText("GuideMain.helpText.Help_" + Main.helpText);
-                    if (text.CanFormatWith(obj)) {
-                        Main.npcChatText = text.FormatWith(obj);
-                        return;
-                    }
-                }
-
-                if (flag3) {
-                    if (Main.helpText == 1) {
-                        Main.npcChatText = GetChatDialog(177);
-                        return;
-                    }
-
-                    if (Main.helpText == 2) {
-                        Main.npcChatText = GetChatDialog(178);
-                        return;
-                    }
-
-                    if (Main.helpText == 3) {
-                        Main.npcChatText = GetChatDialog(179);
-                        return;
-                    }
-
-                    if (Main.helpText == 4) {
-                        Main.npcChatText = GetChatDialog(180);
-                        return;
-                    }
-
-                    if (Main.helpText == 5) {
-                        Main.npcChatText = GetChatDialog(181);
-                        return;
-                    }
-
-                    if (Main.helpText == 6) {
-                        Main.npcChatText = GetChatDialog(182);
-                        return;
-                    }
-                }
-
-                if (flag3 && !flag4 && !flag5 && Main.helpText == 11) {
-                    Main.npcChatText = GetChatDialog(183);
-                    return;
-                }
-
-                if (flag3 && flag4 && !flag5) {
-                    if (Main.helpText == 21) {
-                        Main.npcChatText = GetChatDialog(184);
-                        return;
-                    }
-
-                    if (Main.helpText == 22) {
-                        Main.npcChatText = GetChatDialog(185);
-                        return;
-                    }
-                }
-
-                if (flag3 && flag5) {
-                    if (Main.helpText == 31) {
-                        Main.npcChatText = GetChatDialog(186);
-                        return;
-                    }
-
-                    if (Main.helpText == 32) {
-                        Main.npcChatText = GetChatDialog(187);
-                        return;
-                    }
-                }
-
-                if (!flag && Main.helpText == 41) {
-                    Main.npcChatText = GetChatDialog(188);
-                    return;
-                }
-
-                if (!flag2 && Main.helpText == 42) {
-                    Main.npcChatText = GetChatDialog(189);
-                    return;
-                }
-
-                if (!flag2 && !flag6 && Main.helpText == 43) {
-                    Main.npcChatText = GetChatDialog(190);
-                    return;
-                }
-
-                if (!flag14 && !flag15) {
-                    if (Main.helpText == 51) {
-                        Main.npcChatText = GetChatDialog(191);
-                        return;
-                    }
-
-                    if (Main.helpText == 52) {
-                        Main.npcChatText = GetChatDialog(192);
-                        return;
-                    }
-
-                    if (Main.helpText == 53) {
-                        Main.npcChatText = GetChatDialog(193);
-                        return;
-                    }
-
-                    if (Main.helpText == 54) {
-                        Main.npcChatText = GetChatDialog(194);
-                        return;
-                    }
-                }
-
-                if (!flag14 && Main.helpText == 61) {
-                    Main.npcChatText = GetChatDialog(195);
-                    return;
-                }
-
-                if (!flag15 && Main.helpText == 62) {
-                    Main.npcChatText = GetChatDialog(196);
-                    return;
-                }
-
-                if (!flag17 && Main.helpText == 63) {
-                    Main.npcChatText = GetChatDialog(197);
-                    return;
-                }
-
-                if (!flag16 && Main.helpText == 64) {
-                    Main.npcChatText = GetChatDialog(198);
-                    return;
-                }
-
-                if (!flag19 && Main.helpText == 65 && NPC.downedBoss3) {
-                    Main.npcChatText = GetChatDialog(199);
-                    return;
-                }
-
-                if (!flag22 && Main.helpText == 66 && NPC.downedBoss3) {
-                    Main.npcChatText = GetChatDialog(200);
-                    return;
-                }
-
-                if (!flag18 && Main.helpText == 67) {
-                    Main.npcChatText = GetChatDialog(201);
-                    return;
-                }
-
-                if (!flag21 && NPC.downedBoss2 && Main.helpText == 68) {
-                    Main.npcChatText = GetChatDialog(202);
-                    return;
-                }
-
-                if (!flag20 && Main.hardMode && Main.helpText == 69) {
-                    Main.npcChatText = GetChatDialog(203);
-                    return;
-                }
-
-                if (!flag23 && Main.helpText == 70 && NPC.downedBoss2) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1100");
-                    return;
-                }
-
-                if (!flag24 && Main.helpText == 71 && Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1101");
-                    return;
-                }
-
-                if (!flag25 && Main.helpText == 72 && NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1102");
-                    return;
-                }
-
-                if (!flag26 && Main.helpText == 73) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1103");
-                    return;
-                }
-
-                if (!flag27 && Main.helpText == 74) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1104");
-                    return;
-                }
-
-                if (!flag28 && Main.helpText == 75 && Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1105");
-                    return;
-                }
-
-                if (!flag29 && Main.helpText == 76 && Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1106");
-                    return;
-                }
-
-                if (!flag30 && Main.helpText == 77) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1107");
-                    return;
-                }
-
-                if (!flag31 && Main.helpText == 78 && Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1108");
-                    return;
-                }
-
-                if (!flag32 && Main.helpText == 79) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1109");
-                    return;
-                }
-
-                if (!flag33 && Main.helpText == 80 && num >= 5) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1110");
-                    return;
-                }
-
-                if (!flag34 && Main.helpText == 81 && num >= 11) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1111");
-                    return;
-                }
-
-                if (!flag35 && NPC.downedBoss2 && Main.helpText == 82) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1112");
-                    return;
-                }
-
-                if (!flag36 && Main.helpText == 83 && flag14) {
-                    Main.npcChatText = Language.GetTextValueWith("GuideHelpTextSpecific.Help_1113", obj);
-                    return;
-                }
-
-                if (!flag37 && Main.helpText == 84 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1114");
-                    return;
-                }
-
-                if (!flag38 && Main.helpText == 85 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1115");
-                    return;
-                }
-
-                if (flag7 && !WorldGen.crimson && Main.helpText == 100) {
-                    Main.npcChatText = GetChatDialog(204);
-                    return;
-                }
-
-                if (flag8 && Main.helpText == 101) {
-                    Main.npcChatText = GetChatDialog(WorldGen.crimson ? 403 : 205);
-                    return;
-                }
-
-                if ((flag7 || flag8) && Main.helpText == 102) {
-                    Main.npcChatText = GetChatDialog(WorldGen.crimson ? 402 : 206);
-                    return;
-                }
-
-                if (flag7 && WorldGen.crimson && Main.helpText == 103) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1159");
-                    return;
-                }
-
-                if (!flag9 && LocalPlayer.miscEquips[4].IsAir && Main.helpText == 201 && !Main.hardMode && !NPC.downedBoss3 && !NPC.downedBoss2) {
-                    Main.npcChatText = GetChatDialog(207);
-                    return;
-                }
-
-                if (Main.helpText == 202 && !Main.hardMode && player[myPlayer].statLifeMax >= 140) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1120");
-                    return;
-                }
-
-                if (Main.helpText == 203 && Main.hardMode && NPC.downedMechBossAny) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1121");
-                    return;
-                }
-
-                if (Main.helpText == 204 && !NPC.downedGoblins && player[myPlayer].statLifeMax >= 200 && WorldGen.shadowOrbSmashed) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1122");
-                    return;
-                }
-
-                if (Main.helpText == 205 && Main.hardMode && !NPC.downedPirates && player[myPlayer].statLifeMax >= 200) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1123");
-                    return;
-                }
-
-                if (Main.helpText == 206 && Main.hardMode && NPC.downedGolemBoss && !NPC.downedMartians) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1124");
-                    return;
-                }
-
-                if (Main.helpText == 207 && (NPC.downedBoss1 || NPC.downedBoss2 || NPC.downedBoss3)) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1125");
-                    return;
-                }
-
-                if (Main.helpText == 208 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1130");
-                    return;
-                }
-
-                if (Main.helpText == 209 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1131");
-                    return;
-                }
-
-                if (Main.helpText == 210 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1132");
-                    return;
-                }
-
-                if (Main.helpText == 211 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1133");
-                    return;
-                }
-
-                if (Main.helpText == 212 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1134");
-                    return;
-                }
-
-                if (Main.helpText == 213 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1135");
-                    return;
-                }
-
-                if (Main.helpText == 214 && !Main.hardMode && (flag4 || flag5)) {
-                    Main.npcChatText = Language.GetTextValueWith("GuideHelpTextSpecific.Help_1136", obj);
-                    return;
-                }
-
-                if (Main.helpText == 215 && LocalPlayer.anglerQuestsFinished < 1) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1137");
-                    return;
-                }
-
-                if (Main.helpText == 216 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1138");
-                    return;
-                }
-
-                if (Main.helpText == 1000 && !NPC.downedBoss1 && !NPC.downedBoss2) {
-                    Main.npcChatText = GetChatDialog(208);
-                    return;
-                }
-
-                if (Main.helpText == 1001 && !NPC.downedBoss1 && !NPC.downedBoss2) {
-                    Main.npcChatText = GetChatDialog(209);
-                    return;
-                }
-
-                if (Main.helpText == 1002 && !NPC.downedBoss2) {
-                    if (WorldGen.crimson)
-                        Main.npcChatText = GetChatDialog(331);
-                    else
-                        Main.npcChatText = GetChatDialog(210);
-
-                    return;
-                }
-
-                if (Main.helpText == 1050 && !NPC.downedBoss1 && player[myPlayer].statLifeMax < 200) {
-                    Main.npcChatText = GetChatDialog(211);
-                    return;
-                }
-
-                if (Main.helpText == 1051 && !NPC.downedBoss1 && player[myPlayer].statDefense <= 10) {
-                    Main.npcChatText = GetChatDialog(212);
-                    return;
-                }
-
-                if (Main.helpText == 1052 && !NPC.downedBoss1 && player[myPlayer].statLifeMax >= 200 && player[myPlayer].statDefense > 10) {
-                    Main.npcChatText = GetChatDialog(WorldGen.crimson ? 404 : 213);
-                    return;
-                }
-
-                if (Main.helpText == 1053 && NPC.downedBoss1 && !NPC.downedBoss2 && player[myPlayer].statLifeMax < 300) {
-                    Main.npcChatText = GetChatDialog(214);
-                    return;
-                }
-
-                if (Main.helpText == 1054 && NPC.downedBoss1 && !NPC.downedBoss2 && !WorldGen.crimson && player[myPlayer].statLifeMax >= 300) {
-                    Main.npcChatText = GetChatDialog(215);
-                    return;
-                }
-
-                if (Main.helpText == 1055 && NPC.downedBoss1 && !NPC.downedBoss2 && !WorldGen.crimson && player[myPlayer].statLifeMax >= 300) {
-                    Main.npcChatText = GetChatDialog(216);
-                    return;
-                }
-
-                if (Main.helpText == 1056 && NPC.downedBoss1 && NPC.downedBoss2 && !NPC.downedBoss3) {
-                    Main.npcChatText = GetChatDialog(217);
-                    return;
-                }
-
-                if (Main.helpText == 1057 && NPC.downedBoss1 && NPC.downedBoss2 && NPC.downedBoss3 && !Main.hardMode && player[myPlayer].statLifeMax < 400) {
-                    Main.npcChatText = GetChatDialog(218);
-                    return;
-                }
-
-                if (Main.helpText == 1058 && NPC.downedBoss1 && NPC.downedBoss2 && NPC.downedBoss3 && !Main.hardMode && player[myPlayer].statLifeMax >= 400) {
-                    Main.npcChatText = GetChatDialog(219);
-                    return;
-                }
-
-                if (Main.helpText == 1059 && NPC.downedBoss1 && NPC.downedBoss2 && NPC.downedBoss3 && !Main.hardMode && player[myPlayer].statLifeMax >= 400) {
-                    Main.npcChatText = GetChatDialog(220);
-                    return;
-                }
-
-                if (Main.helpText == 1060 && NPC.downedBoss1 && NPC.downedBoss2 && NPC.downedBoss3 && !Main.hardMode && player[myPlayer].statLifeMax >= 400) {
-                    Main.npcChatText = GetChatDialog(221);
-                    return;
-                }
-
-                if (Main.helpText == 1061 && Main.hardMode && !NPC.downedPlantBoss) {
-                    Main.npcChatText = GetChatDialog(WorldGen.crimson ? 401 : 222);
-                    return;
-                }
-
-                if (Main.helpText == 1062 && Main.hardMode && !NPC.downedPlantBoss) {
-                    Main.npcChatText = GetChatDialog(223);
-                    return;
-                }
-
-                if (Main.helpText == 1140 && NPC.downedBoss1 && !NPC.downedBoss2 && WorldGen.crimson && player[myPlayer].statLifeMax >= 300) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1140");
-                    return;
-                }
-
-                if (Main.helpText == 1141 && NPC.downedBoss1 && !NPC.downedBoss2 && WorldGen.crimson && player[myPlayer].statLifeMax >= 300) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1141");
-                    return;
-                }
-
-                if (Main.helpText == 1142 && NPC.downedBoss2 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1142");
-                    return;
-                }
-
-                if (Main.helpText == 1143 && NPC.downedBoss2 && !NPC.downedQueenBee && player[myPlayer].statLifeMax >= 300) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1143");
-                    return;
-                }
-
-                if (Main.helpText == 1144 && flag10) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1144");
-                    return;
-                }
-
-                if (Main.helpText == 1145 && flag11 && !Main.hardMode) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1145");
-                    return;
-                }
-
-                if (Main.helpText == 1146 && Main.hardMode && player[myPlayer].wingsLogic == 0 && !LocalPlayer.mount.Active && !NPC.downedPlantBoss) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1146");
-                    return;
-                }
-
-                if (Main.helpText == 1147 && Main.hardMode && WorldGen.SavedOreTiers.Adamantite == 111 && !NPC.downedMechBossAny) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1147");
-                    return;
-                }
-
-                if (Main.helpText == 1148 && Main.hardMode && WorldGen.SavedOreTiers.Adamantite == 223 && !NPC.downedMechBossAny) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1148");
-                    return;
-                }
-
-                if (Main.helpText == 1149 && Main.hardMode && NPC.downedMechBossAny && player[myPlayer].statLifeMax < 500) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1149");
-                    return;
-                }
-
-                if (Main.helpText == 1150 && Main.hardMode && NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3 && !NPC.downedPlantBoss) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1150");
-                    return;
-                }
-
-                if (Main.helpText == 1151 && Main.hardMode && NPC.downedPlantBoss && !NPC.downedGolemBoss && flag12) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1151");
-                    return;
-                }
-
-                if (Main.helpText == 1152 && Main.hardMode && NPC.downedPlantBoss && !NPC.downedGolemBoss && !flag12) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1152");
-                    return;
-                }
-
-                if (Main.helpText == 1153 && Main.hardMode && flag13) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1153");
-                    return;
-                }
-
-                if (Main.helpText == 1154 && Main.hardMode && !NPC.downedFishron) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1154");
-                    return;
-                }
-
-                if (Main.helpText == 1155 && Main.hardMode && NPC.downedGolemBoss && !NPC.downedHalloweenTree && !NPC.downedHalloweenKing) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1155");
-                    return;
-                }
-
-                if (Main.helpText == 1156 && Main.hardMode && NPC.downedGolemBoss && !NPC.downedChristmasIceQueen && !NPC.downedChristmasTree && !NPC.downedChristmasSantank) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1156");
-                    return;
-                }
-
-                if (Main.helpText == 1157 && Main.hardMode && NPC.downedGolemBoss && NPC.AnyNPCs(437) && !NPC.downedMoonlord) {
-                    Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1157");
-                    return;
-                }
-
-                if (Main.helpText == 1158 && Main.hardMode && NPC.LunarApocalypseIsUp && !NPC.downedMoonlord)
-                    break;
-
-                if (Main.helpText > 1200)
-                    Main.helpText = 0;
-            }
-
-            Main.npcChatText = Language.GetTextValue("GuideHelpTextSpecific.Help_1158");
+            var targetMethod = Main.instance.GetType().GetMethod("HelpText", BindingFlags.Static | BindingFlags.NonPublic);
+            targetMethod.Invoke(Main.instance, null);
         }
         public static string GetChatDialog(int l) => Language.GetTextValueWith($"LegacyDialog.{l}", Lang.CreateDialogSubstitutionObject());
     }

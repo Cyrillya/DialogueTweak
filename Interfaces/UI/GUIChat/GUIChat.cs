@@ -1,4 +1,7 @@
-﻿namespace DialogueTweak.Interfaces.UI.GUIChat
+﻿using ReLogic.Localization.IME;
+using ReLogic.OS;
+
+namespace DialogueTweak.Interfaces.UI.GUIChat
 {
     public class GUIChat
     {
@@ -56,8 +59,7 @@
             string[] textLines = _textDisplayCache.TextLines;
             int amountOfLines = _textDisplayCache.AmountOfLines;
 
-            // 用于标牌 | 竖线闪动机制
-            bool flag2 = false;
+            // 用于标牌 | 竖线闪动机制，和输入法
             if (Main.editSign) {
                 textBlinkerCount++;
                 if (textBlinkerCount >= 20) {
@@ -69,9 +71,7 @@
                     textBlinkerCount = 0;
                 }
 
-                if (textBlinkerState == 1)
-                    flag2 = true;
-
+                // 输入法面板，不过1.4tml好像不调用游戏内输入法面板了
                 Main.instance.DrawWindowsIMEPanel(new Vector2(ScreenWidth / 2, 90f), 0.5f);
             }
 
@@ -123,8 +123,6 @@
             for (int i = 0; i < amountOfLines; i++) {
                 string text = textLines[i];
                 if (text != null) {
-                    if (i == amountOfLines - 1 && flag2)
-                        text += "|";
                     string showText = "";
                     for (int j = 0; j < text.Length; j++) {
                         showText += text[j];
@@ -133,7 +131,22 @@
                             break;
                         }
                     }
-                    Utils.DrawBorderStringFourWay(spriteBatch, FontAssets.MouseText.Value, showText, 273 + (ScreenWidth - 800) / 2, 150 + i * 30, textColor, Color.Black, Vector2.Zero);
+                    var font = FontAssets.MouseText.Value;
+                    var basePos = new Vector2(273 + (ScreenWidth - 800) / 2, 150 + i * 30);
+                    // 输入法缓冲文本与光标闪动
+                    if (i == amountOfLines - 1 && Main.editSign) {
+                        var drawCursor = basePos + new Vector2(ChatManager.GetStringSize(font, showText, Vector2.One).X, 0);
+                        string compositionString = Platform.Get<IImeService>().CompositionString;
+                        if (compositionString != null && compositionString.Length > 0) {
+                            Vector2 position = drawCursor;
+                            ChatManager.DrawColorCodedStringShadow(spriteBatch, font, compositionString, position, Color.Black, 0f, Vector2.Zero, Vector2.One, spread: 1.2f);
+                            Utils.DrawBorderStringFourWay(spriteBatch, font, compositionString, position.X, position.Y, new Color(255, 240, 20), Color.Transparent, Vector2.Zero);
+                            drawCursor.X += font.MeasureString(compositionString).X; // the cursor drawing position should be changed.
+                        }
+                        if (textBlinkerState == 1)
+                            Utils.DrawBorderStringFourWay(spriteBatch, font, "|", drawCursor.X, drawCursor.Y, Color.White, Color.Black, Vector2.Zero);
+                    }
+                    ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, showText, basePos, textColor, 0, Vector2.Zero, Vector2.One);
                     if (shownCharCount >= _textDisplayCache.TextAppeared) {
                         break;
                     }
