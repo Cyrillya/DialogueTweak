@@ -21,5 +21,70 @@ namespace DialogueTweak
 {
     public class DialogueTweak : Mod
     {
+		internal static DialogueTweak instance;
+
+        public override void Load() {
+			instance = this;
+		}
+
+        public override void Unload() {
+			instance = null;
+        }
+
+        public override object Call(params object[] args) {
+			try {
+				if (args is null) {
+					throw new ArgumentNullException(nameof(args), "Arguments cannot be null!");
+				}
+
+				if (args.Length == 0) {
+					throw new ArgumentException("Arguments cannot be empty!");
+				}
+
+				if (args[0] is string msg) {
+					switch (msg) {
+						case "OverrideExtraButtonIcon":
+							if (args.Length <= 3) {
+								HandleAssets.IconInfos.Add(new IconInfo(
+									IconType.Extra, // This icon is for extra button.
+									Convert.ToInt32(args[1]), // NPC ID
+									args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+									));
+							}
+							else {
+								HandleAssets.IconInfos.Add(new IconInfo(
+									IconType.Extra, // This icon is for extra button.
+									Convert.ToInt32(args[1]), // NPC ID
+									args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+									args[3] as Func<bool> // Available
+									));
+							}
+							return true;
+						case "OverrideShopButtonIcon":
+							if (args.Length <= 3) {
+								HandleAssets.IconInfos.Add(new IconInfo(
+									IconType.Shop, // This icon is for shop button.
+									Convert.ToInt32(args[1]), // NPC ID
+									args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+									));
+							}
+							else {
+								HandleAssets.IconInfos.Add(new IconInfo(
+									IconType.Shop, // This icon is for shop button.
+									Convert.ToInt32(args[1]), // NPC ID
+									args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+									args[3] as Func<bool> // Available
+									));
+							}
+							return true;
+					}
+				}
+			}
+			catch (Exception e) {
+				Logger.Error($"{e.StackTrace} {e.Message}");
+			}
+
+			return false;
+        }
     }
 }

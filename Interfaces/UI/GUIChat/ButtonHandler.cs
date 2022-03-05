@@ -41,11 +41,14 @@
                 DrawHappinessButton(statY);
             }
             else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = false; // 考虑手柄
+
             ChatMethods.HandleShopTexture(Main.LocalPlayer.sign != -1 ? -1 : Main.LocalPlayer.talkNPC, ref Shop, ref Extra);
+
             if (!string.IsNullOrWhiteSpace(focusText)) {
                 DrawLongShopButton(statY, focusText, textColor, string.IsNullOrWhiteSpace(focusText2));
             }
             else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight2 = false; // 考虑手柄
+
             if (!string.IsNullOrWhiteSpace(focusText2)) {
                 DrawLongExtraButton(statY, focusText2, textColor);
             }
@@ -127,7 +130,7 @@
             }
             // 按钮
             SpriteBatch.Draw(asset.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            // 对应图像
+            // 对应图像（即icon）
             SpriteBatch.Draw(Shop.Value, pos + new Vector2(asset.Height(), asset.Height()) / 2f, null, Color.White * 0.9f, 0f, new Vector2(Shop.Width(), Shop.Height()) / 2f, 1f, SpriteEffects.None, 0f);
             Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, asset.Width(), asset.Height());
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
@@ -181,7 +184,7 @@
             Vector2 pos = new Vector2(ScreenWidth / 2 - TextureAssets.ChatBack.Width() / 2 + Button_Back.Width() * 2 + 34, statY + 10);
             // 按钮
             SpriteBatch.Draw(asset.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            // 对应图像
+            // 对应图像（即icon）
             SpriteBatch.Draw(Extra.Value, pos + new Vector2(asset.Height(), asset.Height()) / 2f, null, Color.White * 0.9f, 0f, new Vector2(Extra.Width(), Extra.Height()) / 2f, 1f, SpriteEffects.None, 0f);
             Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, asset.Width(), asset.Height());
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {

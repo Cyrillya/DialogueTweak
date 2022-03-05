@@ -1,14 +1,23 @@
-﻿namespace DialogueTweak
+﻿using System.Collections.Generic;
+
+namespace DialogueTweak
 {
     // 一个贴图库，使用贴图时可以直接从这里调用
-    public class HandleAssets : ModSystem
+    internal class HandleAssets : ModSystem
     {
-        public static Asset<Texture2D> DefaultIcon;
-        public static Asset<Texture2D> HelpIcon;
-        public static Asset<Texture2D> HammerIcon;
-        public static Asset<Texture2D> OldManIcon;
-        public static Asset<Texture2D> SignIcon;
-        public static Asset<Texture2D> EditIcon;
+
+        // 覆盖Icon的List，有一些默认值
+        internal static List<IconInfo> IconInfos = new List<IconInfo>() {
+            new IconInfo(IconType.Shop, NPCID.Guide, "DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Help"),
+            new IconInfo(IconType.Extra, NPCID.Guide, "DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Hammer"),
+            new IconInfo(IconType.Shop, NPCID.OldMan, "DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Old_Man"),
+            new IconInfo(IconType.Shop, NPCID.TaxCollector, "Head"),
+            new IconInfo(IconType.Shop, NPCID.Angler, "Head"),
+            new IconInfo(IconType.Shop, NPCID.Nurse, "Head"),
+        };
+        internal static Asset<Texture2D> DefaultIcon;
+        internal static Asset<Texture2D> SignIcon;
+        internal static Asset<Texture2D> EditIcon;
         public override void PostSetupContent() {
             base.PostSetupContent();
             if (Main.netMode != NetmodeID.Server) {
@@ -26,9 +35,6 @@
                 ButtonHandler.Extra = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Default");
 
                 DefaultIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Default");
-                HelpIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Help");
-                HammerIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Hammer");
-                OldManIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Old_Man");
                 SignIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Sign");
                 EditIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/UI/GUIChat/Buttons/Icon_Edit");
 

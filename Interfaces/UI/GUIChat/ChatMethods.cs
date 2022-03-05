@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Terraria.DataStructures;
 using Terraria.GameContent.Achievements;
@@ -9,7 +10,6 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
     // 这里基本上就是垃圾堆，都是原版代码（写死了，必须要自己新写一个自己执行的那种）
     public class ChatMethods
     {
-        static int myPlayer => Main.myPlayer;
 
         // 自己写的控制NPC语速（实际效果进游戏看
         public static float HandleSpeakingRate(int npcType) {
@@ -98,20 +98,23 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                 Extra = TextureAssets.NpcHead[head];
             }
 
-            // Special
-            switch (type) {
-                case NPCID.Guide:
-                    Shop = HandleAssets.HelpIcon;
-                    Extra = HandleAssets.HammerIcon;
-                    break;
-                case NPCID.OldMan:
-                    Shop = HandleAssets.OldManIcon;
-                    break;
-                case NPCID.TaxCollector:
-                case NPCID.Angler:
-                case NPCID.Nurse:
-                    Shop = TextureAssets.NpcHead[NPC.TypeToDefaultHeadIndex(type)];
-                    break;
+            foreach (var info in from a in HandleAssets.IconInfos where a.npcType == type && a.available() && a.texture != "" select a) {
+                if (info.iconType == IconType.Shop) {
+                    if (info.texture == "Head") {
+                        Shop = TextureAssets.NpcHead[head];
+                    }
+                    else {
+                        Shop = ModContent.Request<Texture2D>(info.texture);
+                    }
+                }
+                if (info.iconType == IconType.Extra) {
+                    if (info.texture == "Head") {
+                        Extra = TextureAssets.NpcHead[head];
+                    }
+                    else {
+                        Extra = ModContent.Request<Texture2D>(info.texture);
+                    }
+                }
             }
         }
 
