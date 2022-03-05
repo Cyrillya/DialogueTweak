@@ -26,7 +26,8 @@
 以下是一个为自己的NPC自定义Shop图标的完整的例子:
 ```CSharp
 public override void PostSetupContent() {
-    if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
+    Mod dialogueTweak = ModLoader.GetMod("DialogueTweak");
+    if (dialogueTweak != null) {
         dialogueTweakMod.Call(
             "ReplaceShopButtonIcon",
             ModContent.NPCType<NPCs.MyNPC>(), // NPC ID
@@ -38,7 +39,8 @@ public override void PostSetupContent() {
 以下代码可让向导的“帮助”按钮贴图显示为向导的头像
 ```CSharp
 public override void PostSetupContent() {
-    if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
+    Mod dialogueTweak = ModLoader.GetMod("DialogueTweak");
+    if (dialogueTweak != null) {
         dialogueTweakMod.Call(
             "ReplaceShopButtonIcon",
             NPCID.Guide, // NPC ID，这里是向导
