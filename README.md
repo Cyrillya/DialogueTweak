@@ -27,7 +27,8 @@ You can decide if your replacement is used. This is useful if your NPC has multi
 Here is a complete example of how to custom your shop icon in this mod:
 ```CSharp
 public override void PostSetupContent() {
-    if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
+    Mod dialogueTweak = ModLoader.GetMod("DialogueTweak");
+    if (dialogueTweak != null) {
         dialogueTweakMod.Call(
             "ReplaceShopButtonIcon",
             ModContent.NPCType<NPCs.MyNPC>(), // NPC ID
@@ -39,7 +40,8 @@ public override void PostSetupContent() {
 If you want to replace the guide's shop icon (aka "help" button icon) with the NPC's head, use this:
 ```CSharp
 public override void PostSetupContent() {
-    if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
+    Mod dialogueTweak = ModLoader.GetMod("DialogueTweak");
+    if (dialogueTweak != null) {
         dialogueTweakMod.Call(
             "ReplaceShopButtonIcon",
             NPCID.Guide, // NPC ID
