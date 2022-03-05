@@ -23,25 +23,25 @@ You can decide if your replacement is used. If you don't want to show your icon 
 
 ## Examples
 Here is a complete example of how to custom your shop icon in this mod:
-```
+```CSharp
 public override void PostSetupContent() {
-	if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
-    dialogueTweakMod.Call(
-      "ReplaceShopButtonIcon",
-      ModContent.NPCType<NPCs.MyNPC>(), // NPC ID
-      "TheMod/Assets/NPCShopIcon", // The texture's path
-      (Func<bool>)(() => Main.LocalPlayer.direction >= 0)); // Shown only when the player faces right.
-  }
+    if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
+        dialogueTweakMod.Call(
+            "ReplaceShopButtonIcon",
+            ModContent.NPCType<NPCs.MyNPC>(), // NPC ID
+            "TheMod/Assets/NPCShopIcon", // The texture's path
+            (Func<bool>)(() => Main.LocalPlayer.direction >= 0)); // Shown only when the player faces right.
+    }
 }
 ```
-If you want to replace shop icon with the NPC's head, use this:
-```
+If you want to replace the guide's shop icon with the NPC's head, use this:
+```CSharp
 public override void PostSetupContent() {
-	if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
-    dialogueTweakMod.Call(
-      "ReplaceShopButtonIcon",
-      ModContent.NPCType<NPCs.MyNPC>(), // NPC ID
-      "Head"); // Then the NPC's head texture will be shown
-  }
+    if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
+        dialogueTweakMod.Call(
+            "ReplaceShopButtonIcon",
+            NPCID.Guide, // NPC ID
+            "Head"); // Then the NPC's head texture will be shown
+    }
 }
 ```
