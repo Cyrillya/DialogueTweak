@@ -1,6 +1,8 @@
 # Dialogue Panel Rework, a mod that makes your NPC dialogue panel better.
 Dialogue Panel Rework, aka Dialogue Tweak, is a mod that completely reworks NPC dialogue panel and sign editing panel. Inspired by the mobile version.
 
+[Chinese version | 中文版看这里](README-zhCN.md)
+
 # Mod.Calls
 ### ReplaceExtraButtonIcon
 ```"ReplaceExtraButtonIcon", int NPCID, string texture, [Func<bool> replacementAvailable]```Replaces the extra button icon with your custom icon. Read below for specifics on the parameters.
@@ -19,7 +21,7 @@ Your NPC's ID number is needed. Use ```ModContent.NPCType<>()``` to submit your 
 You have to specify the texture that replaces icons. Use your texture's path or use **Head** if you want to replace icon with the NPC's head.
 
 ### 4.) Availability - ```Func<bool>```
-You can decide if your replacement is used. If you don't want to show your icon for whatever reason, make a Func of the conditions needed to make the replacement available. This is useful if your NPC has multiple functions that display different icons.
+You can decide if your replacement is used. This is useful if your NPC has multiple functions that display different icons.
 
 ## Examples
 Here is a complete example of how to custom your shop icon in this mod:
@@ -34,7 +36,7 @@ public override void PostSetupContent() {
     }
 }
 ```
-If you want to replace the guide's shop icon with the NPC's head, use this:
+If you want to replace the guide's shop icon (aka "help" button icon) with the NPC's head, use this:
 ```CSharp
 public override void PostSetupContent() {
     if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
