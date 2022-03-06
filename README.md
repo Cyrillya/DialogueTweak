@@ -69,7 +69,7 @@ public override void PostSetupContent() {
 
 ## Arguments
 ### 1.) Drawing Hook Type - ```string```
-The drawing hook type you want. Read above for a list of drawing hook types
+The drawing hook type you want. Read above for a list of drawing hook types.
 
 ### 2.) Drawing Action - ```Action<SpriteBatch, Color, Rectangle, int/NPC>```
 Your drawing action lands here.
