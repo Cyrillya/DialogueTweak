@@ -1,4 +1,4 @@
-﻿namespace DialogueTweak.Interfaces.UI.GUIChat
+﻿namespace DialogueTweak.Interfaces
 {
     internal class ButtonHandler
     {
@@ -178,6 +178,7 @@
                 UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight2 = false;
             }
         }
+
         private static void DrawLongExtraButton(float statY, string shopText, Color chatColor) {
             Asset<Texture2D> asset = ButtonLong;
             Asset<Texture2D> highlightAsset = ButtonLong_Highlight;

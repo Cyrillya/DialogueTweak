@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Terraria.DataStructures;
 using Terraria.GameContent.Achievements;
-using Terraria.ID;
 
-namespace DialogueTweak.Interfaces.UI.GUIChat
+namespace DialogueTweak.Interfaces
 {
     // 这里基本上就是垃圾堆，都是原版代码（写死了，必须要自己新写一个自己执行的那种）
     public class ChatMethods
@@ -77,10 +75,20 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
 
         // 自己写的控制Shop和Extra的贴图
         public static void HandleShopTexture(int i, ref Asset<Texture2D> Shop, ref Asset<Texture2D> Extra) {
-            if (i == -1) { // -1是标牌
+            // -1即标牌绘制
+            if (i == -1) {
                 Shop = HandleAssets.EditIcon;
+                foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(-1) && a.available() && a.texture != "" && a.texture != "Head" select a) {
+                    if (info.iconType == IconType.Shop) {
+                        Shop = ModContent.Request<Texture2D>(info.texture);
+                    }
+                    if (info.iconType == IconType.Extra) {
+                        Extra = ModContent.Request<Texture2D>(info.texture);
+                    }
+                }
                 return;
             }
+
             var npc = Main.npc[Main.LocalPlayer.talkNPC];
             int type = npc.type;
             // Shop
@@ -98,7 +106,7 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
                 Extra = TextureAssets.NpcHead[head];
             }
 
-            foreach (var info in from a in HandleAssets.IconInfos where a.npcType == type && a.available() && a.texture != "" select a) {
+            foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(type) && a.available() && a.texture != "" select a) {
                 if (info.iconType == IconType.Shop) {
                     if (info.texture == "Head") {
                         Shop = TextureAssets.NpcHead[head];

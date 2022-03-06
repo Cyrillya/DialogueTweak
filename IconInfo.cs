@@ -2,6 +2,7 @@
 {
     internal enum IconType
     {
+        Portrait,
         Shop,
         Extra
     }
@@ -9,18 +10,22 @@
     internal class IconInfo
     {
         internal IconType iconType;
-        internal int npcType;
+        internal List<int> npcTypes;
         internal string texture;
         internal Func<bool> available;
-        internal IconInfo(IconType iconType, int npcType, string texture, Func<bool> available = null) {
+        internal Func<Rectangle> frame;
+        internal IconInfo(IconType iconType, List<int> npcTypes, string texture, Func<bool> available = null, Func<Rectangle> frame = null) {
             this.iconType = iconType;
-            this.npcType = npcType;
+            this.npcTypes = npcTypes ?? new List<int> { NPCID.None };
             this.texture = texture ?? "";
-            if (!Main.dedServ && !ModContent.HasAsset(this.texture) && this.texture != "" && this.texture != "Head") {
+            if (!Main.dedServ && !ModContent.HasAsset(this.texture) && this.texture != "" &&
+                (((iconType == IconType.Shop || iconType == IconType.Extra) && this.texture != "Head") || // 是Shop, Extra图标，但不是Head而且是给NPC用的
+                 (iconType == IconType.Portrait && this.texture != "None"))) { // 是Portrait而且不是None
                 DialogueTweak.instance.Logger.Warn($"Texture path {this.texture} is missing.");
                 this.texture = "";
             }
             this.available = available ?? (() => true);
+            this.frame = frame;
         }
     }
 }

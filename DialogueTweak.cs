@@ -1,9 +1,11 @@
-global using DialogueTweak.Interfaces.UI.GUIChat;
+global using DialogueTweak.Interfaces;
 global using Microsoft.Xna.Framework;
 global using Microsoft.Xna.Framework.Graphics;
 global using ReLogic.Content;
 global using ReLogic.Graphics;
 global using System;
+global using System.Collections.Generic;
+global using System.Linq;
 global using Terraria;
 global using Terraria.Audio;
 global using Terraria.GameContent;
@@ -19,75 +21,24 @@ global using Terraria.UI.Gamepad;
 
 namespace DialogueTweak
 {
-    public class DialogueTweak : Mod
+    public partial class DialogueTweak : Mod
     {
 		internal static DialogueTweak instance;
+		internal static GUIChatDraw MobileChat = new();
 
-        public override void Load() {
+		public override void Load() {
 			instance = this;
+			On.Terraria.Main.GUIChatDrawInner += Main_GUIChatDrawInner;
 		}
 
-        public override void Unload() {
+		public override void Unload() {
 			instance = null;
         }
 
-        public override object Call(params object[] args) {
-			try {
-				if (args is null) {
-					throw new ArgumentNullException(nameof(args), "Arguments cannot be null!");
-				}
-
-				if (args.Length == 0) {
-					throw new ArgumentException("Arguments cannot be empty!");
-				}
-
-				if (args[0] is string msg) {
-					switch (msg) {
-						case "ReplaceExtraButtonIcon":
-							if (args.Length <= 3) {
-								HandleAssets.IconInfos.Add(new IconInfo(
-									IconType.Extra, // This icon is for extra button.
-									Convert.ToInt32(args[1]), // NPC ID
-									args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
-									));
-							}
-							else {
-								HandleAssets.IconInfos.Add(new IconInfo(
-									IconType.Extra, // This icon is for extra button.
-									Convert.ToInt32(args[1]), // NPC ID
-									args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
-									args[3] as Func<bool> // Available
-									));
-							}
-							return true;
-						case "ReplaceShopButtonIcon":
-							if (args.Length <= 3) {
-								HandleAssets.IconInfos.Add(new IconInfo(
-									IconType.Shop, // This icon is for shop button.
-									Convert.ToInt32(args[1]), // NPC ID
-									args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
-									));
-							}
-							else {
-								HandleAssets.IconInfos.Add(new IconInfo(
-									IconType.Shop, // This icon is for shop button.
-									Convert.ToInt32(args[1]), // NPC ID
-									args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
-									args[3] as Func<bool> // Available
-									));
-							}
-							return true;
-						default:
-							Logger.Error($"Replacement type \"{msg}\" not found.");
-							return false;
-					}
-				}
-			}
-			catch (Exception e) {
-				Logger.Error($"{e.StackTrace} {e.Message}");
-			}
-
-			return false;
-        }
-    }
+		// 通过调整screenWidth使一切绘制到屏幕之外，NPC对话机制不会被影响
+		private void Main_GUIChatDrawInner(On.Terraria.Main.orig_GUIChatDrawInner orig, Main self) {
+			// 确保是处于NPC对话状态（PC版中编辑告示牌什么的也是这个UI）
+			MobileChat.GUIDrawInner();
+		}
+	}
 }

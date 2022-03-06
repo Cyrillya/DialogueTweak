@@ -2,14 +2,16 @@ This mod completely reworked NPC dialogue panel and sign editing panel. Inspired
 Mods that also modified NPC dialogue panel might not work with this mod.
 If issues happend, please leave a comment on this mod's Steam Workshop page.
 
-Mods can custom the button icons displayed for their NPCs easily. Use Mod.Call in PostSetupContent.
-For more information, visit the mod's github page below and read the README.md
+Modders can custom the button icons displayed for their NPCs easily or access the drawing of the panel to draw their own things by using Mod.Call in PostSetupContent.
+For more information, visit the mod's github page below and read the README.md.
+You can also check out DialogueTweak.ModCall.cs for the relevant code.
 
 本Mod完全重制了NPC对话框UI，设计基于手机版UI但有所改善。
 同样修改了NPC对话框的Mod可能和此Mod不兼容。
 如果使用过程中遇到问题请在Steam创意工坊页面下留言。
 
-其他Mod可以用Mod.Call简单地为他们的NPC自定义按钮图标。
-参见本Mod的Github页面并阅读README-zhCN.md来获取更多信息
+Mod制作者可以在PostSetupContent调用Mod.Call简单地为他们的NPC自定义按钮图标，甚至可以访问面板绘制以绘制他们自己的东西。
+参见本Mod的Github页面并阅读README-zhCN.md来获取更多信息。
+您也可以查看DialogueTweak.ModCall.cs来获取相关代码。
 
 Github: https://github.com/Crapsky233/DialogueTweak
