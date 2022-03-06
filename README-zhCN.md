@@ -1,7 +1,7 @@
 # 更好的NPC对话面板
 这是一个完全重制了NPC对话框UI的Mod，UI设计基于手机版UI但有所改善.
 
-# 通过Mod.Call自定义图标
+# Mod.Call (替代项)
 以下是所有可选的覆盖类型.
 ### ReplaceExtraButtonIcon
 ```"ReplaceExtraButtonIcon", int NPCID, string texture, [Func<bool> replacementAvailable]```更改指定NPC的Extra图标，阅读下文了解有关参数的详细信息.
@@ -44,5 +44,50 @@ public override void PostSetupContent() {
             NPCID.Guide, // NPC ID，这里是向导
             "Head"); // 这样的话就会显示NPC的头像贴图
     }
+}
+```
+
+# Mod.Call (绘制项)
+### OnPostPortraitDraw
+```"OnPostPortraitDraw", Action<SpriteBatch, Color, Rectangle> drawingAction```在肖像绘制后绘制你想要的东西.
+
+### OnPreNPCPortraitDraw
+```"OnPreNPCPortraitDraw", Action<SpriteBatch, Color, Rectangle, NPC> drawingAction```在NPC肖像绘制前绘制你想要的东西.
+
+### OnPostNPCPortraitDraw
+```"OnPostNPCPortraitDraw", Action<SpriteBatch, Color, Rectangle, NPC> drawingAction```在NPC肖像绘制后绘制你想要的东西.
+
+### OnPreSignPortraitDraw
+```"OnPreNPCPortraitDraw", Action<SpriteBatch, Color, Rectangle, int> drawingAction```在标牌肖像绘制前绘制你想要的东西.
+
+### OnPostSignPortraitDraw
+```"OnPostNPCPortraitDraw", Action<SpriteBatch, Color, Rectangle, int> drawingAction```在标牌肖像绘制后绘制你想要的东西.
+
+## 参数
+### 1.) 绘制钩子类型 - ```string```
+输入你想要的绘制钩子的名称，以上是一个钩子类型的列表
+
+### 2.) 绘制Action - ```Action<SpriteBatch, Color, Rectangle, int/NPC>```
+你要传入你的绘制方法
+
+ **```SpriteBatch``` - 用于绘制的SpriteBatch实例**
+ 
+ **```Color``` - 该NPC/标牌在绘制名称时应使用的颜色**
+ 
+ **```Rectangle``` - 对话面板的Rectangle实例**
+ 
+ **```int``` - 标牌的索引， ```NPC``` - NPC实例**
+
+## 使用例
+以下是一个在面板左上角绘制一个颜色为DiscoColor的玩意的例子:
+```CSharp
+public override void PostSetupContent() {
+    if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
+        dialogueTweakMod.Call("OnPostPortraitDraw", DrawSomething);
+    }
+}
+private void DrawNPCPortrait(SpriteBatch sb, Color textColor, Rectangle panel) {
+    var tex = ModContent.Request<Texture2D>("TheMod/Assets/Something");
+    sb.Draw(tex.Value, panel.Location.ToVector2(), Main.DiscoColor);
 }
 ```
