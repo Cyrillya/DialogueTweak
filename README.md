@@ -5,13 +5,13 @@ Dialogue Panel Rework, aka Dialogue Tweak, is a mod that completely reworks NPC 
 
 # Mod.Calls (Replacements)
 ### ReplaceExtraButtonIcon
-```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```Replaces the extra button icon with your custom icon. Read below for specifics on the parameters.
+```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the extra button icon with your custom icon. Read below for specifics on the parameters.
 
 ### ReplaceShopButtonIcon
-```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```Replaces the shop button icon with your custom icon. Read below for specifics on the parameters.
+```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the shop button icon with your custom icon. Read below for specifics on the parameters.
 
 ### ReplacePortrait
-```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```Replaces the portrait with your custom texture. Read below for specifics on the parameters.
+```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the portrait with your custom texture. Read below for specifics on the parameters.
 
 ## Arguments
 ### 1.) Replacement Type - ```string```
@@ -25,6 +25,9 @@ You have to specify the texture that replaces icons. Use your texture's path. Us
 
 ### 4.) Availability - ```Func<bool>```
 You can decide if your replacement is used. This is useful if your NPC has multiple functions that display different icons.
+
+### 5.) Frame - ```Func<Rectangle>```
+You can customize the frame of the texture. It is useful to display different parts of the texture in different situations.
 
 ## Examples
 Here is a complete example of how to custom your shop icon in this mod:

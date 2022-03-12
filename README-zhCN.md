@@ -4,13 +4,13 @@
 # Mod.Call (替代项)
 以下是所有可选的覆盖类型.
 ### ReplaceExtraButtonIcon
-```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```更改指定NPC的Extra图标，阅读下文了解有关参数的详细信息.
+```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的Extra图标，阅读下文了解有关参数的详细信息.
 
 ### ReplaceShopButtonIcon
-```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```更改指定NPC的Shop图标，阅读下文了解有关参数的详细信息.
+```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的Shop图标，阅读下文了解有关参数的详细信息.
 
 ### ReplacePortrait
-```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```更改指定NPC的左上角肖像，阅读下文了解有关参数的详细信息.
+```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的左上角肖像，阅读下文了解有关参数的详细信息.
 
 ## 参数
 ### 1.) 覆盖类型 - ```string```
@@ -24,6 +24,9 @@
 
 ### 4.) 可见性 - ```Func<bool>```
 你可以决定是否使用该覆盖贴图. 这对于有多种功能并想要不同的图标贴图的NPC来说十分有用.
+
+### 5.) 帧 - ```Func<Rectangle>```
+你可以自定义覆盖贴图的绘制帧. 以在不同状况下显示一个贴图的不同部分.
 
 ## 使用例
 以下是一个为自己的NPC自定义Shop图标的完整的例子:

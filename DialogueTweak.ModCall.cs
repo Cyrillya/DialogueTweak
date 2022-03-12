@@ -29,7 +29,8 @@ namespace DialogueTweak
 										IconType.Extra, // This icon is for extra button.
 										AsListOfInt(args[1]), // NPC IDs
 										args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
-										args[3] as Func<bool> // Available
+										args[3] as Func<bool>, // Available
+										args[4] as Func<Rectangle> // Frame Rectangle
 										));
 								}
 								return true;
@@ -47,7 +48,8 @@ namespace DialogueTweak
 										IconType.Shop, // This icon is for shop button.
 										AsListOfInt(args[1]), // NPC IDs
 										args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
-										args[3] as Func<bool> // Available
+										args[3] as Func<bool>, // Available
+										args[4] as Func<Rectangle> // Frame Rectangle
 										));
 								}
 								return true;
@@ -65,7 +67,8 @@ namespace DialogueTweak
 										IconType.Portrait, // This icon is for portrait.
 										AsListOfInt(args[1]), // NPC IDs
 										args[2] as string, // Texture Path (With Mod Name) ("None" for not drawing portrait.)
-										args[3] as Func<bool> // Available
+										args[3] as Func<bool>, // Available
+										args[4] as Func<Rectangle> // Frame Rectangle
 										));
 								}
 								return true;
