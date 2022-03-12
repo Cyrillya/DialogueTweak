@@ -11,17 +11,17 @@ Dialogue Panel Rework, aka Dialogue Tweak, is a mod that completely reworks NPC 
 ```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```Replaces the shop button icon with your custom icon. Read below for specifics on the parameters.
 
 ### ReplacePortrait
-```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```Replaces the portrait with your custom icon. Read below for specifics on the parameters.
+```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```Replaces the portrait with your custom texture. Read below for specifics on the parameters.
 
 ## Arguments
 ### 1.) Replacement Type - ```string```
 The first argument should be the replacement type you want. For extra button icon use **ReplaceExtraButtonIcon**, for shop button icon use **ReplaceShopButtonIcon**, and for portrait use **ReplacePortrait**.
 
-### 2.) NPC ID - ```int/List<int>```
+### 2.) NPC IDs - ```int/List<int>```
 Your NPC's ID number is needed. Use ```ModContent.NPCType<>()``` to submit your ID. Use **-1** if you want to acess signs.
 
 ### 3.) Texture - ```string```
-You have to specify the texture that replaces icons. Use your texture's path or use **Head** if you want to replace icon with the NPC's head.
+You have to specify the texture that replaces icons. Use your texture's path. Use **Head** for button icons if you want to replace icon with the NPC's head. Use **None** for portrait if you don't want to show the default portrait of the NPC.
 
 ### 4.) Availability - ```Func<bool>```
 You can decide if your replacement is used. This is useful if your NPC has multiple functions that display different icons.
@@ -90,7 +90,7 @@ public override void PostSetupContent() {
         dialogueTweakMod.Call("OnPostPortraitDraw", DrawSomething);
     }
 }
-private void DrawNPCPortrait(SpriteBatch sb, Color textColor, Rectangle panel) {
+private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
     var tex = ModContent.Request<Texture2D>("TheMod/Assets/Something");
     sb.Draw(tex.Value, panel.Location.ToVector2(), Main.DiscoColor);
 }

@@ -4,20 +4,23 @@
 # Mod.Call (替代项)
 以下是所有可选的覆盖类型.
 ### ReplaceExtraButtonIcon
-```"ReplaceExtraButtonIcon", int NPCID, string texture, [Func<bool> replacementAvailable]```更改指定NPC的Extra图标，阅读下文了解有关参数的详细信息.
+```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```更改指定NPC的Extra图标，阅读下文了解有关参数的详细信息.
 
 ### ReplaceShopButtonIcon
-```"ReplaceShopButtonIcon", int NPCID, string texture, [Func<bool> replacementAvailable]```更改指定NPC的Shop图标，阅读下文了解有关参数的详细信息.
+```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```更改指定NPC的Shop图标，阅读下文了解有关参数的详细信息.
+
+### ReplacePortrait
+```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable]```更改指定NPC的左上角肖像，阅读下文了解有关参数的详细信息.
 
 ## 参数
 ### 1.) 覆盖类型 - ```string```
 第一个参数应为你想要的覆盖类型. 覆盖Extra图标请使用**ReplaceExtraButtonIcon**，覆盖Shop图标请使用**ReplaceShopButtonIcon**.
 
-### 2.) NPC ID - ```int```
-你需要表明你想要覆盖的NPC对象的ID，使用```ModContent.NPCType<>()```来获取你的Mod中相应NPC的ID.
+### 2.) NPC ID - ```int/List<int>```
+你需要表明你想要覆盖的NPC对象的ID，使用```ModContent.NPCType<>()```来获取你的Mod中相应NPC的ID. 如果要覆盖标牌请使用**-1**
 
 ### 3.) 贴图 - ```string```
-你需要表明用于替代图标的贴图. 请输入贴图路径. 如果你想要使用NPC的头像贴图请直接输入**Head**
+你需要表明用于替代图标/肖像的贴图. 请输入贴图路径. 如果你想要使用NPC的头像贴图替换按钮图标请直接输入**Head**. 如果你想要禁止原肖像绘制请输入**None**.
 
 ### 4.) 可见性 - ```Func<bool>```
 你可以决定是否使用该覆盖贴图. 这对于有多种功能并想要不同的图标贴图的NPC来说十分有用.
@@ -79,14 +82,14 @@ public override void PostSetupContent() {
  **```int``` - 标牌的索引， ```NPC``` - NPC实例**
 
 ## 使用例
-以下是一个在面板左上角绘制一个颜色为DiscoColor的玩意的例子:
+以下是一个在面板左上角绘制一个颜色为DiscoColor的某玩意的例子:
 ```CSharp
 public override void PostSetupContent() {
     if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
         dialogueTweakMod.Call("OnPostPortraitDraw", DrawSomething);
     }
 }
-private void DrawNPCPortrait(SpriteBatch sb, Color textColor, Rectangle panel) {
+private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
     var tex = ModContent.Request<Texture2D>("TheMod/Assets/Something");
     sb.Draw(tex.Value, panel.Location.ToVector2(), Main.DiscoColor);
 }
