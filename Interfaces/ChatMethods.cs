@@ -226,8 +226,7 @@ namespace DialogueTweak.Interfaces
         }
 
         // NPC对话选项显示字样
-        public static void HandleFocusText(ref string focusText, ref string focusText2, ref Color textColor, ref int money) {
-            textColor = new Color(Main.mouseTextColor, (int)((double)Main.mouseTextColor / 1.1), Main.mouseTextColor / 2, Main.mouseTextColor);
+        public static void HandleFocusText(ref string focusText, ref string focusText2, ref int money) {
             // 标牌直接特判就行了
             if (Main.LocalPlayer.sign > -1) {
                 focusText = (!Main.editSign) ? Lang.inter[48].Value : Lang.inter[47].Value;

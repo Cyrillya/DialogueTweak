@@ -34,14 +34,14 @@ namespace DialogueTweak.Interfaces
                 }
             }
         }
-        private TextDisplayCache _textDisplayCache = new TextDisplayCache();
-        public int textBlinkerCount { get => Main.instance.textBlinkerCount; set => Main.instance.textBlinkerCount = value; }
-        public int textBlinkerState { get => Main.instance.textBlinkerState; set => Main.instance.textBlinkerState = value; }
+        private static TextDisplayCache _textDisplayCache = new TextDisplayCache();
+        public static ref int textBlinkerState => ref Main.instance.textBlinkerState;
+        public static ref int textBlinkerCount => ref Main.instance.textBlinkerCount;
 
         public static Asset<Texture2D> GreyPixel;
         public static Asset<Texture2D> PortraitPanel;
         public static Asset<Texture2D> ChatStringBack;
-        public void GUIDrawInner() {
+        public static void GUIDrawInner() {
             if (Main.LocalPlayer.talkNPC < 0 && Main.LocalPlayer.sign == -1) {
                 Main.npcChatText = "";
                 return;
@@ -88,8 +88,7 @@ namespace DialogueTweak.Interfaces
             string focusText = "";
             string focusText2 = "";
             int money = 0;
-            Color c = default;
-            ChatMethods.HandleFocusText(ref focusText, ref focusText2, ref c, ref money);
+            ChatMethods.HandleFocusText(ref focusText, ref focusText2, ref money);
             if (money != 0) {
                 amountOfLines++;
             }
@@ -186,7 +185,7 @@ namespace DialogueTweak.Interfaces
             }
 
             // 交互按钮
-            if (!flag) ButtonHandler.DrawButtons(linePositioning * 30 + 70);
+            if (!flag) ButtonHandler.DrawButtons(linePositioning * 30 + 70, focusText, focusText2, money);
 
             // 判断鼠标是否处于交互界面
             if (rectangle.Contains(new Point(Main.mouseX, Main.mouseY))) {

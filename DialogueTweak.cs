@@ -24,7 +24,7 @@ namespace DialogueTweak
     public partial class DialogueTweak : Mod
     {
 		internal static DialogueTweak instance;
-		internal static GUIChatDraw MobileChat = new();
+		internal static GUIChatDraw MobileChat;
 
 		public override void Load() {
 			instance = this;
@@ -38,7 +38,7 @@ namespace DialogueTweak
 		// 通过调整screenWidth使一切绘制到屏幕之外，NPC对话机制不会被影响
 		private void Main_GUIChatDrawInner(On.Terraria.Main.orig_GUIChatDrawInner orig, Main self) {
 			// 确保是处于NPC对话状态（PC版中编辑告示牌什么的也是这个UI）
-			MobileChat.GUIDrawInner();
+			GUIChatDraw.GUIDrawInner();
 		}
 	}
 }

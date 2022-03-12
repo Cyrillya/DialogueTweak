@@ -25,13 +25,8 @@
         private static bool moveOnShopButton;
         private static bool moveOnExtraButton;
 
-        public static void DrawButtons(float statY) {
-            string focusText = "";
-            string focusText2 = "";
-            int money = 0;
-            int num = (Main.mouseTextColor * 2 + 255) / 3;
-            Color textColor = new Color(num, num, num, num);
-            ChatMethods.HandleFocusText(ref focusText, ref focusText2, ref textColor, ref money);
+        public static void DrawButtons(float statY, string focusText, string focusText2, int money) {
+            Color textColor = new Color(Main.mouseTextColor, (int)((double)Main.mouseTextColor / 1.1), Main.mouseTextColor / 2, Main.mouseTextColor);
             NPCLoader.SetChatButtons(ref focusText, ref focusText2);
 
             bool showHappinessReport = Main.LocalPlayer.sign == -1 && Main.LocalPlayer.currentShoppingSettings.HappinessReport != "" && Main.npc[Main.LocalPlayer.talkNPC].townNPC;
