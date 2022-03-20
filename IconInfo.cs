@@ -3,6 +3,8 @@
     internal enum IconType
     {
         Portrait,
+        Happiness,
+        Back,
         Shop,
         Extra
     }
@@ -20,7 +22,8 @@
             this.texture = texture ?? "";
             if (!Main.dedServ && !ModContent.HasAsset(this.texture) && this.texture != "" &&
                 (((iconType == IconType.Shop || iconType == IconType.Extra) && this.texture != "Head") || // 是Shop, Extra图标，但不是Head而且是给NPC用的
-                 (iconType == IconType.Portrait && this.texture != "None"))) { // 是Portrait而且不是None
+                 (iconType == IconType.Portrait && this.texture != "None") || // 是Portrait而且不是None
+                 (iconType == IconType.Happiness || iconType == IconType.Back))) { // 是Happiness, Back
                 DialogueTweak.instance.Logger.Warn($"Texture path {this.texture} is missing.");
                 this.texture = "";
             }

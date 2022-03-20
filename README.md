@@ -10,12 +10,18 @@ Dialogue Panel Rework, aka Dialogue Tweak, is a mod that completely reworks NPC 
 ### ReplaceShopButtonIcon
 ```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the shop button icon with your custom icon. Read below for specifics on the parameters.
 
+### ReplaceHappinessButtonIcon
+```"ReplaceHappinessButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the happiness button icon with your custom icon. Read below for specifics on the parameters.
+
+### ReplaceBackButtonIcon
+```"ReplaceBackButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the back button icon with your custom icon. Read below for specifics on the parameters.
+
 ### ReplacePortrait
 ```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the portrait with your custom texture. Read below for specifics on the parameters.
 
 ## Arguments
 ### 1.) Replacement Type - ```string```
-The first argument should be the replacement type you want. For extra button icon use **ReplaceExtraButtonIcon**, for shop button icon use **ReplaceShopButtonIcon**, and for portrait use **ReplacePortrait**.
+The first argument should be the replacement type you want. The type table is listed above.
 
 ### 2.) NPC IDs - ```int/List<int>```
 Your NPC's ID number is needed. Use ```ModContent.NPCType<>()``` to submit your ID. Use **-1** if you want to acess signs.

@@ -54,6 +54,44 @@ namespace DialogueTweak
 								}
 								return true;
 							}
+						case "ReplaceHappinessButtonIcon": {
+								if (args.Length <= 3) {
+									HandleAssets.IconInfos.Add(new IconInfo(
+										IconType.Happiness, // This icon is for happiness button.
+										AsListOfInt(args[1]), // NPC IDs
+										args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										));
+								}
+								else {
+									HandleAssets.IconInfos.Add(new IconInfo(
+										IconType.Happiness, // This icon is for happiness button.
+										AsListOfInt(args[1]), // NPC IDs
+										args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										args[3] as Func<bool>, // Available
+										args[4] as Func<Rectangle> // Frame Rectangle
+										));
+								}
+								return true;
+							}
+						case "ReplaceBackButtonIcon": {
+								if (args.Length <= 3) {
+									HandleAssets.IconInfos.Add(new IconInfo(
+										IconType.Back, // This icon is for back button.
+										AsListOfInt(args[1]), // NPC IDs
+										args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										));
+								}
+								else {
+									HandleAssets.IconInfos.Add(new IconInfo(
+										IconType.Back, // This icon is for back button.
+										AsListOfInt(args[1]), // NPC IDs
+										args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										args[3] as Func<bool>, // Available
+										args[4] as Func<Rectangle> // Frame Rectangle
+										));
+								}
+								return true;
+							}
 						case "ReplacePortrait": {
 								if (args.Length <= 3) {
 									HandleAssets.IconInfos.Add(new IconInfo(

@@ -9,18 +9,24 @@
 ### ReplaceShopButtonIcon
 ```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的Shop图标，阅读下文了解有关参数的详细信息.
 
+### ReplaceHappinessButtonIcon
+```"ReplaceHappinessButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的快乐值按钮图标，阅读下文了解有关参数的详细信息.
+
+### ReplaceBackButtonIcon
+```"ReplaceBackButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的退出按钮图标，阅读下文了解有关参数的详细信息.
+
 ### ReplacePortrait
 ```"ReplacePortrait", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的左上角肖像，阅读下文了解有关参数的详细信息.
 
 ## 参数
 ### 1.) 覆盖类型 - ```string```
-第一个参数应为你想要的覆盖类型. 覆盖Extra图标请使用**ReplaceExtraButtonIcon**，覆盖Shop图标请使用**ReplaceShopButtonIcon**.
+第一个参数应为你想要的覆盖类型. 类型表已在上方列出.
 
 ### 2.) NPC ID - ```int/List<int>```
 你需要表明你想要覆盖的NPC对象的ID，使用```ModContent.NPCType<>()```来获取你的Mod中相应NPC的ID. 如果要覆盖标牌请使用**-1**
 
 ### 3.) 贴图 - ```string```
-你需要表明用于替代图标/肖像的贴图. 请输入贴图路径. 如果你想要使用NPC的头像贴图替换按钮图标请直接输入**Head**. 如果你想要禁止原肖像绘制请输入**None**.
+你需要表明用于替代图标/肖像的贴图. 请输入贴图路径. 如果你想要使用NPC的头像贴图替换Shop和Extra按钮图标请直接输入**Head**. 对于覆盖肖像，如果你想要禁止原肖像绘制请输入**None**.
 
 ### 4.) 可见性 - ```Func<bool>```
 你可以决定是否使用该覆盖贴图. 这对于有多种功能并想要不同的图标贴图的NPC来说十分有用.

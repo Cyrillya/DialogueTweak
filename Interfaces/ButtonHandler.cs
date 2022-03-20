@@ -52,9 +52,16 @@
 
         private static void DrawBackButton(float statY, bool longer) {
             Rectangle buttonRectangle = new Rectangle((int)GUIChatDraw.PanelPosition.X + 16, (int)statY + 10, longer ? 98 : 44, 44);
+            Rectangle? frame = null;
+            var value = Button_Back.Value;
+            // ModCall
+            foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(Main.npc[Main.LocalPlayer.talkNPC].type) && a.available() && a.texture != "" && a.iconType == IconType.Back select a) {
+                value = ModContent.Request<Texture2D>(info.texture).Value;
+                frame = info.frame();
+            }
 
             DrawPanel(SpriteBatch, ButtonPanel.Value, buttonRectangle.Location.ToVector2(), buttonRectangle.Size(), Color.White);
-            SpriteBatch.Draw(Button_Back.Value, buttonRectangle.Location.ToVector2() + buttonRectangle.Size() / 2f, null, Color.White * 0.9f, 0f, Button_Back.Size() / 2f, 1f, SpriteEffects.None, 0f);
+            SpriteBatch.Draw(value, buttonRectangle.Location.ToVector2() + buttonRectangle.Size() / 2f, frame, Color.White * 0.9f, 0f, Button_Back.Size() / 2f, 1f, SpriteEffects.None, 0f);
 
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 if (!moveOnBackButton) {
@@ -80,8 +87,16 @@
 
         private static void DrawHappinessButton(float statY) {
             Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 68, statY + 10);
+            Rectangle? frame = null;
+            var value = Button_Happiness.Value;
+            // ModCall
+            foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(Main.npc[Main.LocalPlayer.talkNPC].type) && a.available() && a.texture != "" && a.iconType == IconType.Happiness select a) {
+                value = ModContent.Request<Texture2D>(info.texture).Value;
+                frame = info.frame();
+            }
+
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(44, 44), Color.White);
-            SpriteBatch.Draw(Button_Happiness.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            SpriteBatch.Draw(value, pos, frame, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
             Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, Button_Happiness.Width(), Button_Happiness.Height());
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
