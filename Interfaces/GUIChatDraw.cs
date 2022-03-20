@@ -28,7 +28,7 @@ namespace DialogueTweak.Interfaces
                     _lastScreenWidth = Main.screenWidth;
                     _lastScreenHeight = Main.screenHeight;
                     _originalText = text;
-                    TextLines = ChatMethods.WordwrapString(Main.npcChatText, FontAssets.MouseText.Value, 365, out int lineAmount);
+                    TextLines = ChatMethods.WordwrapString(Main.npcChatText, FontAssets.MouseText.Value, 362, out int lineAmount);
                     AmountOfLines = lineAmount;
                     TextAppeared = 0;
                 }
@@ -40,7 +40,10 @@ namespace DialogueTweak.Interfaces
 
         public static Asset<Texture2D> GreyPixel;
         public static Asset<Texture2D> PortraitPanel;
-        public static Asset<Texture2D> ChatStringBack;
+        public static Asset<Texture2D> ChatTextPanel;
+        public static readonly Color ChatTextColor = new Color(35, 43, 89);
+        public static Vector2 PanelPosition => new Vector2(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100f);
+
         public static void GUIDrawInner() {
             if (Main.LocalPlayer.talkNPC < 0 && Main.LocalPlayer.sign == -1) {
                 Main.npcChatText = "";
@@ -99,24 +102,22 @@ namespace DialogueTweak.Interfaces
                 linePositioning -= 1.85f;
             }
             // 没事别乱改参数了呜呜呜，这里是背景板。中间加一段防止文字太长了的延续特判，当然再长我就不管了，直接用最大行数限制吧
-            Main.spriteBatch.Draw(TextureAssets.ChatBack.Value, new Vector2(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100f), new Rectangle(0, 0, TextureAssets.ChatBack.Width(), (int)(linePositioning >= 15 ? 450 : 2 + linePositioning * 30)), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
-            if (linePositioning >= 15) Main.spriteBatch.Draw(TextureAssets.ChatBack.Value, new Vector2(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 550f), new Rectangle(0, 30, TextureAssets.ChatBack.Width(), (int)(2 + (linePositioning - 15) * 30)), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
-            Main.spriteBatch.Draw(TextureAssets.ChatBack.Value, new Vector2(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 102 + linePositioning * 30), new Rectangle(0, TextureAssets.ChatBack.Height() - 30, TextureAssets.ChatBack.Width(), 30), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(TextureAssets.ChatBack.Value, PanelPosition, new Rectangle(0, 0, TextureAssets.ChatBack.Width(), (int)(linePositioning >= 15 ? 450 : 2 + linePositioning * 30)), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
+            if (linePositioning >= 15) Main.spriteBatch.Draw(TextureAssets.ChatBack.Value, PanelPosition + new Vector2(0, 450f), new Rectangle(0, 30, TextureAssets.ChatBack.Width(), (int)(2 + (linePositioning - 15) * 30)), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(TextureAssets.ChatBack.Value, PanelPosition + new Vector2(0, 2 + linePositioning * 30), new Rectangle(0, TextureAssets.ChatBack.Height() - 30, TextureAssets.ChatBack.Width(), 30), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
             // 碰撞箱
-            var rectangle = new Rectangle(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100, TextureAssets.ChatBack.Width(), (int)(2 + linePositioning * 30 + 30));
+            var rectangle = new Rectangle((int)PanelPosition.X, (int)PanelPosition.Y, TextureAssets.ChatBack.Width(), (int)(2 + linePositioning * 30 + 30));
 
-            // 文字，还有一个方框深黑底
-            if (amountOfLines > 1) {
-                Main.spriteBatch.Draw(ChatStringBack.Value, new Vector2(268 + (Main.screenWidth - 800) / 2, 145f), new Rectangle(0, 0, ChatStringBack.Width(), (amountOfLines - 1) * 30), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
-                Main.spriteBatch.Draw(ChatStringBack.Value, new Vector2(268 + (Main.screenWidth - 800) / 2, 145f + (amountOfLines - 1) * 30), new Rectangle(0, ChatStringBack.Height() - 30, ChatStringBack.Width(), 30), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
-            }
-            // 只有一行，为了避免黑底显示错误，做一下特判
-            else {
-                Main.spriteBatch.Draw(ChatStringBack.Value, new Vector2(268 + (Main.screenWidth - 800) / 2, 145f), new Rectangle(0, 0, ChatStringBack.Width(), 15), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
-                Main.spriteBatch.Draw(ChatStringBack.Value, new Vector2(268 + (Main.screenWidth - 800) / 2, 145f + 15), new Rectangle(0, ChatStringBack.Height() - 15, ChatStringBack.Width(), 15), panelColor, 0f, default(Vector2), 1f, SpriteEffects.None, 0f);
-            }
-            int shownCharCount = 0;
+            // 文字框
+            var textPanelPosition = PanelPosition + new Vector2(120, 45f);
+            var textPanelSize = new Vector2(370f, amountOfLines * 30);
+            ButtonHandler.DrawPanel(Main.spriteBatch, ChatTextPanel.Value,
+                textPanelPosition, // position
+                textPanelSize, // size
+                ChatTextColor, cornerSize: 12, barSize: 4);
+
             // 对话文本
+            int shownCharCount = 0;
             for (int i = 0; i < amountOfLines; i++) {
                 string text = textLines[i];
                 if (text != null) {
@@ -129,7 +130,7 @@ namespace DialogueTweak.Interfaces
                         }
                     }
                     var font = FontAssets.MouseText.Value;
-                    var basePos = new Vector2(273 + (Main.screenWidth - 800) / 2, 150 + i * 30);
+                    var basePos = textPanelPosition + new Vector2(5, 5 + i * 30);
                     // 输入法缓冲文本与光标闪动
                     if (i == amountOfLines - 1 && Main.editSign) {
                         var drawCursor = basePos + new Vector2(ChatManager.GetStringSize(font, showText, Vector2.One).X, 0);
@@ -155,8 +156,8 @@ namespace DialogueTweak.Interfaces
 
             // 任务物品展示
             if (Main.npcChatCornerItem != 0) {
-                Vector2 position = new Vector2(Main.screenWidth / 2 + TextureAssets.ChatBack.Width() / 2 - 8, 30 + (amountOfLines + 3) * 30 + 30);
-                position -= Vector2.One * 8f;
+                Vector2 position = textPanelPosition + textPanelSize;
+                position -= Vector2.One * 4f;
                 Item Item = new Item();
                 Item.netDefaults(Main.npcChatCornerItem);
                 float num3 = 1f;
@@ -174,18 +175,18 @@ namespace DialogueTweak.Interfaces
             }
 
             // 人像背景框，以及名字和文本的分割线
-            Main.spriteBatch.Draw(PortraitPanel.Value, new Vector2(Main.screenWidth / 2 - PortraitPanel.Width() / 2, 115f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(PortraitPanel.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             // 肖像
             PortraitDrawer.DrawPortrait(Main.spriteBatch, textColor, rectangle);
 
             // 在交互按钮和对话之间一条浅黑线，如果在手柄状态下编辑文本的话没有交互按钮，且UI底部也会缩回去，就不Draw了
             if (!Main.editSign || UIVirtualKeyboard.ShouldHideText) {
                 byte breakPixel = 2; // 左右都有[breakPixel]个像素的空隙
-                Main.spriteBatch.Draw(GreyPixel.Value, new Vector2(breakPixel * 2 + Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, linePositioning * 30 + 70), null, Color.White * 0.9f, 0f, Vector2.Zero, new Vector2(TextureAssets.ChatBack.Width() - breakPixel * 4, 3f), SpriteEffects.None, 0f);
+                Main.spriteBatch.Draw(GreyPixel.Value, PanelPosition + new Vector2(breakPixel * 2, linePositioning * 30 - 30), null, Color.White * 0.9f, 0f, Vector2.Zero, new Vector2(TextureAssets.ChatBack.Width() - breakPixel * 4, 3f), SpriteEffects.None, 0f);
             }
 
             // 交互按钮
-            if (!flag) ButtonHandler.DrawButtons(linePositioning * 30 + 70, focusText, focusText2, money);
+            if (!flag) ButtonHandler.DrawButtons(linePositioning * 30 - 30 + PanelPosition.Y, focusText, focusText2, money);
 
             // 判断鼠标是否处于交互界面
             if (rectangle.Contains(new Point(Main.mouseX, Main.mouseY))) {

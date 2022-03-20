@@ -17,15 +17,10 @@
         public override void PostSetupContent() {
             base.PostSetupContent();
             if (Main.netMode != NetmodeID.Server) {
+                ButtonHandler.ButtonPanel = Main.Assets.Request<Texture2D>("Images/UI/CharCreation/CategoryPanel");
+                ButtonHandler.ButtonPanel_Highlight = Main.Assets.Request<Texture2D>("Images/UI/CharCreation/CategoryPanelBorder");
                 ButtonHandler.Button_Back = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Button_Back");
-                ButtonHandler.Button_BackLong = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Button_BackLong");
                 ButtonHandler.Button_Happiness = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Button_Happiness");
-                ButtonHandler.Button_Highlight = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Button_Highlight");
-
-                ButtonHandler.ButtonLong = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/ButtonLong");
-                ButtonHandler.ButtonLong_Highlight = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/ButtonLong_Highlight");
-                ButtonHandler.ButtonLonger = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/ButtonLonger");
-                ButtonHandler.ButtonLonger_Highlight = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/ButtonLonger_Highlight");
 
                 ButtonHandler.Shop = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Icon_Default");
                 ButtonHandler.Extra = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Icon_Default");
@@ -36,7 +31,7 @@
 
                 GUIChatDraw.GreyPixel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/GreyPixel");
                 GUIChatDraw.PortraitPanel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/PortraitPanel");
-                GUIChatDraw.ChatStringBack = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/ChatStringBack");
+                GUIChatDraw.ChatTextPanel = Main.Assets.Request<Texture2D>("Images/UI/PanelBackground");
             }
         }
     }

@@ -7,18 +7,18 @@
         private static int MouseY => Main.mouseY;
         private static int ScreenWidth => Main.screenWidth;
 
+        public static Asset<Texture2D> ButtonPanel;
+        public static Asset<Texture2D> ButtonPanel_Highlight;
         public static Asset<Texture2D> Button_Back;
-        public static Asset<Texture2D> Button_BackLong;
         public static Asset<Texture2D> Button_Happiness;
-        public static Asset<Texture2D> Button_Highlight;
-
-        public static Asset<Texture2D> ButtonLong;
-        public static Asset<Texture2D> ButtonLong_Highlight;
-        public static Asset<Texture2D> ButtonLonger;
-        public static Asset<Texture2D> ButtonLonger_Highlight;
 
         public static Asset<Texture2D> Shop;
         public static Asset<Texture2D> Extra;
+
+        public static readonly Color BorderColor = Color.Black;
+        public static readonly Color BackgroundColor = new Color(73, 85, 186);
+        public static readonly Color HighlightColor = new Color(255, 231, 69);
+        public static readonly Color HighlightCornerColor = new Color(233, 176, 0);
 
         private static bool moveOnBackButton;
         private static bool moveOnHappinessButton;
@@ -51,26 +51,17 @@
         }
 
         private static void DrawBackButton(float statY, bool longer) {
-            Vector2 pos = new Vector2(ScreenWidth / 2 - TextureAssets.ChatBack.Width() / 2 + 16, statY + 10);
-            Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, Button_Back.Width(), Button_Back.Height());
-            if (longer) {
-                buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, Button_BackLong.Width(), Button_BackLong.Height() / 2);
-                SpriteBatch.Draw(Button_BackLong.Value, pos, new Rectangle(0, 0, Button_BackLong.Width(), Button_BackLong.Height() / 2), Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            }
-            else {
-                SpriteBatch.Draw(Button_Back.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            }
+            Rectangle buttonRectangle = new Rectangle((int)GUIChatDraw.PanelPosition.X + 16, (int)statY + 10, longer ? 98 : 44, 44);
+
+            DrawPanel(SpriteBatch, ButtonPanel.Value, buttonRectangle.Location.ToVector2(), buttonRectangle.Size(), Color.White);
+            SpriteBatch.Draw(Button_Back.Value, buttonRectangle.Location.ToVector2() + buttonRectangle.Size() / 2f, null, Color.White * 0.9f, 0f, Button_Back.Size() / 2f, 1f, SpriteEffects.None, 0f);
+
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 if (!moveOnBackButton) {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     moveOnBackButton = true;
                 }
-                if (longer) {
-                    SpriteBatch.Draw(Button_BackLong.Value, pos, new Rectangle(0, 44, Button_BackLong.Width(), Button_BackLong.Height() / 2), Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                }
-                else {
-                    SpriteBatch.Draw(Button_Highlight.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                }
+                DrawPanel(SpriteBatch, ButtonPanel_Highlight.Value, buttonRectangle.Location.ToVector2(), buttonRectangle.Size(), Color.White);
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Main.mouseLeft && Main.mouseLeftRelease) {
@@ -83,20 +74,22 @@
                 SoundEngine.PlaySound(SoundID.MenuTick);
             }
             // 手柄支持，这个是最左边
-            UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat0, pos + buttonRectangle.Size() / 2f);
+            UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat0, buttonRectangle.Location.ToVector2() + buttonRectangle.Size() / 2f);
             UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsLeft = true;
         }
 
         private static void DrawHappinessButton(float statY) {
-            Vector2 pos = new Vector2(ScreenWidth / 2 - TextureAssets.ChatBack.Width() / 2 + Button_Back.Width() + 24, statY + 10);
+            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 68, statY + 10);
+            DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(44, 44), Color.White);
             SpriteBatch.Draw(Button_Happiness.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
             Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, Button_Happiness.Width(), Button_Happiness.Height());
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 if (!moveOnHappinessButton) {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     moveOnHappinessButton = true;
                 }
-                SpriteBatch.Draw(Button_Highlight.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                DrawPanel(SpriteBatch, ButtonPanel_Highlight.Value, pos, new Vector2(44, 44), Color.White);
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Main.mouseLeft && Main.mouseLeftRelease) {
@@ -115,25 +108,20 @@
         }
 
         private static void DrawLongShopButton(float statY, string shopText, Color chatColor, bool useLonger) {
-            Asset<Texture2D> asset = ButtonLong;
-            Asset<Texture2D> highlightAsset = ButtonLong_Highlight;
-            Vector2 pos = new Vector2(ScreenWidth / 2 - TextureAssets.ChatBack.Width() / 2 + Button_Back.Width() * 2 + asset.Width() + 48, statY + 10);
-            if (useLonger) {
-                asset = ButtonLonger;
-                highlightAsset = ButtonLonger_Highlight;
-                pos = new Vector2(ScreenWidth / 2 - TextureAssets.ChatBack.Width() / 2 + Button_Back.Width() * 2 + 34, statY + 10);
-            }
+            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + (useLonger ? 122 : 311), statY + 10);
+            int width = useLonger ? 365 : 175;
+            int height = 44;
             // 按钮
-            SpriteBatch.Draw(asset.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
             // 对应图像（即icon）
-            SpriteBatch.Draw(Shop.Value, pos + new Vector2(asset.Height(), asset.Height()) / 2f, null, Color.White * 0.9f, 0f, new Vector2(Shop.Width(), Shop.Height()) / 2f, 1f, SpriteEffects.None, 0f);
-            Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, asset.Width(), asset.Height());
+            SpriteBatch.Draw(Shop.Value, pos + new Vector2(44, height) / 2f, null, Color.White * 0.9f, 0f, new Vector2(Shop.Width(), Shop.Height()) / 2f, 1f, SpriteEffects.None, 0f);
+            Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, width, height);
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 if (!moveOnShopButton) {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     moveOnShopButton = true;
                 }
-                SpriteBatch.Draw(highlightAsset.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                DrawPanel(SpriteBatch, ButtonPanel_Highlight.Value, pos, new Vector2(width, height), Color.White);
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Main.mouseLeft && Main.mouseLeftRelease) {
@@ -159,7 +147,7 @@
             Vector2 buttonOrigin = new Vector2(buttonRectangle.Width, buttonRectangle.Height) / 2f;
             DrawButtonText(shopText, moveOnShopButton ? 2 : 1.5f, value, buttonOrigin, shadowColor, chatColor, scale, pos, out Vector2 drawCenter);
             if (scale <= 0.7f && moveOnShopButton) { // 缩放程度太高的放在上面时会在面板下方显示文本
-                Vector2 bottom = new Vector2(ScreenWidth / 2, statY + asset.Height() + 30);
+                Vector2 bottom = new Vector2(ScreenWidth / 2, statY + height + 30);
                 DrawButtonText(shopText, 1.5f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
             }
 
@@ -175,21 +163,22 @@
         }
 
         private static void DrawLongExtraButton(float statY, string shopText, Color chatColor) {
-            Asset<Texture2D> asset = ButtonLong;
-            Asset<Texture2D> highlightAsset = ButtonLong_Highlight;
-            Vector2 pos = new Vector2(ScreenWidth / 2 - TextureAssets.ChatBack.Width() / 2 + Button_Back.Width() * 2 + 34, statY + 10);
+            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 122, statY + 10);
+            int width = 175;
+            int height = 44;
             // 按钮
-            SpriteBatch.Draw(asset.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
             // 对应图像（即icon）
-            SpriteBatch.Draw(Extra.Value, pos + new Vector2(asset.Height(), asset.Height()) / 2f, null, Color.White * 0.9f, 0f, new Vector2(Extra.Width(), Extra.Height()) / 2f, 1f, SpriteEffects.None, 0f);
-            Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, asset.Width(), asset.Height());
+            SpriteBatch.Draw(Extra.Value, pos + new Vector2(44, height) / 2f, null, Color.White * 0.9f, 0f, new Vector2(Extra.Width(), Extra.Height()) / 2f, 1f, SpriteEffects.None, 0f);
+            Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, width, height);
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 NPC talkNPC = Main.npc[Main.LocalPlayer.talkNPC];
                 if (!moveOnExtraButton) {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     moveOnExtraButton = true;
                 }
-                SpriteBatch.Draw(highlightAsset.Value, pos, null, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                // 高光边框
+                DrawPanel(SpriteBatch, ButtonPanel_Highlight.Value, pos, new Vector2(width, height), Color.White);
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Main.mouseLeft && Main.mouseLeftRelease) {
@@ -208,7 +197,7 @@
             Vector2 buttonOrigin = new Vector2(buttonRectangle.Width, buttonRectangle.Height) / 2f;
             DrawButtonText(shopText, moveOnExtraButton ? 2 : 1.5f, value, buttonOrigin, shadowColor, chatColor, scale, pos, out Vector2 drawCenter);
             if (scale <= 0.7f && moveOnExtraButton) { // 缩放程度太高的放在上面时会在面板下方显示文本
-                Vector2 bottom = new Vector2(ScreenWidth / 2, statY + asset.Height() + 30);
+                Vector2 bottom = new Vector2(ScreenWidth / 2, statY + height + 30);
                 DrawButtonText(shopText, 1.5f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
             }
 
@@ -237,6 +226,23 @@
             pos = basePos + buttonOrigin + offset;
             ChatManager.DrawColorCodedStringShadow(SpriteBatch, font, text, pos, shadowColor, 0f, stringSize * 0.5f, scale, -1, spread);
             ChatManager.DrawColorCodedString(SpriteBatch, font, text, pos, chatColor, 0f, stringSize * 0.5f, scale);
+        }
+
+        public static void DrawPanel(SpriteBatch spriteBatch, Texture2D texture, Vector2 position, Vector2 size, Color color, Color? cornerColor = null, int cornerSize = 6, int barSize = 32) {
+            Color corner = cornerColor ?? color;
+            Point point = new Point((int)position.X, (int)position.Y);
+            Point point2 = new Point(point.X + (int)size.X - cornerSize, point.Y + (int)size.Y - cornerSize);
+            int width = point2.X - point.X - cornerSize;
+            int height = point2.Y - point.Y - cornerSize;
+            spriteBatch.Draw(texture, new Rectangle(point.X, point.Y, cornerSize, cornerSize), new Rectangle(0, 0, cornerSize, cornerSize), corner); // left-top corner
+            spriteBatch.Draw(texture, new Rectangle(point2.X, point.Y, cornerSize, cornerSize), new Rectangle(cornerSize + barSize, 0, cornerSize, cornerSize), corner); // right-top corner
+            spriteBatch.Draw(texture, new Rectangle(point.X, point2.Y, cornerSize, cornerSize), new Rectangle(0, cornerSize + barSize, cornerSize, cornerSize), corner); // left-bottom corner
+            spriteBatch.Draw(texture, new Rectangle(point2.X, point2.Y, cornerSize, cornerSize), new Rectangle(cornerSize + barSize, cornerSize + barSize, cornerSize, cornerSize), corner); // right-bottom corner
+            spriteBatch.Draw(texture, new Rectangle(point.X + cornerSize, point.Y, width, cornerSize), new Rectangle(cornerSize, 0, barSize, cornerSize), color); // top bar
+            spriteBatch.Draw(texture, new Rectangle(point.X + cornerSize, point2.Y, width, cornerSize), new Rectangle(cornerSize, cornerSize + barSize, barSize, cornerSize), color); // bottom bar
+            spriteBatch.Draw(texture, new Rectangle(point.X, point.Y + cornerSize, cornerSize, height), new Rectangle(0, cornerSize, cornerSize, barSize), color); // left bar
+            spriteBatch.Draw(texture, new Rectangle(point2.X, point.Y + cornerSize, cornerSize, height), new Rectangle(cornerSize + barSize, cornerSize, cornerSize, barSize), color); // right bar
+            spriteBatch.Draw(texture, new Rectangle(point.X + cornerSize, point.Y + cornerSize, width, height), new Rectangle(cornerSize, cornerSize, barSize, barSize), color); // middle bar
         }
     }
 }

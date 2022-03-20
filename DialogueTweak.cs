@@ -24,7 +24,6 @@ namespace DialogueTweak
     public partial class DialogueTweak : Mod
     {
 		internal static DialogueTweak instance;
-		internal static GUIChatDraw MobileChat;
 
 		public override void Load() {
 			instance = this;
