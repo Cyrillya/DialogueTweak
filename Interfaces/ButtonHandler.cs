@@ -39,7 +39,7 @@
             else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = false; // 考虑手柄
 
             // 该NPC所有可用的额外按钮
-            int type = Main.LocalPlayer.sign != -1 ? -1 : talk; // 为了标牌特判
+            int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[talk].type; // 为了标牌特判
             bool useShopButton = !string.IsNullOrWhiteSpace(focusText);
             bool useExtraButton = !string.IsNullOrWhiteSpace(focusText2);
             List<int> buttons = new(); // 所有该NPC可用额外按钮的index，直接调用HandleAssets.ButtonInfos里的值
