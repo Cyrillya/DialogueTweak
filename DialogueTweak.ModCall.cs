@@ -131,6 +131,27 @@ namespace DialogueTweak
 								PortraitDrawer.OnPostSignPortraitDraw += args[1] as Action<SpriteBatch, Color, Rectangle, int>;
 								return true;
 							}
+						case "AddButton": {
+								if (args.Length <= 5) {
+									HandleAssets.ButtonInfos.Add(new ButtonInfo(
+										AsListOfInt(args[1]), // NPC IDs
+										args[2] as Func<string>, // NPC Button Text
+										args[3] as string, // Icon Texture Path (With Mod Name)
+										args[4] as Action // Hover Action
+										));
+								}
+								else {
+									HandleAssets.ButtonInfos.Add(new ButtonInfo(
+										AsListOfInt(args[1]), // NPC IDs
+										args[2] as Func<string>, // NPC Button Text
+										args[3] as string, // Icon Texture Path (With Mod Name)
+										args[4] as Action, // Hover Action
+										args[5] as Func<bool>, // Available
+										args[6] as Func<Rectangle> // Frame Rectangle
+										));
+								}
+								return true;
+							}
 						default:
 							Logger.Error($"Replacement type \"{msg}\" not found.");
 							return false;
@@ -142,6 +163,7 @@ namespace DialogueTweak
 			}
 
             static List<int> AsListOfInt(object data) => data is List<int> ? data as List<int> : new List<int>() { Convert.ToInt32(data) };
+			static Func<bool> AsFuncBool(object data) => data is Func<bool> ? data as Func<bool> : (Func<bool>)data;
 
 			return false;
 		}

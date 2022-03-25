@@ -11,6 +11,7 @@
             new IconInfo(IconType.Shop, new List<int> { NPCID.OldMan }, "DialogueTweak/Interfaces/Assets/Icon_Old_Man"),
             new IconInfo(IconType.Shop, new List<int> { NPCID.Nurse, NPCID.Angler, NPCID.TaxCollector }, "Head")
         };
+        internal static List<ButtonInfo> ButtonInfos = new List<ButtonInfo>();
         internal static Asset<Texture2D> DefaultIcon;
         internal static Asset<Texture2D> SignIcon;
         internal static Asset<Texture2D> EditIcon;

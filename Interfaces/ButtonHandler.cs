@@ -25,7 +25,8 @@
         private static bool moveOnShopButton;
         private static bool moveOnExtraButton;
 
-        public static void DrawButtons(float statY, string focusText, string focusText2, int money) {
+        public static void DrawButtons(int statY, string focusText, string focusText2) {
+            int talk = Main.LocalPlayer.talkNPC;
             Color textColor = new Color(Main.mouseTextColor, (int)((double)Main.mouseTextColor / 1.1), Main.mouseTextColor / 2, Main.mouseTextColor);
             NPCLoader.SetChatButtons(ref focusText, ref focusText2);
 
@@ -37,17 +38,38 @@
             }
             else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = false; // 考虑手柄
 
-            ChatMethods.HandleShopTexture(Main.LocalPlayer.sign != -1 ? -1 : Main.LocalPlayer.talkNPC, ref Shop, ref Extra);
+            // 该NPC所有可用的额外按钮
+            bool useShopButton = !string.IsNullOrWhiteSpace(focusText);
+            bool useExtraButton = !string.IsNullOrWhiteSpace(focusText2);
+            List<int> buttons = new(); // 所有该NPC可用额外按钮的index，直接调用HandleAssets.ButtonInfos里的值
+            foreach (int i in from a in HandleAssets.ButtonInfos where a.npcTypes.Contains(Main.npc[talk].type) && a.available() select HandleAssets.ButtonInfos.IndexOf(a))
+                buttons.Add(i);
+            int buttonCounts = buttons.Count + useShopButton.ToInt() + useExtraButton.ToInt();
+            if (buttonCounts == 0) return;
+            int spacing = 10; // 按扭之间的间隔
+            int buttonWidth = 375 / buttonCounts - spacing; // 每个按钮的宽度，+2是加上，-10是去除了按钮之间的间隔
 
-            if (!string.IsNullOrWhiteSpace(focusText)) {
-                DrawLongShopButton(statY, focusText, textColor, string.IsNullOrWhiteSpace(focusText2));
+            // 决定图标
+            ChatMethods.HandleShopTexture(Main.LocalPlayer.sign != -1 ? -1 : talk, ref Shop, ref Extra);
+
+            int offsetX = 0;
+
+            if (useExtraButton) {
+                DrawLongExtraButton(statY, offsetX, buttonWidth, focusText2, textColor);
+                offsetX += buttonWidth + spacing;
+            }
+            else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = false; // 考虑手柄
+
+            if (useShopButton) {
+                DrawLongShopButton(statY, offsetX, buttonWidth, focusText, textColor);
+                offsetX += buttonWidth + spacing;
             }
             else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight2 = false; // 考虑手柄
 
-            if (!string.IsNullOrWhiteSpace(focusText2)) {
-                DrawLongExtraButton(statY, focusText2, textColor);
+            foreach (int i in buttons) {
+                DrawModCallButton(i, statY, offsetX, buttonWidth, textColor);
+                offsetX += buttonWidth + spacing;
             }
-            else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = false; // 考虑手柄
         }
 
         private static void DrawBackButton(float statY, bool longer) {
@@ -122,9 +144,8 @@
             UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = true;
         }
 
-        private static void DrawLongShopButton(float statY, string shopText, Color chatColor, bool useLonger) {
-            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + (useLonger ? 122 : 311), statY + 10);
-            int width = useLonger ? 365 : 175;
+        private static void DrawLongShopButton(int statY, int offsetX, int width, string shopText, Color chatColor) {
+            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 122 + offsetX, statY + 10);
             int height = 44;
             // 按钮
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
@@ -177,9 +198,8 @@
             }
         }
 
-        private static void DrawLongExtraButton(float statY, string shopText, Color chatColor) {
-            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 122, statY + 10);
-            int width = 175;
+        private static void DrawLongExtraButton(int statY, int offsetX, int width, string shopText, Color chatColor) {
+            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 122 + offsetX, statY + 10);
             int height = 44;
             // 按钮
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
@@ -224,6 +244,54 @@
                 UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat1, drawCenter);
                 UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = true;
                 UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = false;
+            }
+        }
+
+        private static void DrawModCallButton(int i, int statY, int offsetX, int width, Color chatColor) {
+            var button = HandleAssets.ButtonInfos[i];
+            bool useText = button.buttonText is not null && button.buttonText().Trim() != string.Empty; // 确实有文本
+            bool useIcon = button.iconTexture != "";
+            string text = !useText ? "" : button.buttonText().Trim();
+
+            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 122 + offsetX, statY + 10);
+            int height = 44;
+            // 按钮
+            DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
+            // 对应图像（即icon）
+            if (useIcon) {
+                if (button.texture is null) button.texture = ModContent.Request<Texture2D>(button.iconTexture);
+                var iconOffset = new Vector2(!useText ? width : 44, height) / 2f;
+                SpriteBatch.Draw(button.texture.Value, pos + iconOffset, null, Color.White * 0.9f, 0f, new Vector2(button.texture.Width(), button.texture.Height()) / 2f, 1f, SpriteEffects.None, 0f);
+            }
+            Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, width, height);
+            if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
+                NPC talkNPC = Main.npc[Main.LocalPlayer.talkNPC];
+                if (!button.focused) {
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+                    button.focused = true;
+                }
+                // 高光边框
+                DrawPanel(SpriteBatch, ButtonPanel_Highlight.Value, pos, new Vector2(width, height), Color.White);
+                Main.LocalPlayer.mouseInterface = true;
+
+                // 悬停行为
+                button.hoverAction.Invoke();
+            }
+            else if (button.focused) {
+                button.focused = false;
+                SoundEngine.PlaySound(SoundID.MenuTick);
+            }
+            if (useText) {
+                // 还有一个文字提示
+                DynamicSpriteFont value = FontAssets.MouseText.Value;
+                float scale = DecideTextScale(text, value, buttonRectangle.Width - (useIcon ? 50 : 0)); // 减少值是为了给icon腾出空间
+                Color shadowColor = (!button.focused) ? Color.Black : Color.Brown;
+                Vector2 buttonOrigin = new Vector2(buttonRectangle.Width, buttonRectangle.Height) / 2f;
+                DrawButtonText(text, button.focused ? 2 : 1.5f, value, buttonOrigin, shadowColor, chatColor, scale, pos, out Vector2 drawCenter);
+                if (scale <= 0.7f && button.focused) { // 缩放程度太高的放在上面时会在面板下方显示文本
+                    Vector2 bottom = new Vector2(ScreenWidth / 2, statY + height + 30);
+                    DrawButtonText(text, 1.5f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
+                }
             }
         }
 

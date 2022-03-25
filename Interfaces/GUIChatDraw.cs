@@ -186,7 +186,7 @@ namespace DialogueTweak.Interfaces
             }
 
             // 交互按钮
-            if (!flag) ButtonHandler.DrawButtons(linePositioning * 30 - 30 + PanelPosition.Y, focusText, focusText2, money);
+            if (!flag) ButtonHandler.DrawButtons((int)(linePositioning * 30 - 30 + PanelPosition.Y), focusText, focusText2);
 
             // 判断鼠标是否处于交互界面
             if (rectangle.Contains(new Point(Main.mouseX, Main.mouseY))) {

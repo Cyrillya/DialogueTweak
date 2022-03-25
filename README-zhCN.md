@@ -39,7 +39,7 @@
 ```CSharp
 public override void PostSetupContent() {
     if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
-        dialogueTweakMod.Call(
+        dialogueTweak.Call(
             "ReplaceShopButtonIcon",
             ModContent.NPCType<NPCs.MyNPC>(), // NPC ID
             "TheMod/Assets/NPCShopIcon", // 贴图路径
@@ -51,7 +51,7 @@ public override void PostSetupContent() {
 ```CSharp
 public override void PostSetupContent() {
     if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
-        dialogueTweakMod.Call(
+        dialogueTweak.Call(
             "ReplaceShopButtonIcon",
             NPCID.Guide, // NPC ID，这里是向导
             "Head"); // 这样的话就会显示NPC的头像贴图
@@ -95,11 +95,57 @@ public override void PostSetupContent() {
 ```CSharp
 public override void PostSetupContent() {
     if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
-        dialogueTweakMod.Call("OnPostPortraitDraw", DrawSomething);
+        dialogueTweak.Call("OnPostPortraitDraw", DrawSomething);
     }
 }
 private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
     var tex = ModContent.Request<Texture2D>("TheMod/Assets/Something");
     sb.Draw(tex.Value, panel.Location.ToVector2(), Main.DiscoColor);
+}
+```
+
+# Mod.Call (添加按钮)
+目前只有一个添加按钮的Mod.Call，不过我觉得应该够用了.
+### AddButton
+```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string texture, Action hoverAction, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```添加一个新按钮.
+
+## Arguments
+### 1.) 按钮类型 - ```string```
+填“AddButton”就完事了.
+
+### 2.) NPC ID - ```int/List<int>```
+你需要表明你想要覆盖的NPC对象的ID，使用```ModContent.NPCType<>()```来获取你的Mod中相应NPC的ID. 你也可以用原版NPC的ID来修改原版NPC.
+
+### 3.) 按钮文本 - ```Func<string>```
+这是按钮将会显示的文本. 类型为```Func<string>```因此你可以使用Language.GetTextValue或者其他别的玩意.
+
+### 4.) 图标贴图 - ```string```
+你需要表明用于图标的贴图. 请输入贴图路径. 不填的话就不会显示图标.
+
+### 5.) 悬停Action - ```Action```
+当客户端将鼠标悬停在按钮上时将调用的操作. 使用它来定义按下按钮时的行为.
+
+### 6.) 可见性 - ```Func<bool>```
+你可以决定是否使用该覆盖贴图. 这对于有多种功能并想要不同的图标贴图的NPC来说十分有用.
+
+### 7.) 帧 - ```Func<Rectangle>```
+你可以自定义图标贴图的绘制帧. 以在不同状况下显示一个贴图的不同部分.
+
+## Examples
+以下示例使用此Mod的关闭按钮贴图(即Button_Back)添加了一个按钮，显示为“关闭”. 当玩家单击它时将显示一条消息。
+```CSharp
+public override void PostSetupContent() {
+	if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
+		dialogueTweakLoaded = true;
+		dialogueTweak.Call(
+			"AddButton",
+			NPCID.Angler,
+			(Func<string>)(() => Language.GetTextValue("LegacyInterface.52")), // "关闭"
+			"DialogueTweak/Interfaces/Assets/Button_Back", // 直接引用该Mod的贴图.
+			(Action)(() => {
+				if (Main.mouseLeft)
+                    Main.NewText("这是假的关闭按钮哦");
+			}));
+	}
 }
 ```
