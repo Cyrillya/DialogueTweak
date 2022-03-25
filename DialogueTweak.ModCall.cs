@@ -163,7 +163,6 @@ namespace DialogueTweak
 			}
 
             static List<int> AsListOfInt(object data) => data is List<int> ? data as List<int> : new List<int>() { Convert.ToInt32(data) };
-			static Func<bool> AsFuncBool(object data) => data is Func<bool> ? data as Func<bool> : (Func<bool>)data;
 
 			return false;
 		}

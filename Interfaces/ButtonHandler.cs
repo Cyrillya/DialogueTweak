@@ -33,6 +33,7 @@
             bool showHappinessReport = Main.LocalPlayer.sign == -1 && Main.LocalPlayer.currentShoppingSettings.HappinessReport != "" && Main.npc[Main.LocalPlayer.talkNPC].townNPC;
             // 返回按钮，小动物由于没有幸福值，所以返回按钮要长一点。由于返回按钮总会显示，就不考虑手柄了
             DrawBackButton(statY, !showHappinessReport);
+            if (moveOnBackButton && Main.mouseLeft && Main.mouseLeftRelease) return; // 按下返回按钮后应该停止绘制了，防止数组超限
             if (showHappinessReport) {
                 DrawHappinessButton(statY);
             }
