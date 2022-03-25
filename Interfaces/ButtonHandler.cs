@@ -39,10 +39,11 @@
             else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = false; // 考虑手柄
 
             // 该NPC所有可用的额外按钮
+            int type = Main.LocalPlayer.sign != -1 ? -1 : talk; // 为了标牌特判
             bool useShopButton = !string.IsNullOrWhiteSpace(focusText);
             bool useExtraButton = !string.IsNullOrWhiteSpace(focusText2);
             List<int> buttons = new(); // 所有该NPC可用额外按钮的index，直接调用HandleAssets.ButtonInfos里的值
-            foreach (int i in from a in HandleAssets.ButtonInfos where a.npcTypes.Contains(Main.npc[talk].type) && a.available() select HandleAssets.ButtonInfos.IndexOf(a))
+            foreach (int i in from a in HandleAssets.ButtonInfos where a.npcTypes.Contains(type) && a.available() select HandleAssets.ButtonInfos.IndexOf(a))
                 buttons.Add(i);
             int buttonCounts = buttons.Count + useShopButton.ToInt() + useExtraButton.ToInt();
             if (buttonCounts == 0) return;
@@ -50,7 +51,7 @@
             int buttonWidth = 375 / buttonCounts - spacing; // 每个按钮的宽度，+2是加上，-10是去除了按钮之间的间隔
 
             // 决定图标
-            ChatMethods.HandleShopTexture(Main.LocalPlayer.sign != -1 ? -1 : talk, ref Shop, ref Extra);
+            ChatMethods.HandleShopTexture(type, ref Shop, ref Extra);
 
             int offsetX = 0;
 
@@ -77,7 +78,8 @@
             Rectangle? frame = null;
             var value = Button_Back.Value;
             // ModCall
-            foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(Main.npc[Main.LocalPlayer.talkNPC].type) && a.available() && a.texture != "" && a.iconType == IconType.Back select a) {
+            int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[Main.LocalPlayer.talkNPC].type; // 为了标牌特判
+            foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(type) && a.available() && a.texture != "" && a.iconType == IconType.Back select a) {
                 value = ModContent.Request<Texture2D>(info.texture).Value;
                 frame = info.frame();
             }
@@ -112,7 +114,8 @@
             Rectangle? frame = null;
             var value = Button_Happiness.Value;
             // ModCall
-            foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(Main.npc[Main.LocalPlayer.talkNPC].type) && a.available() && a.texture != "" && a.iconType == IconType.Happiness select a) {
+            int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[Main.LocalPlayer.talkNPC].type; // 为了标牌特判
+            foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(type) && a.available() && a.texture != "" && a.iconType == IconType.Happiness select a) {
                 value = ModContent.Request<Texture2D>(info.texture).Value;
                 frame = info.frame();
             }
