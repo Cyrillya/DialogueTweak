@@ -3,7 +3,6 @@
     // 一个贴图库，使用贴图时可以直接从这里调用
     internal class HandleAssets : ModSystem
     {
-
         // 覆盖Icon的List，有一些默认值
         internal static List<IconInfo> IconInfos = new List<IconInfo>() {
             new IconInfo(IconType.Shop, new List<int> { NPCID.Guide }, "DialogueTweak/Interfaces/Assets/Icon_Help"),
@@ -31,8 +30,9 @@
                 EditIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Icon_Edit");
 
                 GUIChatDraw.PortraitPanel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/PortraitPanel");
-                ChatTextDrawer.GreyPixel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/GreyPixel");
-                ChatTextDrawer.ChatTextPanel = Main.Assets.Request<Texture2D>("Images/UI/PanelBackground");
+                GUIChatDraw.GreyPixel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/GreyPixel");
+                GUIChatDraw.ChatTextPanel = Main.Assets.Request<Texture2D>("Images/UI/PanelBackground");
+                GUIChatDraw.BiomeIconTags = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Tags_Shadow");
             }
         }
     }

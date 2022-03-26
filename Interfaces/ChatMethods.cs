@@ -2,12 +2,36 @@
 using System.Reflection;
 using Terraria.DataStructures;
 using Terraria.GameContent.Achievements;
+using Terraria.GameContent.Personalities;
 
 namespace DialogueTweak.Interfaces
 {
     // 这里基本上就是垃圾堆，都是原版代码（写死了，必须要自己新写一个自己执行的那种）
-    public class ChatMethods
+    public static class ChatMethods
     {
+        /// <summary>反射获取的NPC喜好数据库，用于在对话框右上角显示NPC偏好</summary>
+        private static PersonalityDatabase personalityDatabase => (PersonalityDatabase)typeof(ShopHelper).GetField("_database", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Main.ShopHelper);
+
+        public static void GetNPCPreferenceSorted(this NPC npc, out List<NPCPreferenceTrait> NPCPreferences, out List<BiomePreferenceListTrait> BiomePreferences) {
+            var personalityProfile = personalityDatabase.GetOrCreateProfileByNPCID(npc.type);
+            var shopModifiers = personalityProfile.ShopModifiers;
+            // NPC和环境偏好表
+            List<IShopPersonalityTrait> INPCPreferences = shopModifiers.Where(t => t is NPCPreferenceTrait).ToList();
+            List<IShopPersonalityTrait> IBiomePreferences = shopModifiers.Where(t => t is BiomePreferenceListTrait).ToList();
+            NPCPreferences = null;
+            if (INPCPreferences != null) {
+                NPCPreferences = INPCPreferences.ConvertAll(t => t as NPCPreferenceTrait);
+                NPCPreferences.Sort(NPCLevelComparison);
+            }
+            BiomePreferences = null;
+            if (IBiomePreferences != null) {
+                BiomePreferences = IBiomePreferences.ConvertAll(t => t as BiomePreferenceListTrait);
+                BiomePreferences.ForEach(t => t.Preferences.Sort(BiomeLevelComparison));
+            }
+
+            static int NPCLevelComparison(NPCPreferenceTrait p1, NPCPreferenceTrait p2) => p2.Level.CompareTo(p1.Level);
+            static int BiomeLevelComparison(BiomePreferenceListTrait.BiomePreference p1, BiomePreferenceListTrait.BiomePreference p2) => p2.Affection.CompareTo(p1.Affection);
+        }
 
         // 自己写的控制NPC语速（实际效果进游戏看
         public static float HandleSpeakingRate(int npcType) {
@@ -74,7 +98,7 @@ namespace DialogueTweak.Interfaces
         }
 
         // 自己写的控制Shop和Extra的贴图
-        public static void HandleShopTexture(int i, ref Asset<Texture2D> Shop, ref Asset<Texture2D> Extra) {
+        public static void HandleButtonIcon(int i, ref Asset<Texture2D> Shop, ref Asset<Texture2D> Extra) {
             // -1即标牌绘制
             if (i == -1) {
                 Shop = HandleAssets.EditIcon;
@@ -354,7 +378,6 @@ namespace DialogueTweak.Interfaces
 
             NPCLoader.OnChatButtonClicked(true);
 
-            ChatMethods methods = new ChatMethods();
             switch (talkNPC.type) {
                 case NPCID.Angler: {
                         Main.npcChatCornerItem = 0;
@@ -549,82 +572,82 @@ namespace DialogueTweak.Interfaces
                         break;
                     }
                 case NPCID.Merchant:
-                    methods.OpenShop(1);
+                    OpenShop(1);
                     break;
                 case NPCID.ArmsDealer:
-                    methods.OpenShop(2);
+                    OpenShop(2);
                     break;
                 case NPCID.Dryad:
-                    methods.OpenShop(3);
+                    OpenShop(3);
                     break;
                 case NPCID.Demolitionist:
-                    methods.OpenShop(4);
+                    OpenShop(4);
                     break;
                 case NPCID.Clothier:
-                    methods.OpenShop(5);
+                    OpenShop(5);
                     break;
                 case NPCID.GoblinTinkerer:
-                    methods.OpenShop(6);
+                    OpenShop(6);
                     break;
                 case NPCID.Wizard:
-                    methods.OpenShop(7);
+                    OpenShop(7);
                     break;
                 case NPCID.Mechanic:
-                    methods.OpenShop(8);
+                    OpenShop(8);
                     break;
                 case NPCID.SantaClaus:
-                    methods.OpenShop(9);
+                    OpenShop(9);
                     break;
                 case NPCID.Truffle:
-                    methods.OpenShop(10);
+                    OpenShop(10);
                     break;
                 case NPCID.Steampunker:
-                    methods.OpenShop(11);
+                    OpenShop(11);
                     break;
                 case NPCID.DyeTrader:
-                    methods.OpenShop(12);
+                    OpenShop(12);
                     break;
                 case NPCID.PartyGirl:
-                    methods.OpenShop(13);
+                    OpenShop(13);
                     break;
                 case NPCID.Cyborg:
-                    methods.OpenShop(14);
+                    OpenShop(14);
                     break;
                 case NPCID.Painter:
-                    methods.OpenShop(15);
+                    OpenShop(15);
                     break;
                 case NPCID.WitchDoctor:
-                    methods.OpenShop(16);
+                    OpenShop(16);
                     break;
                 case NPCID.Pirate:
-                    methods.OpenShop(17);
+                    OpenShop(17);
                     break;
                 case NPCID.Stylist:
-                    methods.OpenShop(18);
+                    OpenShop(18);
                     break;
                 case NPCID.TravellingMerchant:
-                    methods.OpenShop(19);
+                    OpenShop(19);
                     break;
                 case NPCID.SkeletonMerchant:
-                    methods.OpenShop(20);
+                    OpenShop(20);
                     break;
                 case NPCID.DD2Bartender:
-                    methods.OpenShop(21);
+                    OpenShop(21);
                     break;
                 case NPCID.Golfer:
-                    methods.OpenShop(22);
+                    OpenShop(22);
                     break;
                 case NPCID.BestiaryGirl:
-                    methods.OpenShop(23);
+                    OpenShop(23);
                     break;
                 case NPCID.Princess:
-                    methods.OpenShop(24);
+                    OpenShop(24);
                     break;
             }
         }
 
         // 打开商店
-        public void OpenShop(int shopIndex) {
+        public static void OpenShop(int shopIndex) {
             var targetMethod = Main.instance.GetType().GetMethod("OpenShop", BindingFlags.Instance | BindingFlags.NonPublic, new Type[] { typeof(int) });
             targetMethod.Invoke(Main.instance, new object[] { shopIndex });
         }

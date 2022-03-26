@@ -52,7 +52,7 @@
             int buttonWidth = 375 / buttonCounts - spacing; // 每个按钮的宽度，+2是加上，-10是去除了按钮之间的间隔
 
             // 决定图标
-            ChatMethods.HandleShopTexture(type, ref Shop, ref Extra);
+            ChatMethods.HandleButtonIcon(type, ref Shop, ref Extra);
 
             int offsetX = 0;
 
@@ -137,6 +137,24 @@
                     Main.npcChatCornerItem = 0;
                     SoundEngine.PlaySound(12);
                     Main.npcChatText = Main.LocalPlayer.currentShoppingSettings.HappinessReport;
+
+                    // 点击按钮后在左下角显示具体偏好情况
+                    var npc = Main.npc[Main.LocalPlayer.talkNPC];
+                    npc.GetNPCPreferenceSorted(out var NPCPreferences, out var biomePreferences);
+                    Main.NewText($"[c/{Main.DiscoColor.Hex3()}:{NPC.GetFullnameByID(npc.type)}]");
+                    foreach (var preference in NPCPreferences) {
+                        Main.NewText($"{preference.Level}: {NPC.GetFullnameByID(preference.NpcId)}");
+                    }
+                    foreach (var biomes in biomePreferences) {
+                        foreach (var biome in biomes.Preferences) {
+                            var name = ShopHelper.BiomeNameByKey(biome.Biome.NameKey);
+                            // 对于模组群系，直接获取DisplayName的翻译
+                            if (biome.Biome is ModBiome modBiome) {
+                                name = modBiome.DisplayName.GetTranslation(Language.ActiveCulture);
+                            }
+                            Main.NewText($"{biome.Affection}: {name}");
+                        }
+                    }
                 }
             }
             else if (moveOnHappinessButton) {

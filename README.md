@@ -127,7 +127,7 @@ You have to specify the icon texture of the button. Use your texture's path. If 
 The action that will be called when the client hovers over the button. Use this to define the behavior when the button is pressed.
 
 ### 6.) Availability - ```Func<bool>```
-You can decide if your replacement is used. This is useful if your NPC has multiple functions that display different icons.
+You can decide if your button should be shown.
 
 ### 7.) Frame - ```Func<Rectangle>```
 You can customize the frame of the icon texture. It is useful to display different parts of the texture in different situations.

@@ -126,7 +126,7 @@ private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
 当客户端将鼠标悬停在按钮上时将调用的操作. 使用它来定义按下按钮时的行为.
 
 ### 6.) 可见性 - ```Func<bool>```
-你可以决定是否使用该覆盖贴图. 这对于有多种功能并想要不同的图标贴图的NPC来说十分有用.
+你可以决定是否显示该按钮.
 
 ### 7.) 帧 - ```Func<Rectangle>```
 你可以自定义图标贴图的绘制帧. 以在不同状况下显示一个贴图的不同部分.
