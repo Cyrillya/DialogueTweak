@@ -30,9 +30,9 @@
                 SignIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Icon_Sign");
                 EditIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Icon_Edit");
 
-                GUIChatDraw.GreyPixel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/GreyPixel");
                 GUIChatDraw.PortraitPanel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/PortraitPanel");
-                GUIChatDraw.ChatTextPanel = Main.Assets.Request<Texture2D>("Images/UI/PanelBackground");
+                ChatTextDrawer.GreyPixel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/GreyPixel");
+                ChatTextDrawer.ChatTextPanel = Main.Assets.Request<Texture2D>("Images/UI/PanelBackground");
             }
         }
     }
