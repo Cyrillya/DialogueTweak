@@ -252,8 +252,7 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
             }
             else if (talkNPC.type == NPCID.DyeTrader) {
                 focusText = Language.GetText("LegacyInterface.28").Value;
-                if (Main.hardMode)
-                    focusText2 = Language.GetText("LegacyInterface.107").Value;
+                focusText2 = Language.GetText("LegacyInterface.107").Value;
             }
             else if (talkNPC.type == NPCID.SkeletonMerchant) {
                 focusText = Language.GetText("LegacyInterface.28").Value;

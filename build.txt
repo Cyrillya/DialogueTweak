@@ -1,5 +1,5 @@
 displayName = Dialogue Panel Rework
 author = -Cyril-
-version = 1.2.1
+version = 1.2.2
 side = Client
 homepage = https://github.com/Crapsky233/DialogueTweak
