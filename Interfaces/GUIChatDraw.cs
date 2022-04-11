@@ -115,7 +115,7 @@ namespace DialogueTweak.Interfaces
 
                         Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), texture.Width() + 2, texture.Height() + 2);
                         if (rect.Contains(new Point(Main.mouseX, Main.mouseY))) {
-                            DrawingHelper.DrawTextTopPanel($"{preference.Level}: {NPC.GetFullnameByID(preference.NpcId)}", panelRectangle);
+                            DrawingHelper.DrawTextTopPanel($"{preference.Level}: {Lang.GetNPCNameValue(preference.NpcId)}", panelRectangle);
                         }
                     }
                 }

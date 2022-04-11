@@ -54,7 +54,7 @@
             return Color.White;
         }
 
-        /// <summary>在面板上方绘制文字</summary>
+        /// <summary>在面板右上方绘制文字</summary>
         public static void DrawTextTopPanel(string text, Rectangle panelRectangle) {
             Vector2 top = new Vector2(panelRectangle.X + panelRectangle.Width, panelRectangle.Y + 12f);
             DynamicSpriteFont font = FontAssets.MouseText.Value;
