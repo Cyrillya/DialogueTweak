@@ -59,7 +59,7 @@
                 sb.Draw(value, position, frame, talkNPC.GetColor(talkNPC.color), 0f, origin, scale, SpriteEffects.FlipHorizontally, 0f);
 
             // 名字，用DeathText因为它大而且清晰
-            Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, talkNPC.GivenOrTypeName, 270f + (Main.screenWidth - 800) / 2, 106, textColor, Color.Black, Vector2.Zero, 0.6f);
+            Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, talkNPC.GivenOrTypeName, 270f + (Main.screenWidth - 800) / 2, 108, textColor, Color.Black, Vector2.Zero, 0.54f);
 
             // 还原
             sb.End();
@@ -118,7 +118,7 @@
 
             sb.Draw(value, position, frame, Color.White, 0f, value.Size() / 2f, 2f, SpriteEffects.None, 0f);
             // 名字
-            Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, text, 270f + (Main.screenWidth - 800) / 2, 106, textColor, Color.Black, Vector2.Zero, 0.6f);
+            Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, text, 270f + (Main.screenWidth - 800) / 2, 108, textColor, Color.Black, Vector2.Zero, 0.54f);
 
             // 还原
             sb.End();
