@@ -16,8 +16,6 @@
             private set;
         }
 
-        public float TextAppeared;
-
         public void PrepareCache(string text) {
             if ((0 | ((Main.screenWidth != _lastScreenWidth) ? 1 : 0) | ((Main.screenHeight != _lastScreenHeight) ? 1 : 0) | ((_originalText != text) ? 1 : 0)) != 0) {
                 _lastScreenWidth = Main.screenWidth;
@@ -25,7 +23,6 @@
                 _originalText = text;
                 TextLines = WordwrapString(Main.npcChatText, FontAssets.MouseText.Value, 362, out int lineAmount);
                 AmountOfLines = lineAmount;
-                TextAppeared = 0;
             }
         }
 
