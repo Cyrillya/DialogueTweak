@@ -143,7 +143,7 @@
                     npc.GetNPCPreferenceSorted(out var NPCPreferences, out var biomePreferences);
                     Main.NewText($"[c/{Main.DiscoColor.Hex3()}:{NPC.GetFullnameByID(npc.type)}]");
                     foreach (var preference in NPCPreferences) {
-                        Main.NewText($"{preference.Level}: {NPC.GetFullnameByID(preference.NpcId)}");
+                        Main.NewText($"{Language.GetTextValue($"Mods.{DialogueTweak.instance.Name}.{preference.Level}")}: {NPC.GetFullnameByID(preference.NpcId)}");
                     }
                     foreach (var biomes in biomePreferences) {
                         foreach (var biome in biomes.Preferences) {
@@ -152,7 +152,7 @@
                             if (biome.Biome is ModBiome modBiome) {
                                 name = modBiome.DisplayName.GetTranslation(Language.ActiveCulture);
                             }
-                            Main.NewText($"{biome.Affection}: {name}");
+                            Main.NewText($"{Language.GetTextValue($"Mods.{DialogueTweak.instance.Name}.{biome.Affection}")}: {name}");
                         }
                     }
                 }
