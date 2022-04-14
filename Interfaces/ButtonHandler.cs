@@ -9,7 +9,7 @@ using Terraria.UI;
 using Terraria.UI.Chat;
 using Terraria.UI.Gamepad;
 
-namespace DialogueTweak.Interfaces.UI.GUIChat
+namespace DialogueTweak.Interfaces
 {
     internal class ButtonHandler
     {
@@ -59,13 +59,13 @@ namespace DialogueTweak.Interfaces.UI.GUIChat
         private static void DrawBackButton(float statY) {
             Vector2 pos = new Vector2(ScreenWidth / 2 - Main.chatBackTexture.Width / 2 + 16, statY + 10);
             Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, Button_BackLong.Width, Button_BackLong.Height / 2);
-                SpriteBatch.Draw(Button_BackLong, pos, new Rectangle(0, 0, Button_BackLong.Width, Button_BackLong.Height / 2), Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            SpriteBatch.Draw(Button_BackLong, pos, new Rectangle(0, 0, Button_BackLong.Width, Button_BackLong.Height / 2), Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 if (!moveOnBackButton) {
                     Main.PlaySound(SoundID.MenuTick);
                     moveOnBackButton = true;
                 }
-                    SpriteBatch.Draw(Button_BackLong, pos, new Rectangle(0, 44, Button_BackLong.Width, Button_BackLong.Height / 2), Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                SpriteBatch.Draw(Button_BackLong, pos, new Rectangle(0, 44, Button_BackLong.Width, Button_BackLong.Height / 2), Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Main.mouseLeft && Main.mouseLeftRelease) {

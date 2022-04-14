@@ -13,13 +13,11 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI.Gamepad;
 
-namespace DialogueTweak.Interfaces.UI.GUIChat
+namespace DialogueTweak.Interfaces
 {
     // 这里基本上就是垃圾堆，都是原版代码（写死了，必须要自己新写一个自己执行的那种）
     public class ChatMethods
     {
-        static int myPlayer => Main.myPlayer;
-
         // 自己写的控制NPC语速（实际效果进游戏看
         public static float HandleSpeakingRate(int npcType) {
             switch (npcType) {
