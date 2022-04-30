@@ -6,8 +6,8 @@
         public override void PostSetupContent() {
             AddTranslation(Mod, "Hate", "Hassen", "Odio", "Je déteste", "Odio", "Ненавидеть", "讨厌", "Ódio", "Nienawiść");
             AddTranslation(Mod, "Dislike", "Nicht mögen", "Dislike", "N'aime pas", "No me gusta", "Не нравится", "不喜", "Não gostar", "Nie lubię");
-            AddTranslation(Mod, "Like", "Gefällt", "Come", "J'aime bien", "Como", "нравиться", "喜欢", "Como", "Lubię");
-            AddTranslation(Mod, "Love", "Lieben", "Amore", "J'aime", "Me gusta", "любить", "喜爱", "Amor", "Love");
+            AddTranslation(Mod, "Like", "Gefällt", "Come", "J'aime bien", "Me gusta", "нравиться", "喜欢", "Como", "Lubię");
+            AddTranslation(Mod, "Love", "Lieben", "Amore", "J'aime", "Amo", "любить", "喜爱", "Amor", "Love");
         }
 
         //English = 1,
