@@ -66,8 +66,15 @@ namespace DialogueTweak.Interfaces
                 // 在交互按钮和对话之间一条浅黑线，如果没有交互按钮就不Draw了（绘制条件和交互按钮一致）
                 byte breakPixel = 2; // 左右都有[breakPixel]个像素的空隙
                 Main.spriteBatch.Draw(GreyPixel.Value, PanelPosition + new Vector2(breakPixel * 2, linePositioning * 30 - 30), null, Color.White * 0.9f, 0f, Vector2.Zero, new Vector2(TextureAssets.ChatBack.Width() - breakPixel * 4, 3f), SpriteEffects.None, 0f);
+
+                // 重新开启spriteBatch，以去掉不明觉厉的UI绘制的一层模糊滤镜
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.UIScaleMatrix);
                 // 按钮
                 ButtonHandler.DrawButtons((int)(linePositioning * 30 - 30 + PanelPosition.Y), focusText, focusText2);
+                // 还原
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
             }
         }
 

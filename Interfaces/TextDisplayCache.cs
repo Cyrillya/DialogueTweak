@@ -102,10 +102,6 @@
 
                         str2 += hyphen;
                         array[num++] = str2;
-                        // 后面没有字符了
-                        if (num2 == text2.Length) {
-                            num--; // 拉回来一行
-                        }
                         if (num >= maxLines)
                             break;
 

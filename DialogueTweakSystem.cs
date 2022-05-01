@@ -29,10 +29,10 @@
                 letterAppeared = 1145141919; // 标牌没有缓慢出现机制
                 return;
             }
-            if (letterAppeared < Main.npcChatText.Length) {
-                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 1.4f : 2.2f;
+            if (letterAppeared < Main.npcChatText.Length + 1) {
+                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 1.2f : 2f;
                 if (cursorAtTextPanel) {
-                    speakingRateMultipiler *= 1.5f;
+                    speakingRateMultipiler *= 1.2f;
                     if (Main.mouseLeft) {
                         speakingRateMultipiler *= 3f; // 快速吟唱
                     }
