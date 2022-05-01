@@ -2,6 +2,7 @@
 {
     internal class DialogueTweakSystem : ModSystem
     {
+        internal static bool cursorAtTextPanel;
         internal static string prevText;
         internal static float letterAppeared;
 
@@ -29,9 +30,16 @@
                 return;
             }
             if (letterAppeared < Main.npcChatText.Length) {
-                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 1 : 1.8f;
+                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 1.4f : 2.2f;
+                if (cursorAtTextPanel) {
+                    speakingRateMultipiler *= 1.5f;
+                    if (Main.mouseLeft) {
+                        speakingRateMultipiler *= 3f; // 快速吟唱
+                    }
+                }
                 letterAppeared += ChatMethods.HandleSpeakingRate(Main.npc[Main.LocalPlayer.talkNPC].type) * speakingRateMultipiler;
             }
+            cursorAtTextPanel = false;
         }
     }
 }

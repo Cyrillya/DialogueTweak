@@ -12,7 +12,7 @@ namespace DialogueTweak.Interfaces
         internal static Asset<Texture2D> ChatTextPanel;
         internal static Asset<Texture2D> GreyPixel;
         public static readonly Color ChatTextPanelColor = new(35, 43, 89);
-        public static Vector2 PanelPosition => new(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100f);
+        public static readonly Vector2 PanelPosition = new(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100f);
 
         public static void GUIDrawInner() {
             if (Main.LocalPlayer.talkNPC < 0 && Main.LocalPlayer.sign == -1) {
@@ -44,6 +44,11 @@ namespace DialogueTweak.Interfaces
             // 肖像
             PortraitDrawer.DrawPortrait(Main.spriteBatch, textColor, rectangle);
             DrawButtons(focusText, focusText2, linePositioning);
+
+            // 判断鼠标是否处于对话栏界面
+            if (new Rectangle((int)textPanelPosition.X, (int)textPanelPosition.Y, (int)textPanelSize.X, (int)textPanelSize.Y).Contains(new Point(Main.mouseX, Main.mouseY))) {
+                DialogueTweakSystem.cursorAtTextPanel = true;
+            }
 
             // 判断鼠标是否处于交互界面
             if (rectangle.Contains(new Point(Main.mouseX, Main.mouseY))) {
