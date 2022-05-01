@@ -12,7 +12,7 @@ namespace DialogueTweak.Interfaces
         internal static Asset<Texture2D> ChatTextPanel;
         internal static Asset<Texture2D> GreyPixel;
         public static readonly Color ChatTextPanelColor = new(35, 43, 89);
-        public static readonly Vector2 PanelPosition = new(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100f);
+        public static Vector2 PanelPosition => new(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100f);
 
         public static void GUIDrawInner() {
             if (Main.LocalPlayer.talkNPC < 0 && Main.LocalPlayer.sign == -1) {
