@@ -37,7 +37,7 @@
 
             // 1.4得用这个，城镇宠物有多种品种，用这个才能确保获得对话NPC的贴图
             Texture2D value = TextureAssets.Npc[talkNPC.type].Value;
-            if (TownNPCProfiles.Instance.GetProfile(talkNPC.type, out ITownNPCProfile profile))
+            if (TownNPCProfiles.Instance.GetProfile(talkNPC, out ITownNPCProfile profile))
                 value = profile.GetTextureNPCShouldUse(talkNPC).Value;
 
             // ModCall

@@ -106,7 +106,7 @@ namespace DialogueTweak.Interfaces
                 npc.GetNPCPreferenceSorted(out var NPCPreferences, out var biomePreferences);
                 foreach (var preference in NPCPreferences) {
                     int head = NPC.TypeToDefaultHeadIndex(preference.NpcId);
-                    if (NPC.AnyNPCs(preference.NpcId) && TownNPCProfiles.Instance.GetProfile(preference.NpcId, out ITownNPCProfile profile)) {
+                    if (NPC.AnyNPCs(preference.NpcId) && TownNPCProfiles.Instance.GetProfile(Main.npc[NPC.FindFirstNPC(preference.NpcId)], out ITownNPCProfile profile)) {
                         head = profile.GetHeadTextureIndex(Main.npc[NPC.FindFirstNPC(preference.NpcId)]);
                     }
                     if (head > 0 && head < NPCHeadLoader.NPCHeadCount) {

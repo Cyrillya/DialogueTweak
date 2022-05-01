@@ -116,7 +116,7 @@ namespace DialogueTweak.Interfaces
             var npc = Main.npc[Main.LocalPlayer.talkNPC];
             int type = npc.type;
             // Shop
-            int head = (!TownNPCProfiles.Instance.GetProfile(type, out ITownNPCProfile profile)) ? NPC.TypeToDefaultHeadIndex(type) : profile.GetHeadTextureIndex(npc);
+            int head = (!TownNPCProfiles.Instance.GetProfile(npc, out ITownNPCProfile profile)) ? NPC.TypeToDefaultHeadIndex(type) : profile.GetHeadTextureIndex(npc);
             Shop = HandleAssets.DefaultIcon;
             if (NPCID.Sets.IsTownPet[type]) {
                 Shop = TextureAssets.NpcHead[NPC.TypeToDefaultHeadIndex(type)];
