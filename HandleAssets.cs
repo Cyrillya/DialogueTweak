@@ -29,10 +29,10 @@
                 SignIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Icon_Sign");
                 EditIcon = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/Icon_Edit");
 
-                GUIChatDraw.PortraitPanel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/PortraitPanel");
-                GUIChatDraw.GreyPixel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/GreyPixel");
-                GUIChatDraw.ChatTextPanel = Main.Assets.Request<Texture2D>("Images/UI/PanelBackground");
-                GUIChatDraw.BiomeIconTags = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Tags_Shadow");
+                ChatUI.PortraitPanel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/PortraitPanel");
+                ChatUI.GreyPixel = ModContent.Request<Texture2D>("DialogueTweak/Interfaces/Assets/GreyPixel");
+                ChatUI.ChatTextPanel = Main.Assets.Request<Texture2D>("Images/UI/PanelBackground");
+                ChatUI.BiomeIconTags = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Tags_Shadow");
             }
         }
     }

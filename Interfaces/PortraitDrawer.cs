@@ -50,9 +50,17 @@
             var position = panel.Location.ToVector2() + new Vector2(62f, 62f);
             var origin = new Vector2(frame.Width, frame.Height) / 2f;
 
+            // 重新开启spriteBatch，以去掉不明觉厉的UI绘制的一层模糊滤镜
+            sb.End();
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.UIScaleMatrix);
+
             sb.Draw(value, position, frame, talkNPC.GetAlpha(Color.White), 0f, origin, scale, SpriteEffects.FlipHorizontally, 0f);
             if (talkNPC.color != default(Color))
                 sb.Draw(value, position, frame, talkNPC.GetColor(talkNPC.color), 0f, origin, scale, SpriteEffects.FlipHorizontally, 0f);
+
+            // 还原
+            sb.End();
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
             // 名字，用DeathText因为它大而且清晰
             Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, talkNPC.GivenOrTypeName, 270f + (Main.screenWidth - 800) / 2, 108, textColor, Color.Black, Vector2.Zero, 0.54f);
@@ -105,7 +113,16 @@
 
             var position = panel.Location.ToVector2() + new Vector2(62f, 65f);
 
+            // 重新开启spriteBatch，以去掉不明觉厉的UI绘制的一层模糊滤镜
+            sb.End();
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.UIScaleMatrix);
+
             sb.Draw(value, position, frame, Color.White, 0f, value.Size() / 2f, 2f, SpriteEffects.None, 0f);
+
+            // 还原
+            sb.End();
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+
             // 名字
             Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, text, 270f + (Main.screenWidth - 800) / 2, 108, textColor, Color.Black, Vector2.Zero, 0.54f);
 
@@ -115,14 +132,8 @@
         }
 
         internal static void DrawPortrait(SpriteBatch sb, Color textColor, Rectangle panel) {
-            // 重新开启spriteBatch，以去掉不明觉厉的UI绘制的一层模糊滤镜
-            sb.End();
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.UIScaleMatrix);
             if (OnPortraitDraw is not null)
                 OnPortraitDraw.Invoke(sb, textColor, panel);
-            // 还原
-            sb.End();
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         }
     }
 }

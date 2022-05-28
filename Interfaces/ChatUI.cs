@@ -1,9 +1,10 @@
 ﻿using ReLogic.Localization.IME;
 using ReLogic.OS;
+using Terraria.GameContent.UI.Chat;
 
 namespace DialogueTweak.Interfaces
 {
-    public class GUIChatDraw
+    public class ChatUI : UIState
     {
         private static TextDisplayCache _textDisplayCache = new();
 
@@ -12,9 +13,17 @@ namespace DialogueTweak.Interfaces
         internal static Asset<Texture2D> ChatTextPanel;
         internal static Asset<Texture2D> GreyPixel;
         public static readonly Color ChatTextPanelColor = new(35, 43, 89);
-        public static Vector2 PanelPosition => new(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100f);
 
-        public static void GUIDrawInner() {
+        internal static bool CursorAtTextPanel;
+        internal static string PrevText;
+        internal static float LetterAppeared;
+        internal static float TotalLetters;
+        public const int MAX_LINES = 16;
+
+        public static Vector2 PanelPosition => new(Main.screenWidth / 2 - TextureAssets.ChatBack.Width() / 2, 100f);
+        public static float LineSpacing => FontAssets.MouseText.Value.LineSpacing;
+
+        public override void Draw(SpriteBatch spriteBatch) {
             if (Main.LocalPlayer.talkNPC < 0 && Main.LocalPlayer.sign == -1) {
                 Main.npcChatText = "";
                 return;
@@ -25,7 +34,7 @@ namespace DialogueTweak.Interfaces
             int textValue = (Main.mouseTextColor * 2 + 255) / 3;
             Color textColor = new(textValue, textValue, textValue, textValue);
 
-            PrepareCache(ref _textDisplayCache, out string[] textLines, out int amountOfLines);
+            PrepareCache(ref _textDisplayCache, out TextSnippet[] snippets, out int amountOfLines);
             if (Main.editSign) {
                 PrepareBlinker(ref Main.instance.textBlinkerCount, ref Main.instance.textBlinkerState);
                 // 输入法面板，不过1.4tml好像不调用游戏内输入法面板了
@@ -34,9 +43,11 @@ namespace DialogueTweak.Interfaces
             PrepareVirtualKeyboard(amountOfLines);
             PrepareLinesFocuses(ref amountOfLines, out string focusText, out string focusText2, out int money, out float linePositioning);
             DrawPanel(linePositioning, panelColor, out Rectangle rectangle);
+
             var textPanelPosition = PanelPosition + new Vector2(120, 45f);
-            var textPanelSize = new Vector2(370f, amountOfLines * 30);
-            DrawTextAndPanel(textPanelPosition, textPanelSize, textColor, DialogueTweakSystem.letterAppeared, amountOfLines, textLines); // 文字框
+            var textPanelSize = new Vector2(370f, amountOfLines * LineSpacing);
+
+            DrawTextAndPanel(textPanelPosition, textPanelSize, LetterAppeared, snippets); // 文字框
             // 人像背景框，以及名字和文本的分割线
             Main.spriteBatch.Draw(PortraitPanel.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             // 钱币、物品、偏好之类
@@ -47,7 +58,7 @@ namespace DialogueTweak.Interfaces
 
             // 判断鼠标是否处于对话栏界面
             if (new Rectangle((int)textPanelPosition.X, (int)textPanelPosition.Y, (int)textPanelSize.X, (int)textPanelSize.Y).Contains(new Point(Main.mouseX, Main.mouseY))) {
-                DialogueTweakSystem.cursorAtTextPanel = true;
+                CursorAtTextPanel = true;
             }
 
             // 判断鼠标是否处于交互界面
@@ -65,16 +76,10 @@ namespace DialogueTweak.Interfaces
             if (shouldDrawButton) {
                 // 在交互按钮和对话之间一条浅黑线，如果没有交互按钮就不Draw了（绘制条件和交互按钮一致）
                 byte breakPixel = 2; // 左右都有[breakPixel]个像素的空隙
-                Main.spriteBatch.Draw(GreyPixel.Value, PanelPosition + new Vector2(breakPixel * 2, linePositioning * 30 - 30), null, Color.White * 0.9f, 0f, Vector2.Zero, new Vector2(TextureAssets.ChatBack.Width() - breakPixel * 4, 3f), SpriteEffects.None, 0f);
+                Main.spriteBatch.Draw(GreyPixel.Value, PanelPosition + new Vector2(breakPixel * 2, linePositioning * LineSpacing - LineSpacing), null, Color.White * 0.9f, 0f, Vector2.Zero, new Vector2(TextureAssets.ChatBack.Width() - breakPixel * 4, 3f), SpriteEffects.None, 0f);
 
-                // 重新开启spriteBatch，以去掉不明觉厉的UI绘制的一层模糊滤镜
-                Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.UIScaleMatrix);
                 // 按钮
-                ButtonHandler.DrawButtons((int)(linePositioning * 30 - 30 + PanelPosition.Y), focusText, focusText2);
-                // 还原
-                Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+                ButtonHandler.DrawButtons((int)(linePositioning * LineSpacing - LineSpacing + PanelPosition.Y), focusText, focusText2);
             }
         }
 
@@ -160,70 +165,102 @@ namespace DialogueTweak.Interfaces
             }
         }
 
-        internal static void DrawTextAndPanel(Vector2 textPanelPosition, Vector2 textPanelSize, Color textColor, float letterAppeared, int amountOfLines, string[] textLines) {
+        internal static void DrawTextAndPanel(Vector2 textPanelPosition, Vector2 textPanelSize, float letterAppeared, TextSnippet[] originalSnippets) {
             ButtonHandler.DrawPanel(Main.spriteBatch, ChatTextPanel.Value,
                 textPanelPosition, // position
                 textPanelSize, // size
                 ChatTextPanelColor, cornerSize: 12, barSize: 4);
 
             // 对话文本
+            int linesCount = 0;
             int letterCount = 0;
-            for (int i = 0; i < amountOfLines; i++) {
-                string text = textLines[i];
-                if (text != null) {
-                    var snippets = ChatManager.ParseMessage(text, textColor).ToArray();
-                    ChatManager.ConvertNormalSnippets(snippets);
-                    foreach (var snippet in snippets) {
-                        letterCount += snippet.Text.Length; // 直接这一段加进去
-                        if (letterCount > letterAppeared) {
-                            // 计算出多了多少个
-                            int outOfRange = letterCount - (int)letterAppeared;
-                            snippet.Text = (outOfRange >= snippet.Text.Length) ? string.Empty : snippet.Text.Remove(snippet.Text.Length - outOfRange);
-                        }
-                    }
-                    var font = FontAssets.MouseText.Value;
-                    var basePos = textPanelPosition + new Vector2(5, 5 + i * 30);
-                    // 输入法缓冲文本与光标闪动
-                    if (i == amountOfLines - 1 && Main.editSign) {
-                        var drawCursor = basePos + new Vector2(ChatManager.GetStringSize(font, snippets, Vector2.One).X, 0);
-                        string compositionString = Platform.Get<IImeService>().CompositionString;
-                        if (compositionString != null && compositionString.Length > 0) {
-                            Vector2 position = drawCursor;
-                            ChatManager.DrawColorCodedStringShadow(Main.spriteBatch, font, compositionString, position, Color.Black, 0f, Vector2.Zero, Vector2.One, spread: 1.2f);
-                            Utils.DrawBorderStringFourWay(Main.spriteBatch, font, compositionString, position.X, position.Y, new Color(255, 240, 20), Color.Transparent, Vector2.Zero);
-                            drawCursor.X += font.MeasureString(compositionString).X; // the cursor drawing position should be changed.
-                        }
-                        if (Main.instance.textBlinkerState == 1)
-                            Utils.DrawBorderStringFourWay(Main.spriteBatch, font, "|", drawCursor.X, drawCursor.Y, Color.White, Color.Black, Vector2.Zero);
-                    }
-                    ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, snippets, basePos, 0, Vector2.Zero, Vector2.One, out _);
-                    // 也进行braek退出显示
+            List<TextSnippet> snippets = new(); // new一个新的出来，不然就把原来的snippets改了
+            foreach (var snippet in originalSnippets) {
+                if (snippet is PlainTagHandler.PlainSnippet) {
+                    letterCount += snippet.Text.Length; // 直接这一段加进去
+                    string visualString = snippet.Text;
                     if (letterCount > letterAppeared) {
-                        break;
+                        // 计算出多了多少个
+                        int outOfRange = letterCount - (int)letterAppeared;
+                        visualString = (outOfRange >= snippet.Text.Length) ? string.Empty : snippet.Text.Remove(snippet.Text.Length - outOfRange);
+                    }
+                    linesCount += visualString.Split('\n').Length - 1;
+                    if (linesCount > MAX_LINES) {
+                        visualString = string.Empty;
+                    }
+                    if (visualString != string.Empty) {
+                        snippets.Add(new TextSnippet(visualString, snippet.Color));
+                    }
+                }
+                else {
+                    letterCount += 1; // 直接这一段加进去
+                    if (letterCount <= letterAppeared) {
+                        snippets.Add(snippet);
                     }
                 }
             }
+            var font = FontAssets.MouseText.Value;
+            var basePos = textPanelPosition + new Vector2(5);
+            // 输入法缓冲文本与光标闪动
+            if (Main.editSign && linesCount <= MAX_LINES) {
+                string compositionString = Platform.Get<IImeService>().CompositionString;
+                if (compositionString != null && compositionString.Length > 0) {
+                    snippets.Add(new TextSnippet(compositionString, new Color(255, 240, 20)));
+                }
+                if (Main.instance.textBlinkerState == 1) {
+                    snippets.Add(new TextSnippet("|"));
+                }
+            }
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, snippets.ToArray(), basePos, 0, Vector2.Zero, Vector2.One, out _);
         }
 
         internal static void DrawPanel(float linePositioning, Color color, out Rectangle rectangle) {
-            // 没事别乱改参数了呜呜呜，这里是背景板。中间加一段防止文字太长了的延续特判，当然再长我就不管了，直接用最大行数限制吧
+            // 没事别乱改参数了呜呜呜，这里是背景板。中间加一段防止文字太长了的延续特判，当然再长我就不管了，直接让他写出格吧
+            linePositioning = Math.Clamp(linePositioning, 0f, 22f);
+            int height = (int)(2 + linePositioning * LineSpacing);
             Main.spriteBatch.Draw(
                 texture: TextureAssets.ChatBack.Value,
                 position: PanelPosition,
-                sourceRectangle: new Rectangle(0, 0, TextureAssets.ChatBack.Width(), (int)(linePositioning >= 15 ? 450 : 2 + linePositioning * 30)),
+                sourceRectangle: new Rectangle(0, 0, TextureAssets.ChatBack.Width(), (int)(linePositioning >= 15 ? LineSpacing * 15 : height)),
                 color: color);
             if (linePositioning >= 15) {
                 Main.spriteBatch.Draw(
                     texture: TextureAssets.ChatBack.Value,
-                    position: PanelPosition + new Vector2(0, 450f),
-                    sourceRectangle: new Rectangle(0, 30, TextureAssets.ChatBack.Width(), (int)(2 + (linePositioning - 15) * 30)),
+                    position: PanelPosition + new Vector2(0, LineSpacing * 15),
+                    sourceRectangle: new Rectangle(0, (int)LineSpacing, TextureAssets.ChatBack.Width(), (int)(2 + (linePositioning - 15) * LineSpacing)),
                     color: color);
             }
             Main.spriteBatch.Draw(
-                texture: TextureAssets.ChatBack.Value, position: PanelPosition + new Vector2(0, 2 + linePositioning * 30),
-                sourceRectangle: new Rectangle(0, TextureAssets.ChatBack.Height() - 30, TextureAssets.ChatBack.Width(), 30),
+                texture: TextureAssets.ChatBack.Value, position: PanelPosition + new Vector2(0, height),
+                sourceRectangle: new Rectangle(0, TextureAssets.ChatBack.Height() - 32, TextureAssets.ChatBack.Width(), 32),
                 color: color);
-            rectangle = new Rectangle((int)PanelPosition.X, (int)PanelPosition.Y, TextureAssets.ChatBack.Width(), (int)(2 + linePositioning * 30 + 30));
+            rectangle = new Rectangle((int)PanelPosition.X, (int)PanelPosition.Y, TextureAssets.ChatBack.Width(), height + 32);
+        }
+
+        // Text scrolling 文字滚动机制
+        public override void Update(GameTime gameTime) {
+            if (Main.npcChatText != PrevText) {
+                LetterAppeared = 0;
+            }
+            if (Main.LocalPlayer.sign > -1) {
+                LetterAppeared = 1145141919; // 标牌没有缓慢出现机制
+                return;
+            }
+            PrevText = Main.npcChatText;
+            if (!Main.npc.IndexInRange(Main.LocalPlayer.talkNPC) || Main.npc[Main.LocalPlayer.talkNPC] is null || !Main.npc[Main.LocalPlayer.talkNPC].active) {
+                return;
+            }
+            if (LetterAppeared < TotalLetters + 1) {
+                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 1.2f : 2f;
+                if (CursorAtTextPanel) {
+                    speakingRateMultipiler *= 1.2f;
+                    if (Main.mouseLeft) {
+                        speakingRateMultipiler *= 3f; // 快速吟唱
+                    }
+                }
+                LetterAppeared += ChatMethods.HandleSpeakingRate(Main.npc[Main.LocalPlayer.talkNPC].type) * speakingRateMultipiler;
+            }
+            CursorAtTextPanel = false;
         }
 
         /// <summary>用于标牌 | 竖线闪动机制</summary>
@@ -241,12 +278,12 @@ namespace DialogueTweak.Interfaces
 
         /// <summary>手柄虚拟键盘的位置</summary>
         internal static void PrepareVirtualKeyboard(int amountOfLines) {
-            int num2 = 120 + amountOfLines * 30 + 30;
-            num2 -= 180;
+            float offsetDown = 120 + amountOfLines * LineSpacing + LineSpacing;
+            offsetDown -= 180;
             UIVirtualKeyboard.ShouldHideText = !PlayerInput.UsingGamepad;
             if (!PlayerInput.UsingGamepad) // 不使用手柄就隐藏了
-                num2 = 9999;
-            UIVirtualKeyboard.OffsetDown = num2;
+                offsetDown = 9999;
+            UIVirtualKeyboard.OffsetDown = (int)offsetDown;
         }
 
         /// <summary>决定按钮文本以及用于绘制的基于行数的定位</summary>
@@ -262,15 +299,15 @@ namespace DialogueTweak.Interfaces
                 amountOfLines++;
             }
 
-            linePositioning = (amountOfLines < 2 ? 2 : amountOfLines) + 3; // float更方便细调，其实就是为了手柄编辑标牌的对称感
+            linePositioning = (amountOfLines <= 2 ? 2.2f : amountOfLines) + 3f; // float更方便细调，其实就是为了手柄编辑标牌的对称感
             if (Main.editSign && !UIVirtualKeyboard.ShouldHideText) { // 手柄下编辑标牌时底部没有按钮，会缩回去
                 linePositioning -= 1.85f;
             }
         }
 
-        internal static void PrepareCache(ref TextDisplayCache textDisplayCache, out string[] textLines, out int amountOfLines) {
+        internal static void PrepareCache(ref TextDisplayCache textDisplayCache, out TextSnippet[] snippets, out int amountOfLines) {
             textDisplayCache.PrepareCache(Main.npcChatText); // 处理对话文本（换行、统计行数之类）
-            textLines = textDisplayCache.TextLines;
+            snippets = textDisplayCache.Snippets;
             amountOfLines = textDisplayCache.AmountOfLines;
         }
     }

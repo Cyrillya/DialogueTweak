@@ -75,7 +75,7 @@
         }
 
         private static void DrawBackButton(float statY, bool longer) {
-            Rectangle buttonRectangle = new Rectangle((int)GUIChatDraw.PanelPosition.X + 16, (int)statY + 10, longer ? 98 : 44, 44);
+            Rectangle buttonRectangle = new Rectangle((int)ChatUI.PanelPosition.X + 16, (int)statY + 10, longer ? 98 : 44, 44);
             Rectangle? frame = null;
             var value = Button_Back.Value;
             // ModCall
@@ -111,7 +111,7 @@
         }
 
         private static void DrawHappinessButton(float statY) {
-            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 68, statY + 10);
+            Vector2 pos = new Vector2(ChatUI.PanelPosition.X + 68, statY + 10);
             Rectangle? frame = null;
             var value = Button_Happiness.Value;
             // ModCall
@@ -167,7 +167,7 @@
         }
 
         private static void DrawLongShopButton(int statY, int offsetX, int width, string shopText, Color chatColor) {
-            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 122 + offsetX, statY + 10);
+            Vector2 pos = new Vector2(ChatUI.PanelPosition.X + 122 + offsetX, statY + 10);
             int height = 44;
             // 按钮
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
@@ -221,7 +221,7 @@
         }
 
         private static void DrawLongExtraButton(int statY, int offsetX, int width, string shopText, Color chatColor) {
-            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 122 + offsetX, statY + 10);
+            Vector2 pos = new Vector2(ChatUI.PanelPosition.X + 122 + offsetX, statY + 10);
             int height = 44;
             // 按钮
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
@@ -275,7 +275,7 @@
             bool useIcon = button.iconTexture != "";
             string text = !useText ? "" : button.buttonText().Trim();
 
-            Vector2 pos = new Vector2(GUIChatDraw.PanelPosition.X + 122 + offsetX, statY + 10);
+            Vector2 pos = new Vector2(ChatUI.PanelPosition.X + 122 + offsetX, statY + 10);
             int height = 44;
             // 按钮
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);

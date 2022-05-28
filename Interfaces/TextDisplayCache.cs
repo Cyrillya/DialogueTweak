@@ -1,4 +1,7 @@
-﻿namespace DialogueTweak.Interfaces
+﻿using ReLogic.Text;
+using Terraria.GameContent.UI.Chat;
+
+namespace DialogueTweak.Interfaces
 {
     internal class TextDisplayCache
     {
@@ -6,7 +9,7 @@
         private int _lastScreenWidth;
         private int _lastScreenHeight;
 
-        public string[] TextLines {
+        public TextSnippet[] Snippets {
             get;
             private set;
         }
@@ -20,134 +23,100 @@
             if ((0 | ((Main.screenWidth != _lastScreenWidth) ? 1 : 0) | ((Main.screenHeight != _lastScreenHeight) ? 1 : 0) | ((_originalText != text) ? 1 : 0)) != 0) {
                 _lastScreenWidth = Main.screenWidth;
                 _lastScreenHeight = Main.screenHeight;
+
                 _originalText = text;
-                TextLines = WordwrapString(Main.npcChatText, FontAssets.MouseText.Value, 362, out int lineAmount);
-                AmountOfLines = lineAmount;
+                Snippets = WordwrapString(_originalText, FontAssets.MouseText.Value, 362);
+                ChatManager.ConvertNormalSnippets(Snippets);
+
+                AmountOfLines = 0;
+                foreach (var s in Snippets) {
+                    var texts = s.Text.Split('\n');
+                    foreach (var t in texts) {
+                        AmountOfLines++;
+                        ChatUI.TotalLetters += t.Length + 1; // +1换行符
+                    }
+                    AmountOfLines -= 1;
+                }
+                AmountOfLines = Math.Min(AmountOfLines, ChatUI.MAX_LINES);
             }
         }
 
+        // 针对textSnippet特殊文本的换行
+        public TextSnippet[] WordwrapString(string text, DynamicSpriteFont font, int maxWidth) {
+            float workingLineLength = 0f; // 当前行长度
+            TextSnippet[] originalSnippets = ChatManager.ParseMessage(text, Color.White).ToArray();
+            ChatManager.ConvertNormalSnippets(originalSnippets);
+            List<TextSnippet> finalSnippets = new() { new TextSnippet() };
 
-        // 对于中文有优化的换行，自创
-        public static string[] WordwrapString(string text, DynamicSpriteFont font, int maxWidth, out int lineAmount) {
-            const int maxLines = 27; // 最大行数限制
-            string[] array = new string[maxLines];
-            int num = 0;
-            // 这里用for给list2添加，是大概是为了一个\n的换行
-            // list2似乎是精确到了每个单词
-            List<string> list = new List<string>(text.Split('\n'));
-            List<string> list2 = new List<string>(list[0].Split(' '));
-            for (int i = 1; i < list.Count && i < maxLines; i++) {
-                //Main.NewText(list[i]);
-                list2.Add("\n");
-                list2.AddRange(list[i].Split(' '));
-            }
+            foreach (var snippet in originalSnippets) {
+                if (snippet is PlainTagHandler.PlainSnippet) {
+                    string cacheString = ""; // 缓存字符串 - 准备输入的字符
+                    for (int i = 0; i < snippet.Text.Length; i++) {
+                        GlyphMetrics characterMetrics = font.GetCharacterMetrics(snippet.Text[i]);
+                        workingLineLength += font.CharacterSpacing + characterMetrics.KernedWidth;
 
-            bool flag = true;
-            while (list2.Count > 0) {
-                string text2 = list2[0];
-                string str = " ";
-                if (list2.Count == 1)
-                    str = "";
+                        if (workingLineLength > maxWidth && !char.IsWhiteSpace(snippet.Text[i])) {
+                            // 如果第一个字符是空格，单词长度小于19（实际上是18因为第一个字符为空格），可以空格换行
+                            bool canWrapWord = cacheString.Length > 1 && cacheString.Length < 19;
 
-                if (text2 == "\n") {
-                    array[num++] += text2;
-                    flag = true;
-                    if (num >= maxLines)
-                        break;
-
-                    list2.RemoveAt(0);
-                }
-                else if (flag) {
-                    if (font.MeasureString(text2).X > (float)maxWidth) {
-                        string str2 = text2[0].ToString() ?? "";
-                        int num2 = 1;
-                        // 如果是以中文结尾(text2[num2]为中文)，那么不需要"-"
-                        string hyphen = "";
-                        if (IsChineseOrSymbols(text2[num2 - 1]) && text2.Length < num2 + 1 && IsChineseOrSymbols(text2[num2 + 1])) {
-                            hyphen = "-";
-                        }
-                        // 添加文本阶段————文字长度还未触行末
-                        while (font.MeasureString(str2 + text2[num2] + hyphen).X <= (float)maxWidth) {
-                            str2 += text2[num2++];
-                            // 如果下一个索引是英文，上一个是中文
-                            if (!IsChineseOrSymbols(text2[num2]) && IsChineseOrSymbols(text2[num2 - 1])) {
-                                // 获取单词
-                                int count = 1;
-                                string word = "" + text2[num2];
-                                while (!IsChineseOrSymbols(text2[num2 + count])) {
-                                    word += text2[num2 + count];
-                                    count++;
-                                }
-                                // 获取单词所占空间，如果超限，直接break，让单词换行
-                                if (font.MeasureString(str2 + word).X > (float)maxWidth) {
-                                    break;
-                                }
+                            // 找不到空格，或者拆腻子，则强制换行
+                            if (!canWrapWord || (i > 0 && CanBreakBetween(snippet.Text[i - 1], snippet.Text[i]))) {
+                                finalSnippets.Add(new TextSnippet(cacheString, snippet.Color));
+                                finalSnippets.Add(new TextSnippet("\n"));
+                                workingLineLength = characterMetrics.KernedWidthOnNewLine;
+                                cacheString = "";
                             }
-                            // 每次都更新一下，因为选取的字符是不断变动的
-                            if (IsChineseOrSymbols(text2[num2 - 1]) && text2.Length < num2 + 1 && IsChineseOrSymbols(text2[num2 + 1])) {
-                                hyphen = "-";
-                            }
-                        }
-                        // 换行代码
-                        // 如果下一个索引是中文符号，上一个不是
-                        if (ChineseSymbols.Exists(t => t == text2[num2]) && !ChineseSymbols.Exists(t => t == text2[num2 - 1])) {
-                            // 加上这个符号，并把指针向后移动
-                            str2 += text2[num2++];
-                            hyphen = "";
-                            // 下一个字符是不显示的字符（如换行\n等）
-                            while (num2 < text2.Length && font.MeasureString(text2[num2].ToString()).X <= 0) {
-                                str2 += text2[num2++];
+                            // 空格换行
+                            else if (canWrapWord) {
+                                finalSnippets.Add(new TextSnippet("\n"));
+                                finalSnippets.Add(new TextSnippet(cacheString[1..], snippet.Color));
+                                workingLineLength = font.MeasureString(cacheString).X;
+                                cacheString = "";
                             }
                         }
 
-                        str2 += hyphen;
-                        array[num++] = str2;
-                        if (num >= maxLines)
-                            break;
+                        // 这么做可以分割单词，并且使自然分割单词（即不因换行过长强制分割的单词）第一个字符总是空格
+                        // 或者是将CJK字符与非CJK字符分割
+                        if (cacheString != string.Empty && (char.IsWhiteSpace(snippet.Text[i]) || IsCJK(cacheString[^1]) != IsCJK(snippet.Text[i]))) {
+                            finalSnippets.Add(new TextSnippet(cacheString, snippet.Color));
+                            cacheString = "";
+                        }
 
-                        list2.RemoveAt(0); // 清空list2，方便下一行代码的应用
-                        if (num2 < text2.Length) list2.Insert(0, text2.Substring(num2)); // 将剩余文本重新放回到list2（待处理文本区）内
+                        // 原有换行则将当前行长度重置
+                        if (snippet.Text[i] is '\n') {
+                            workingLineLength = 0;
+                        }
+
+                        cacheString += snippet.Text[i];
                     }
-                    else {
-                        ref string reference = ref array[num];
-                        reference = reference + text2 + str;
-                        flag = false;
-                        list2.RemoveAt(0);
-                    }
-                }
-                else if (font.MeasureString(array[num] + text2).X > (float)maxWidth) {
-                    num++;
-                    if (num >= maxLines)
-                        break;
-
-                    flag = true;
+                    finalSnippets.Add(new TextSnippet(cacheString, snippet.Color));
                 }
                 else {
-                    ref string reference2 = ref array[num];
-                    reference2 = reference2 + text2 + str;
-                    flag = false;
-                    list2.RemoveAt(0);
+                    float length = snippet.GetStringLength(font);
+                    workingLineLength += length;
+                    // 超了 - 换行再添加，注意起始长度
+                    if (workingLineLength > maxWidth) {
+                        workingLineLength = length;
+                        finalSnippets.Add(new TextSnippet("\n"));
+                    }
+                    finalSnippets.Add(snippet);
                 }
             }
 
-            lineAmount = num;
-            if (lineAmount == maxLines)
-                lineAmount--;
-
-            return array;
+            return finalSnippets.ToArray();
         }
 
-        // 检测字符是否为中文
+        // https://unicode-table.com/cn/blocks/cjk-unified-ideographs/ 中日韩统一表意文字
+        // https://unicode-table.com/cn/blocks/cjk-symbols-and-punctuation/ 中日韩符号和标点
+        public static bool IsCJK(char a) {
+            return (a >= 0x4E00 && a <= 0x9FFF) || (a >= 0x3000 && a <= 0x303F);
+        }
 
-        public static readonly List<char> ChineseSymbols = new List<char>() {
-            '–', '—', '‘', '’', '“', '”',
-            '…', '、', '。', '〈', '〉', '《',
-            '》', '「', '」', '『', '』', '【',
-            '】', '〔', '〕', '！', '（', '）',
-            '，', '．', '：', '；', '？'
-        };
-        // https://www.qqxiuzi.cn/zh/hanzi-unicode-bianma.php 汉字Unicode编码范围表
-        public static bool IsChinese(char a) => (a >= 0x4E00 && a <= 0x9FEF);
-        public static bool IsChineseOrSymbols(char a) => IsChinese(a) || ChineseSymbols.Exists(t => t == a);
+        internal static bool CanBreakBetween(char previousChar, char nextChar) {
+            if (IsCJK(previousChar) || IsCJK(nextChar))
+                return true;
+
+            return false;
+        }
     }
 }
