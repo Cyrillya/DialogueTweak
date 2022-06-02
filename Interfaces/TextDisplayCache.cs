@@ -42,7 +42,7 @@ namespace DialogueTweak.Interfaces
         }
 
         // 针对textSnippet特殊文本的换行
-        public TextSnippet[] WordwrapString(string text, DynamicSpriteFont font, int maxWidth) {
+        public static TextSnippet[] WordwrapString(string text, DynamicSpriteFont font, int maxWidth) {
             float workingLineLength = 0f; // 当前行长度
             TextSnippet[] originalSnippets = ChatManager.ParseMessage(text, Color.White).ToArray();
             ChatManager.ConvertNormalSnippets(originalSnippets);

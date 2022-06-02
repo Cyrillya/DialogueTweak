@@ -135,7 +135,7 @@
 
                 if (Main.mouseLeft && Main.mouseLeftRelease) {
                     Main.npcChatCornerItem = 0;
-                    SoundEngine.PlaySound(12);
+                    SoundEngine.PlaySound(SoundID.MenuTick);
                     Main.npcChatText = Main.LocalPlayer.currentShoppingSettings.HappinessReport;
 
                     // 点击按钮后在左下角显示具体偏好情况

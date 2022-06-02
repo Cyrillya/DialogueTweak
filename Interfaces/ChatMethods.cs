@@ -196,21 +196,21 @@ namespace DialogueTweak.Interfaces
 
             NPCLoader.OnChatButtonClicked(false);
             if (talkNPC.type == NPCID.Dryad) {
-                SoundEngine.PlaySound(12);
+                SoundEngine.PlaySound(SoundID.MenuTick);
                 Main.npcChatText = Lang.GetDryadWorldStatusDialog();
             }
 
             else if (talkNPC.type == NPCID.Guide) {
                 Main.playerInventory = true;
                 Main.npcChatText = "";
-                SoundEngine.PlaySound(12);
+                SoundEngine.PlaySound(SoundID.MenuTick);
                 Main.InGuideCraftMenu = true;
                 UILinkPointNavigator.GoToDefaultPage();
             }
             else if (talkNPC.type == NPCID.GoblinTinkerer) {
                 Main.playerInventory = true;
                 Main.npcChatText = "";
-                SoundEngine.PlaySound(12);
+                SoundEngine.PlaySound(SoundID.MenuTick);
                 Main.InReforgeMenu = true;
                 UILinkPointNavigator.GoToDefaultPage();
             }
@@ -219,7 +219,7 @@ namespace DialogueTweak.Interfaces
             }
             else if (talkNPC.type == NPCID.DyeTrader) {
                 Main.npcChatCornerItem = 0;
-                SoundEngine.PlaySound(12);
+                SoundEngine.PlaySound(SoundID.MenuTick);
                 bool gotDye = false;
                 int num28 = Main.LocalPlayer.FindItem(ItemID.Sets.ExoticPlantsForDyeTrade);
                 if (num28 != -1) {
@@ -228,19 +228,19 @@ namespace DialogueTweak.Interfaces
                         Main.LocalPlayer.inventory[num28] = new Item();
 
                     gotDye = true;
-                    SoundEngine.PlaySound(24);
+                    SoundEngine.PlaySound(SoundID.Chat);
                     Main.LocalPlayer.GetDyeTraderReward(talkNPC);
                 }
 
                 Main.npcChatText = Lang.DyeTraderQuestChat(gotDye);
             }
             else if (talkNPC.type == NPCID.DD2Bartender) {
-                SoundEngine.PlaySound(12);
+                SoundEngine.PlaySound(SoundID.MenuTick);
                 HelpText();
                 Main.npcChatText = Lang.BartenderHelpText(talkNPC);
             }
             else if (talkNPC.type == NPCID.PartyGirl) {
-                SoundEngine.PlaySound(12);
+                SoundEngine.PlaySound(SoundID.MenuTick);
                 Main.npcChatText = Language.GetTextValue("PartyGirlSpecialText.Music" + Main.rand.Next(1, 4));
                 // 利用反射获取设为private static的Main.swapMusic字段并修改
                 var targetBool = Main.instance.GetType().GetField("swapMusic", BindingFlags.Static | BindingFlags.NonPublic);
@@ -381,7 +381,7 @@ namespace DialogueTweak.Interfaces
             switch (talkNPC.type) {
                 case NPCID.Angler: {
                         Main.npcChatCornerItem = 0;
-                        SoundEngine.PlaySound(12);
+                        SoundEngine.PlaySound(SoundID.MenuTick);
                         bool flag3 = false;
                         if (!Main.anglerQuestFinished && !Main.anglerWhoFinishedToday.Contains(Main.LocalPlayer.name)) {
                             int num19 = Main.LocalPlayer.FindItem(Main.anglerQuestItemNetIDs[Main.anglerQuest]);
@@ -391,7 +391,7 @@ namespace DialogueTweak.Interfaces
                                     Main.LocalPlayer.inventory[num19] = new Item();
 
                                 flag3 = true;
-                                SoundEngine.PlaySound(24);
+                                SoundEngine.PlaySound(SoundID.Chat);
                                 Main.LocalPlayer.anglerQuestsFinished++;
                                 Main.LocalPlayer.GetAnglerReward(talkNPC);
                             }
@@ -418,7 +418,7 @@ namespace DialogueTweak.Interfaces
                     Main.npcChatText = "";
                     break;
                 case NPCID.Guide:
-                    SoundEngine.PlaySound(12);
+                    SoundEngine.PlaySound(SoundID.MenuTick);
                     HelpText();
                     break;
                 case NPCID.TaxCollector: {
@@ -476,7 +476,7 @@ namespace DialogueTweak.Interfaces
                         break;
                     }
                 case NPCID.Nurse: {
-                        SoundEngine.PlaySound(12);
+                        SoundEngine.PlaySound(SoundID.MenuTick);
                         int num4 = Main.LocalPlayer.statLifeMax2 - Main.LocalPlayer.statLife;
                         for (int j = 0; j < Player.MaxBuffs; j++) {
                             int num5 = Main.LocalPlayer.buffType[j];
