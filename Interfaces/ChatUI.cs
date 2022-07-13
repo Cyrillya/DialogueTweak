@@ -46,8 +46,6 @@ namespace DialogueTweak.Interfaces
 
             var textPanelPosition = PanelPosition + new Vector2(120, 45f);
             var textPanelSize = new Vector2(370f, amountOfLines * LineSpacing);
-            if (Main.npcChatCornerItem > 0)
-                textPanelSize.Y += LineSpacing;
 
             DrawTextAndPanel(textPanelPosition, textPanelSize, LetterAppeared, snippets); // 文字框
             // 人像背景框，以及名字和文本的分割线
@@ -297,9 +295,11 @@ namespace DialogueTweak.Interfaces
             focusText2 = "";
             money = 0;
             ChatMethods.HandleFocusText(ref focusText, ref focusText2, ref money);
-            if (money != 0) {
+            if (money != 0)
                 amountOfLines++;
-            }
+
+            if (Main.npcChatCornerItem > 0)
+                amountOfLines++;
 
             linePositioning = (amountOfLines <= 2 ? 2.2f : amountOfLines) + 3f; // float更方便细调，其实就是为了手柄编辑标牌的对称感
             if (Main.editSign && !UIVirtualKeyboard.ShouldHideText) { // 手柄下编辑标牌时底部没有按钮，会缩回去
