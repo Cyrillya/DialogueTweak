@@ -143,8 +143,8 @@ namespace DialogueTweak.Interfaces
                         var name = ShopHelper.BiomeNameByKey(biome.Biome.NameKey);
                         // 对于模组群系，如果可以的话直接获取BestiaryIcon
                         if (biome.Biome is ModBiome modBiome) {
-                            if (modBiome.BestiaryIcon != null && modBiome.Mod.HasAsset(modBiome.BestiaryIcon)) {
-                                texture = modBiome.Mod.Assets.Request<Texture2D>(modBiome.BestiaryIcon).Value;
+                            if (modBiome.BestiaryIcon != null && ModContent.HasAsset(modBiome.BestiaryIcon)) {
+                                texture = ModContent.Request<Texture2D>(modBiome.BestiaryIcon, AssetRequestMode.ImmediateLoad).Value;
                                 frame = new(0, 0, 30, 30); // tML限制了icon必须为30x30
                             }
                             name = modBiome.DisplayName.GetTranslation(Language.ActiveCulture);
