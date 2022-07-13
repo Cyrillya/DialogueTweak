@@ -32,7 +32,6 @@
                 layers[dialogIndex] = new LegacyGameInterfaceLayer(
                     "DialogueTweak: Reworked Dialog Panel",
                     delegate {
-                        // if the player is talking to the Angler, the new shop isn't opened and dialogue tweak mod isn't active.
                         if ((Main.npcChatText != "" || Main.LocalPlayer.sign != -1) && !Main.editChest) {
                             UserInterface.Draw(Main.spriteBatch, _lastUpdateUiGameTime);
                         }

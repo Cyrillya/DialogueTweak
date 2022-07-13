@@ -46,6 +46,8 @@ namespace DialogueTweak.Interfaces
 
             var textPanelPosition = PanelPosition + new Vector2(120, 45f);
             var textPanelSize = new Vector2(370f, amountOfLines * LineSpacing);
+            if (Main.npcChatCornerItem > 0)
+                textPanelSize.Y += LineSpacing;
 
             DrawTextAndPanel(textPanelPosition, textPanelSize, LetterAppeared, snippets); // 文字框
             // 人像背景框，以及名字和文本的分割线
@@ -251,7 +253,7 @@ namespace DialogueTweak.Interfaces
                 return;
             }
             if (LetterAppeared < TotalLetters + 1) {
-                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 1.2f : 2f;
+                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 2.5f : 4f;
                 if (CursorAtTextPanel) {
                     speakingRateMultipiler *= 1.2f;
                     if (Main.mouseLeft) {
