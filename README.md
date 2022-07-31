@@ -108,7 +108,7 @@ private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
 # Mod.Calls (Button)
 There are only one Mod.Call for adding buttons now. I think that's enough though.
 ### AddButton
-```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string texture, Action hoverAction, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Adds a new button.
+```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string texture, Action hoverAction, [Func<bool> replacementAvailable]```Adds a new button.
 
 ## Arguments
 ### 1.) Button Adding Type - ```string```
@@ -128,9 +128,6 @@ The action that will be called when the client hovers over the button. Use this 
 
 ### 6.) Availability - ```Func<bool>```
 You can decide if your button should be shown.
-
-### 7.) Frame - ```Func<Rectangle>```
-You can customize the frame of the icon texture. It is useful to display different parts of the texture in different situations.
 
 ## Examples
 The following example adds a button using the close texture of this mod reads "Close". When you click on it, a message will be shown.

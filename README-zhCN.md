@@ -107,7 +107,7 @@ private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
 # Mod.Call (添加按钮)
 目前只有一个添加按钮的Mod.Call，不过我觉得应该够用了.
 ### AddButton
-```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string texture, Action hoverAction, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```添加一个新按钮.
+```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string texture, Action hoverAction, [Func<bool> replacementAvailable]```添加一个新按钮.
 
 ## Arguments
 ### 1.) 按钮类型 - ```string```
@@ -127,9 +127,6 @@ private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
 
 ### 6.) 可见性 - ```Func<bool>```
 你可以决定是否显示该按钮.
-
-### 7.) 帧 - ```Func<Rectangle>```
-你可以自定义图标贴图的绘制帧. 以在不同状况下显示一个贴图的不同部分.
 
 ## Examples
 以下示例使用此Mod的关闭按钮贴图(即Button_Back)添加了一个按钮，显示为“关闭”. 当玩家单击它时将显示一条消息。

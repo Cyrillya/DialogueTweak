@@ -146,8 +146,7 @@ namespace DialogueTweak
 										args[2] as Func<string>, // NPC Button Text
 										args[3] as string, // Icon Texture Path (With Mod Name)
 										args[4] as Action, // Hover Action
-										args[5] as Func<bool>, // Available
-										args[6] as Func<Rectangle> // Frame Rectangle
+										args[5] as Func<bool> // Available
 										));
 								}
 								return true;
