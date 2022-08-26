@@ -4,10 +4,10 @@
     internal class Localization : ModSystem
     {
         public override void PostSetupContent() {
-            AddTranslation(Mod, "Hate", "Hassen", "Odio", "Je déteste", "Odio", "Ненавидит:", "讨厌", "Ódio", "Nienawiść");
-            AddTranslation(Mod, "Dislike", "Nicht mögen", "Dislike", "N'aime pas", "No me gusta", "Не нравится:", "不喜", "Não gostar", "Nie lubię");
-            AddTranslation(Mod, "Like", "Gefällt", "Come", "J'aime bien", "Me gusta", "Нравится:", "喜欢", "Como", "Lubię");
-            AddTranslation(Mod, "Love", "Lieben", "Amore", "J'aime", "Amo", "Любит:", "喜爱", "Amor", "Love");
+            AddTranslation(Mod, "Hate", "Hassen", "Odio", "Je déteste", "Odio", "Ненавидит:", "讨厌", "Odeia", "Nienawiść");
+            AddTranslation(Mod, "Dislike", "Nicht mögen", "Dislike", "N'aime pas", "No me gusta", "Не нравится:", "不喜", "Não gosta de", "Nie lubię");
+            AddTranslation(Mod, "Like", "Gefällt", "Come", "J'aime bien", "Me gusta", "Нравится:", "喜欢", "Gosta de", "Lubię");
+            AddTranslation(Mod, "Love", "Lieben", "Amore", "J'aime", "Amo", "Любит:", "喜爱", "Ama", "Love");
         }
 
         //English = 1,
