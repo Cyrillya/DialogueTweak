@@ -3,55 +3,34 @@
     internal static class DrawingHelper
     {
         public static Rectangle ShopBiomeVanillaIconFrame(IShoppingBiome biome, Asset<Texture2D> texture) {
-            if (biome is OceanBiome) {
-                return texture.Frame(16, 5, 12, 1);
-            }
-            if (biome is ForestBiome) {
-                return texture.Frame(16, 5, 0, 0);
-            }
-            if (biome is SnowBiome) {
-                return texture.Frame(16, 5, 5, 0);
-            }
-            if (biome is DesertBiome) {
-                return texture.Frame(16, 5, 4, 0);
-            }
-            if (biome is JungleBiome) {
-                return texture.Frame(16, 5, 6, 1);
-            }
-            if (biome is UndergroundBiome) {
-                return texture.Frame(16, 5, 2, 0);
-            }
-            if (biome is HallowBiome) {
-                return texture.Frame(16, 5, 1, 1);
-            }
-            if (biome is MushroomBiome) {
-                return texture.Frame(16, 5, 8, 1);
-            }
-            if (biome is DungeonBiome) {
-                return texture.Frame(16, 5, 0, 2);
-            }
-            if (biome is CorruptionBiome) {
-                return texture.Frame(16, 5, 7, 0);
-            }
-            if (biome is CrimsonBiome) {
-                return texture.Frame(16, 5, 12, 0);
-            }
-            return texture.Frame(16, 5, 0, 4); // 简单的一个“?”
+            return biome switch
+            {
+                OceanBiome => texture.Frame(16, 5, 12, 1),
+                ForestBiome => texture.Frame(16, 5, 0, 0),
+                SnowBiome => texture.Frame(16, 5, 5, 0),
+                DesertBiome => texture.Frame(16, 5, 4, 0),
+                JungleBiome => texture.Frame(16, 5, 6, 1),
+                UndergroundBiome => texture.Frame(16, 5, 2, 0),
+                HallowBiome => texture.Frame(16, 5, 1, 1),
+                MushroomBiome => texture.Frame(16, 5, 8, 1),
+                DungeonBiome => texture.Frame(16, 5, 0, 2),
+                CorruptionBiome => texture.Frame(16, 5, 7, 0),
+                CrimsonBiome => texture.Frame(16, 5, 12, 0),
+                _ => texture.Frame(16, 5, 0, 4)
+            };
         }
 
         /// <summary>根据偏好不同描边颜色不同</summary>
-        public static Color AffectionLevelColor(AffectionLevel level) {
-            switch (level) {
-                case AffectionLevel.Love:
-                    return Color.LawnGreen;
-                case AffectionLevel.Like:
-                    return Color.CornflowerBlue;
-                case AffectionLevel.Dislike:
-                    return Color.BurlyWood;
-                case AffectionLevel.Hate:
-                    return Color.MediumVioletRed;
-            }
-            return Color.White;
+        public static Color AffectionLevelColor(AffectionLevel level)
+        {
+            return level switch
+            {
+                AffectionLevel.Love => Color.LawnGreen,
+                AffectionLevel.Like => Color.CornflowerBlue,
+                AffectionLevel.Dislike => Color.BurlyWood,
+                AffectionLevel.Hate => Color.MediumVioletRed,
+                _ => Color.White
+            };
         }
 
         /// <summary>在面板右上方绘制文字</summary>

@@ -242,7 +242,7 @@ namespace DialogueTweak.Interfaces
             if (Main.npcChatText != PrevText) {
                 LetterAppeared = 0;
             }
-            if (Main.LocalPlayer.sign > -1) {
+            if (Main.LocalPlayer.sign > -1 || !ModContent.GetInstance<Configuration>().TextScrolling) {
                 LetterAppeared = 1145141919; // 标牌没有缓慢出现机制
                 return;
             }

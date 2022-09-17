@@ -8,6 +8,11 @@
             AddTranslation(Mod, "Dislike", "Nicht mögen", "Dislike", "N'aime pas", "No me gusta", "Не нравится:", "不喜", "Não gosta de", "Nie lubię");
             AddTranslation(Mod, "Like", "Gefällt", "Come", "J'aime bien", "Me gusta", "Нравится:", "喜欢", "Gosta de", "Lubię");
             AddTranslation(Mod, "Love", "Lieben", "Amore", "J'aime", "Amo", "Любит:", "喜爱", "Ama", "Love");
+
+            var t = LocalizationLoader.CreateTranslation(Mod, "Config.Scroll");
+            t.SetDefault("Text scrolling");
+            t.AddTranslation(7, "文字滚动");
+            LocalizationLoader.AddTranslation(t);
         }
 
         //English = 1,
