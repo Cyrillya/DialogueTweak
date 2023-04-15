@@ -98,20 +98,26 @@ namespace DialogueTweak.Interfaces
         }
 
         // 自己写的控制Shop和Extra的贴图
-        public static void HandleButtonIcon(int i, ref Asset<Texture2D> Shop, ref Asset<Texture2D> Extra) {
+        public static void HandleButtonIcon(int i, ref Asset<Texture2D> Shop, ref Rectangle ShopFrame, ref Asset<Texture2D> Extra, ref Rectangle ExtraFrame) {
             // -1即标牌绘制
             if (i == -1) {
                 Shop = HandleAssets.EditIcon;
+                ShopFrame = Shop.Frame();
                 foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(-1) && a.available() && a.texture != "" && a.texture != "Head" select a) {
                     if (info.iconType == IconType.Shop) {
                         Shop = ModContent.Request<Texture2D>(info.texture);
+                        ShopFrame = info.frame?.Invoke() ?? Shop.Frame();
                     }
                     if (info.iconType == IconType.Extra) {
                         Extra = ModContent.Request<Texture2D>(info.texture);
+                        ExtraFrame = info.frame?.Invoke() ?? Extra.Frame();
                     }
                 }
                 return;
             }
+
+            Rectangle? shopFrameOverride = null;
+            Rectangle? extraFrameOverride = null;
 
             var npc = Main.npc[Main.LocalPlayer.talkNPC];
             int type = npc.type;
@@ -137,6 +143,7 @@ namespace DialogueTweak.Interfaces
                     }
                     else {
                         Shop = ModContent.Request<Texture2D>(info.texture);
+                        shopFrameOverride = info.frame?.Invoke();
                     }
                 }
                 if (info.iconType == IconType.Extra) {
@@ -145,9 +152,13 @@ namespace DialogueTweak.Interfaces
                     }
                     else {
                         Extra = ModContent.Request<Texture2D>(info.texture);
+                        extraFrameOverride = info.frame?.Invoke();
                     }
                 }
             }
+
+            ShopFrame = shopFrameOverride ?? Shop.Frame();
+            ExtraFrame = extraFrameOverride ?? Extra.Frame();
         }
 
         // 根据标牌type获取对应物品type，原版是直接NewItem所以这里只能特判了
