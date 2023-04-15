@@ -44,7 +44,7 @@
             foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(talkNPC.type) && a.available() && a.texture != "" && a.iconType == IconType.Portrait select a) {
                 if (info.texture == "None") return;
                 value = ModContent.Request<Texture2D>(info.texture).Value;
-                frame = (info.frame ?? (() => new Rectangle(0, 0, value.Width, value.Height)))(); // 如果info.frame为null则使用new Rectangle(0, 0, value.Width, value.Height)
+                frame = info.frame?.Invoke() ?? value.Frame(); // 如果info.frame为null则使用new Rectangle(0, 0, value.Width, value.Height)
             }
 
             var position = panel.Location.ToVector2() + new Vector2(62f, 62f);
@@ -78,7 +78,7 @@
 
             // 画像
             var value = HandleAssets.SignIcon.Value;
-            Rectangle? frame = null;
+            Rectangle frame = value.Frame();
             bool useItemTexture = true;
             int i = Main.LocalPlayer.sign;
             if (Main.sign[i] is null || !WorldGen.InWorld(Main.sign[i].x, Main.sign[i].y) || !Main.tile[Main.sign[i].x, Main.sign[i].y].HasTile)
@@ -92,7 +92,7 @@
             foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(-1) && a.available() && a.texture != "" && a.iconType == IconType.Portrait select a) {
                 if (info.texture == "None") return;
                 value = ModContent.Request<Texture2D>(info.texture).Value;
-                frame = info.frame();
+                frame = info.frame?.Invoke() ?? value.Frame();
                 useItemTexture = false;
             }
 
@@ -105,6 +105,7 @@
                 if (dropItem < TextureAssets.Item.Length && TextureAssets.Item[dropItem] is not null) {
                     Main.instance.LoadItem(dropItem);
                     value = TextureAssets.Item[dropItem].Value;
+                    frame = value.Frame();
                     var item = new Item();
                     item.netDefaults(dropItem);
                     text = item.Name;
@@ -117,7 +118,7 @@
             sb.End();
             sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null, Main.UIScaleMatrix);
 
-            sb.Draw(value, position, frame, Color.White, 0f, value.Size() / 2f, 2f, SpriteEffects.None, 0f);
+            sb.Draw(value, position, frame, Color.White, 0f, frame.Size() / 2f, 2f, SpriteEffects.None, 0f);
 
             // 还原
             sb.End();

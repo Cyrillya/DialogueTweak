@@ -13,7 +13,9 @@
         public static Asset<Texture2D> Button_Happiness;
 
         public static Asset<Texture2D> Shop;
+        public static Rectangle ShopFrame;
         public static Asset<Texture2D> Extra;
+        public static Rectangle ExtraFrame;
 
         public static readonly Color BorderColor = Color.Black;
         public static readonly Color BackgroundColor = new Color(73, 85, 186);
@@ -52,7 +54,7 @@
             int buttonWidth = 375 / buttonCounts - spacing; // 每个按钮的宽度，+2是加上，-10是去除了按钮之间的间隔
 
             // 决定图标
-            ChatMethods.HandleButtonIcon(type, ref Shop, ref Extra);
+            ChatMethods.HandleButtonIcon(type, ref Shop, ref ShopFrame, ref Extra, ref ExtraFrame);
 
             int offsetX = 0;
 
@@ -76,17 +78,17 @@
 
         private static void DrawBackButton(float statY, bool longer) {
             Rectangle buttonRectangle = new Rectangle((int)ChatUI.PanelPosition.X + 16, (int)statY + 10, longer ? 98 : 44, 44);
-            Rectangle? frame = null;
             var value = Button_Back.Value;
+            Rectangle frame = value.Frame();
             // ModCall
             int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[Main.LocalPlayer.talkNPC].type; // 为了标牌特判
             foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(type) && a.available() && a.texture != "" && a.iconType == IconType.Back select a) {
                 value = ModContent.Request<Texture2D>(info.texture).Value;
-                frame = info.frame();
+                frame = info.frame?.Invoke() ?? value.Frame();
             }
 
             DrawPanel(SpriteBatch, ButtonPanel.Value, buttonRectangle.Location.ToVector2(), buttonRectangle.Size(), Color.White);
-            SpriteBatch.Draw(value, buttonRectangle.Location.ToVector2() + buttonRectangle.Size() / 2f, frame, Color.White * 0.9f, 0f, Button_Back.Size() / 2f, 1f, SpriteEffects.None, 0f);
+            SpriteBatch.Draw(value, buttonRectangle.Location.ToVector2() + buttonRectangle.Size() / 2f, frame, Color.White * 0.9f, 0f, frame.Size() / 2f, 1f, SpriteEffects.None, 0f);
 
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 if (!moveOnBackButton) {
@@ -112,13 +114,13 @@
 
         private static void DrawHappinessButton(float statY) {
             Vector2 pos = new Vector2(ChatUI.PanelPosition.X + 68, statY + 10);
-            Rectangle? frame = null;
             var value = Button_Happiness.Value;
+            Rectangle frame = value.Frame();
             // ModCall
             int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[Main.LocalPlayer.talkNPC].type; // 为了标牌特判
             foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(type) && a.available() && a.texture != "" && a.iconType == IconType.Happiness select a) {
                 value = ModContent.Request<Texture2D>(info.texture).Value;
-                frame = info.frame();
+                frame = info.frame?.Invoke() ?? value.Frame();
             }
 
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(44, 44), Color.White);
@@ -172,7 +174,7 @@
             // 按钮
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
             // 对应图像（即icon）
-            SpriteBatch.Draw(Shop.Value, pos + new Vector2(44, height) / 2f, null, Color.White * 0.9f, 0f, new Vector2(Shop.Width(), Shop.Height()) / 2f, 1f, SpriteEffects.None, 0f);
+            SpriteBatch.Draw(Shop.Value, pos + new Vector2(44, height) / 2f, ShopFrame, Color.White * 0.9f, 0f, ShopFrame.Size() / 2f, 1f, SpriteEffects.None, 0f);
             Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, width, height);
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 if (!moveOnShopButton) {
@@ -226,7 +228,7 @@
             // 按钮
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
             // 对应图像（即icon）
-            SpriteBatch.Draw(Extra.Value, pos + new Vector2(44, height) / 2f, null, Color.White * 0.9f, 0f, new Vector2(Extra.Width(), Extra.Height()) / 2f, 1f, SpriteEffects.None, 0f);
+            SpriteBatch.Draw(Extra.Value, pos + new Vector2(44, height) / 2f, ExtraFrame, Color.White * 0.9f, 0f, ExtraFrame.Size() / 2f, 1f, SpriteEffects.None, 0f);
             Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, width, height);
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 NPC talkNPC = Main.npc[Main.LocalPlayer.talkNPC];
