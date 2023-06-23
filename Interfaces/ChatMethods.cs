@@ -9,11 +9,8 @@ namespace DialogueTweak.Interfaces
     // 这里基本上就是垃圾堆，都是原版代码（写死了，必须要自己新写一个自己执行的那种）
     public static class ChatMethods
     {
-        /// <summary>反射获取的NPC喜好数据库，用于在对话框右上角显示NPC偏好</summary>
-        private static PersonalityDatabase personalityDatabase => (PersonalityDatabase)typeof(ShopHelper).GetField("_database", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Main.ShopHelper);
-
         public static void GetNPCPreferenceSorted(this NPC npc, out List<NPCPreferenceTrait> NPCPreferences, out List<BiomePreferenceListTrait> BiomePreferences) {
-            var personalityProfile = personalityDatabase.GetOrCreateProfileByNPCID(npc.type);
+            var personalityProfile = Main.ShopHelper._database.GetOrCreateProfileByNPCID(npc.type);
             var shopModifiers = personalityProfile.ShopModifiers;
             // NPC和环境偏好表
             List<IShopPersonalityTrait> INPCPreferences = shopModifiers.Where(t => t is NPCPreferenceTrait).ToList();
@@ -98,19 +95,19 @@ namespace DialogueTweak.Interfaces
         }
 
         // 自己写的控制Shop和Extra的贴图
-        public static void HandleButtonIcon(int i, ref Asset<Texture2D> Shop, ref Rectangle ShopFrame, ref Asset<Texture2D> Extra, ref Rectangle ExtraFrame) {
+        public static void HandleButtonIcon(int i, out Asset<Texture2D> shop, out Rectangle shopFrame, ref Asset<Texture2D> extra, ref Rectangle extraFrame) {
             // -1即标牌绘制
             if (i == -1) {
-                Shop = HandleAssets.EditIcon;
-                ShopFrame = Shop.Frame();
+                shop = ModAsset.Icon_Edit;
+                shopFrame = shop.Frame();
                 foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(-1) && a.available() && a.texture != "" && a.texture != "Head" select a) {
                     if (info.iconType == IconType.Shop) {
-                        Shop = ModContent.Request<Texture2D>(info.texture);
-                        ShopFrame = info.frame?.Invoke() ?? Shop.Frame();
+                        shop = ModContent.Request<Texture2D>(info.texture);
+                        shopFrame = info.frame?.Invoke() ?? shop.Frame();
                     }
                     if (info.iconType == IconType.Extra) {
-                        Extra = ModContent.Request<Texture2D>(info.texture);
-                        ExtraFrame = info.frame?.Invoke() ?? Extra.Frame();
+                        extra = ModContent.Request<Texture2D>(info.texture);
+                        extraFrame = info.frame?.Invoke() ?? extra.Frame();
                     }
                 }
                 return;
@@ -123,81 +120,42 @@ namespace DialogueTweak.Interfaces
             int type = npc.type;
             // Shop
             int head = (!TownNPCProfiles.Instance.GetProfile(npc, out ITownNPCProfile profile)) ? NPC.TypeToDefaultHeadIndex(type) : profile.GetHeadTextureIndex(npc);
-            Shop = HandleAssets.DefaultIcon;
+            shop = ModAsset.Icon_Default;
             if (NPCID.Sets.IsTownPet[type]) {
-                Shop = TextureAssets.NpcHead[NPC.TypeToDefaultHeadIndex(type)];
+                shop = TextureAssets.NpcHead[NPC.TypeToDefaultHeadIndex(type)];
                 if (head > 0 && head < NPCHeadLoader.NPCHeadCount && !NPCHeadID.Sets.CannotBeDrawnInHousingUI[head]) {
-                    Shop = TextureAssets.NpcHead[head];
+                    shop = TextureAssets.NpcHead[head];
                 }
             }
 
             // Extra
             if (head > 0 && head < NPCHeadLoader.NPCHeadCount && !NPCHeadID.Sets.CannotBeDrawnInHousingUI[head]) {
-                Extra = TextureAssets.NpcHead[head];
+                extra = TextureAssets.NpcHead[head];
             }
 
             foreach (var info in from a in HandleAssets.IconInfos where a.npcTypes.Contains(type) && a.available() && a.texture != "" select a) {
                 if (info.iconType == IconType.Shop) {
                     if (info.texture == "Head") {
-                        Shop = TextureAssets.NpcHead[head];
+                        shop = TextureAssets.NpcHead[head];
                     }
                     else {
-                        Shop = ModContent.Request<Texture2D>(info.texture);
+                        shop = ModContent.Request<Texture2D>(info.texture);
                         shopFrameOverride = info.frame?.Invoke();
                     }
                 }
                 if (info.iconType == IconType.Extra) {
                     if (info.texture == "Head") {
-                        Extra = TextureAssets.NpcHead[head];
+                        extra = TextureAssets.NpcHead[head];
                     }
                     else {
-                        Extra = ModContent.Request<Texture2D>(info.texture);
+                        extra = ModContent.Request<Texture2D>(info.texture);
                         extraFrameOverride = info.frame?.Invoke();
                     }
                 }
             }
 
-            ShopFrame = shopFrameOverride ?? Shop.Frame();
-            ExtraFrame = extraFrameOverride ?? Extra.Frame();
-        }
-
-        // 根据标牌type获取对应物品type，原版是直接NewItem所以这里只能特判了
-        public static void GetSignItemType(int x, int y, ushort tileType, out int dropType) {
-            dropType = 171;
-            switch (tileType) {
-                case 85: {
-                        int frameX = Main.tile[x, y].TileFrameX / 18;
-                        int style = 0;
-                        while (frameX > 1) {
-                            frameX -= 2;
-                            style++;
-                        }
-                        int type2 = 321;
-                        if (style >= 6 && style <= 10)
-                            type2 = 3229 + style - 6;
-                        else if (style >= 1 && style <= 5)
-                            type2 = 1173 + style - 1;
-
-                        dropType = type2;
-
-                        break;
-                    }
-                case 395:
-                    dropType = 3270;
-                    break;
-                case 425:
-                    dropType = 3617;
-                    break;
-                case 573:
-                    dropType = 4710;
-                    break;
-                case 511:
-                    dropType = 4320;
-                    break;
-                case 510:
-                    dropType = 4319;
-                    break;
-            }
+            shopFrame = shopFrameOverride ?? shop.Frame();
+            extraFrame = extraFrameOverride ?? extra.Frame();
         }
 
         // 第二按钮被按下的行动
@@ -208,7 +166,7 @@ namespace DialogueTweak.Interfaces
             NPCLoader.OnChatButtonClicked(false);
             if (talkNPC.type == NPCID.Dryad) {
                 SoundEngine.PlaySound(SoundID.MenuTick);
-                Main.npcChatText = Lang.GetDryadWorldStatusDialog();
+                Main.npcChatText = Lang.GetDryadWorldStatusDialog(out _);
             }
 
             else if (talkNPC.type == NPCID.Guide) {
@@ -253,10 +211,7 @@ namespace DialogueTweak.Interfaces
             else if (talkNPC.type == NPCID.PartyGirl) {
                 SoundEngine.PlaySound(SoundID.MenuTick);
                 Main.npcChatText = Language.GetTextValue("PartyGirlSpecialText.Music" + Main.rand.Next(1, 4));
-                // 利用反射获取设为private static的Main.swapMusic字段并修改
-                var targetBool = Main.instance.GetType().GetField("swapMusic", BindingFlags.Static | BindingFlags.NonPublic);
-                var targetValue = (bool)targetBool.GetValue(null);
-                targetBool.SetValue(Main.instance, !targetValue);
+                Main.swapMusic = !Main.swapMusic;
             }
         }
 
@@ -364,8 +319,6 @@ namespace DialogueTweak.Interfaces
             }
             else if (talkNPC.type == NPCID.Nurse) {
                 int num15 = num4;
-                if (num15 > 0 && num15 < 1)
-                    num15 = 1;
 
                 PlayerLoader.ModifyNursePrice(Main.LocalPlayer, talkNPC, health, removeDebuffs, ref num15);
 
@@ -403,7 +356,7 @@ namespace DialogueTweak.Interfaces
                                 flag3 = true;
                                 SoundEngine.PlaySound(SoundID.Chat);
                                 Main.LocalPlayer.anglerQuestsFinished++;
-                                Main.LocalPlayer.GetAnglerReward(talkNPC);
+                                Main.LocalPlayer.GetAnglerReward(talkNPC, Main.anglerQuestItemNetIDs[Main.anglerQuest]);
                             }
                         }
 

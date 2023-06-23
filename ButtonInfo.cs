@@ -16,7 +16,7 @@
             this.iconTexture = iconTexture ?? "";
             this.hoverAction = hoverAction;
             if (!Main.dedServ && !ModContent.HasAsset(this.iconTexture) && this.iconTexture != "") {
-                DialogueTweak.instance.Logger.Warn($"Texture path {this.iconTexture} is missing.");
+                DialogueTweak.Instance.Logger.Warn($"Texture path {this.iconTexture} is missing.");
                 this.iconTexture = "";
             }
             this.available = available ?? (() => true);

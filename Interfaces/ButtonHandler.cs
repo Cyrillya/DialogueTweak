@@ -9,8 +9,6 @@
 
         public static Asset<Texture2D> ButtonPanel;
         public static Asset<Texture2D> ButtonPanel_Highlight;
-        public static Asset<Texture2D> Button_Back;
-        public static Asset<Texture2D> Button_Happiness;
 
         public static Asset<Texture2D> Shop;
         public static Rectangle ShopFrame;
@@ -54,7 +52,7 @@
             int buttonWidth = 375 / buttonCounts - spacing; // 每个按钮的宽度，+2是加上，-10是去除了按钮之间的间隔
 
             // 决定图标
-            ChatMethods.HandleButtonIcon(type, ref Shop, ref ShopFrame, ref Extra, ref ExtraFrame);
+            ChatMethods.HandleButtonIcon(type, out Shop, out ShopFrame, ref Extra, ref ExtraFrame);
 
             int offsetX = 0;
 
@@ -78,7 +76,7 @@
 
         private static void DrawBackButton(float statY, bool longer) {
             Rectangle buttonRectangle = new Rectangle((int)ChatUI.PanelPosition.X + 16, (int)statY + 10, longer ? 98 : 44, 44);
-            var value = Button_Back.Value;
+            var value = ModAsset.Button_Back.Value;
             Rectangle frame = value.Frame();
             // ModCall
             int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[Main.LocalPlayer.talkNPC].type; // 为了标牌特判
@@ -114,7 +112,7 @@
 
         private static void DrawHappinessButton(float statY) {
             Vector2 pos = new Vector2(ChatUI.PanelPosition.X + 68, statY + 10);
-            var value = Button_Happiness.Value;
+            var value = ModAsset.Button_Happiness.Value;
             Rectangle frame = value.Frame();
             // ModCall
             int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[Main.LocalPlayer.talkNPC].type; // 为了标牌特判
@@ -126,7 +124,7 @@
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(44, 44), Color.White);
             SpriteBatch.Draw(value, pos, frame, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
-            Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, Button_Happiness.Width(), Button_Happiness.Height());
+            Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, ModAsset.Button_Happiness.Width(), ModAsset.Button_Happiness.Height());
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
                 if (!moveOnHappinessButton) {
                     SoundEngine.PlaySound(SoundID.MenuTick);
@@ -140,21 +138,27 @@
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     Main.npcChatText = Main.LocalPlayer.currentShoppingSettings.HappinessReport;
 
-                    // 点击按钮后在左下角显示具体偏好情况
-                    var npc = Main.npc[Main.LocalPlayer.talkNPC];
-                    npc.GetNPCPreferenceSorted(out var NPCPreferences, out var biomePreferences);
-                    Main.NewText($"[c/{Main.DiscoColor.Hex3()}:{NPC.GetFullnameByID(npc.type)}]");
-                    foreach (var preference in NPCPreferences) {
-                        Main.NewText($"{Language.GetTextValue($"Mods.{DialogueTweak.instance.Name}.{preference.Level}")}: {NPC.GetFullnameByID(preference.NpcId)}");
-                    }
-                    foreach (var biomes in biomePreferences) {
-                        foreach (var biome in biomes.Preferences) {
-                            var name = ShopHelper.BiomeNameByKey(biome.Biome.NameKey);
-                            // 对于模组群系，直接获取DisplayName的翻译
-                            if (biome.Biome is ModBiome modBiome) {
-                                name = modBiome.DisplayName.GetTranslation(Language.ActiveCulture);
+                    if (Configuration.Instance.DisplayPreference) {
+                        // 点击按钮后在左下角显示具体偏好情况
+                        var npc = Main.npc[Main.LocalPlayer.talkNPC];
+                        npc.GetNPCPreferenceSorted(out var NPCPreferences, out var biomePreferences);
+                        Main.NewText($"[c/{Main.DiscoColor.Hex3()}:{NPC.GetFullnameByID(npc.type)}]");
+                        foreach (var preference in NPCPreferences) {
+                            Main.NewText(
+                                $"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{preference.Level}")}: {NPC.GetFullnameByID(preference.NpcId)}");
+                        }
+
+                        foreach (var biomes in biomePreferences) {
+                            foreach (var biome in biomes.Preferences) {
+                                var name = ShopHelper.BiomeNameByKey(biome.Biome.NameKey);
+                                // 对于模组群系，直接获取DisplayName的翻译
+                                if (biome.Biome is ModBiome modBiome) {
+                                    name = modBiome.DisplayName.Value;
+                                }
+
+                                Main.NewText(
+                                    $"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{biome.Affection}")}: {name}");
                             }
-                            Main.NewText($"{Language.GetTextValue($"Mods.{DialogueTweak.instance.Name}.{biome.Affection}")}: {name}");
                         }
                     }
                 }
@@ -328,11 +332,14 @@
         private static void DrawButtonText(string text, float spread, DynamicSpriteFont font, Vector2 buttonOrigin, Color shadowColor, Color chatColor, float sizeScale, Vector2 basePos, out Vector2 pos) {
             var scale = new Vector2(sizeScale, 1f);
             var stringSize = ChatManager.GetStringSize(font, text, scale); // 获取文本真正大小，只进行X轴上的缩放
-            Vector2 offset = new Vector2(MathHelper.Lerp(-12f, 4f, sizeScale), 4f); // 根据文本长度调整位置，根据缩放的大小可以让文本往左靠一点，尽量避免脱离按钮，sizeScale为[0.5-1]的值
+            var offset = new Vector2(MathHelper.Lerp(-12f, 4f, sizeScale), 4f); // 根据文本长度调整位置，根据缩放的大小可以让文本往左靠一点，尽量避免脱离按钮，sizeScale为[0.5-1]的值
             if (sizeScale >= 0.9f && stringSize.X >= 90f) offset.X = 12f; // 给不需要缩放但比较长的文本向右调整，以远离icon
             pos = basePos + buttonOrigin + offset;
-            ChatManager.DrawColorCodedStringShadow(SpriteBatch, font, text, pos, shadowColor, 0f, stringSize * 0.5f, scale, -1, spread);
-            ChatManager.DrawColorCodedString(SpriteBatch, font, text, pos, chatColor, 0f, stringSize * 0.5f, scale);
+            
+            var array = ChatManager.ParseMessage(text, chatColor).ToArray();
+            ChatManager.ConvertNormalSnippets(array);
+            ChatManager.DrawColorCodedStringShadow(SpriteBatch, font, array, pos, shadowColor, 0f, stringSize * 0.5f, scale, -1, spread);
+            ChatManager.DrawColorCodedString(SpriteBatch, font, array, pos, chatColor, 0f, stringSize * 0.5f, scale, out int _, -1);
         }
 
         public static void DrawPanel(SpriteBatch spriteBatch, Texture2D texture, Vector2 position, Vector2 size, Color color, Color? cornerColor = null, int cornerSize = 6, int barSize = 32) {

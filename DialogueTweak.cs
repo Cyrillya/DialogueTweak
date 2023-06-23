@@ -1,4 +1,4 @@
-global using DialogueTweak.Interfaces;
+锘縢lobal using DialogueTweak.Interfaces;
 global using Microsoft.Xna.Framework;
 global using Microsoft.Xna.Framework.Graphics;
 global using Mono.Cecil.Cil;
@@ -22,29 +22,18 @@ global using Terraria.UI;
 global using Terraria.UI.Chat;
 global using Terraria.UI.Gamepad;
 
-namespace DialogueTweak
+namespace DialogueTweak;
+
+public partial class DialogueTweak : Mod
 {
-    public partial class DialogueTweak : Mod
-    {
-        internal static DialogueTweak instance;
+    internal static DialogueTweak Instance;
 
-        public override void Load() {
-            // 这里把原版GUIChatDraw改成空白
-            IL.Terraria.UI.IngameFancyUI.Draw += IngameFancyUI_Draw;
-            instance = this;
-        }
+    public override void Load() {
+        Instance = this;
+    }
 
-        public override void Unload() {
-            instance = null;
-        }
-
-        private void IngameFancyUI_Draw(ILContext il) {
-            ILCursor c = new(il);
-            while (c.TryGotoNext(MoveType.Before, i => i.MatchCallOrCallvirt<Main>(nameof(Main.GUIChatDraw)))) {
-                c.Remove();
-                // 调用Main.GUIChatDraw前必有ldsfld将Main.instance推送到计算栈上，如果不Pop掉就会报错
-                c.Emit(OpCodes.Pop);
-            }
-        }
+    public override void Unload() {
+        Instance = null;
+        Configuration.Instance = null;
     }
 }

@@ -25,7 +25,7 @@ namespace DialogueTweak.Interfaces
                 _lastScreenHeight = Main.screenHeight;
 
                 _originalText = text;
-                Snippets = WordwrapString(_originalText, FontAssets.MouseText.Value, 362);
+                Snippets = WordwrapString(ConvertLeftRight(_originalText), FontAssets.MouseText.Value, 362);
                 ChatManager.ConvertNormalSnippets(Snippets);
 
                 AmountOfLines = 0;
@@ -39,6 +39,48 @@ namespace DialogueTweak.Interfaces
                 }
                 AmountOfLines = Math.Min(AmountOfLines, ChatUI.MAX_LINES);
             }
+        }
+        
+        public static string ConvertLeftRight(string text)
+        {
+            // 支持输入<left>和<right>
+            if (text.Contains("<right>"))
+            {
+                InputMode inputMode = InputMode.XBoxGamepad;
+                if (PlayerInput.UsingGamepad)
+                    inputMode = InputMode.XBoxGamepadUI;
+
+                if (inputMode == InputMode.XBoxGamepadUI)
+                {
+                    KeyConfiguration keyConfiguration = PlayerInput.CurrentProfile.InputModes[inputMode];
+                    string input = PlayerInput.BuildCommand("", true, keyConfiguration.KeyStatus["MouseRight"]);
+                    input = input.Replace(": ", "");
+                    text = text.Replace("<right>", input);
+                }
+                else
+                {
+                    text = text.Replace("<right>", Language.GetTextValue("Controls.RightClick"));
+                }
+            }
+            if (text.Contains("<left>"))
+            {
+                InputMode inputMode2 = InputMode.XBoxGamepad;
+                if (PlayerInput.UsingGamepad)
+                    inputMode2 = InputMode.XBoxGamepadUI;
+
+                if (inputMode2 == InputMode.XBoxGamepadUI)
+                {
+                    KeyConfiguration keyConfiguration2 = PlayerInput.CurrentProfile.InputModes[inputMode2];
+                    string input = PlayerInput.BuildCommand("", true, keyConfiguration2.KeyStatus["MouseLeft"]);
+                    input = input.Replace(": ", "");
+                    text = text.Replace("<left>", input);
+                }
+                else
+                {
+                    text = text.Replace("<left>", Language.GetTextValue("Controls.LeftClick"));
+                }
+            }
+            return text;
         }
 
         // 针对textSnippet特殊文本的换行

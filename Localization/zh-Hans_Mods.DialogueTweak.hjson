@@ -1,0 +1,38 @@
+Configs: {
+	Configuration: {
+		TextScrolling: {
+			Tooltip: 决定NPC对话文本是否会一个一个字地出现
+			Label: 文本滚动
+		}
+
+		DisplayName: 配置选项
+
+		DisplayPreference: {
+			Label: 显示NPC生活偏好
+			Tooltip: 显示NPC对环境和其他NPC的喜好，这是此Mod添加的辅助功能
+		}
+
+		BestiryPortrait: {
+			Label: 以图鉴形式绘制NPC肖像
+			Tooltip:
+				'''
+				按照绘制图鉴肖像的方式绘制NPC聊天界面的肖像。
+				如果默认的肖像显示方式出问题了，可以尝试开启此选项
+				'''
+		}
+
+		VanillaUI: {
+			Tooltip:
+				'''
+				允许你在游戏内开启原版对话面板
+				若该模组的UI不兼容其他模组或出现BUG，可以尝试开启此选项
+				'''
+			Label: 使用原版对话面板
+		}
+	}
+}
+
+Hate: 讨厌
+Dislike: 不喜
+Like: 喜欢
+Love: 喜爱

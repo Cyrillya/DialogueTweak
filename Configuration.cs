@@ -1,14 +1,27 @@
 using System.ComponentModel;
 using Terraria.ModLoader.Config;
 
-namespace DialogueTweak
-{
-    public class Configuration : ModConfig
-    {
-        public override ConfigScope Mode => ConfigScope.ClientSide;
+namespace DialogueTweak;
 
-        [DefaultValue(true)]
-        [Label("$Mods.DialogueTweak.Config.Scroll")]
-        public bool TextScrolling;
+public class Configuration : ModConfig
+{
+    public static Configuration Instance;
+        
+    public override ConfigScope Mode => ConfigScope.ClientSide;
+
+    [DefaultValue(true)]
+    public bool TextScrolling;
+
+    [DefaultValue(true)]
+    public bool DisplayPreference;
+
+    [DefaultValue(true)]
+    public bool BestiryPortrait;
+
+    [DefaultValue(false)]
+    public bool VanillaUI;
+        
+    public override void OnLoaded() {
+        Instance = this;
     }
 }

@@ -9,9 +9,7 @@ namespace DialogueTweak.Interfaces
         private static TextDisplayCache _textDisplayCache = new();
 
         internal static Asset<Texture2D> BiomeIconTags;
-        internal static Asset<Texture2D> PortraitPanel;
         internal static Asset<Texture2D> ChatTextPanel;
-        internal static Asset<Texture2D> GreyPixel;
         public static readonly Color ChatTextPanelColor = new(35, 43, 89);
 
         internal static bool CursorAtTextPanel;
@@ -37,8 +35,10 @@ namespace DialogueTweak.Interfaces
             PrepareCache(ref _textDisplayCache, out TextSnippet[] snippets, out int amountOfLines);
             if (Main.editSign) {
                 PrepareBlinker(ref Main.instance.textBlinkerCount, ref Main.instance.textBlinkerState);
-                // 输入法面板，不过1.4tml好像不调用游戏内输入法面板了
-                Main.instance.DrawWindowsIMEPanel(new Vector2(Main.screenWidth / 2, 90f), 0.5f);
+
+                if (Platform.Get<IImeService>().CompositionString is {Length: > 0}) {
+                    Main.instance.DrawWindowsIMEPanel(new Vector2(Main.screenWidth / 2, 90f), 0.5f);
+                }
             }
             PrepareVirtualKeyboard(amountOfLines);
             PrepareLinesFocuses(ref amountOfLines, out string focusText, out string focusText2, out int money, out float linePositioning);
@@ -48,13 +48,15 @@ namespace DialogueTweak.Interfaces
             var textPanelSize = new Vector2(370f, amountOfLines * LineSpacing);
 
             DrawTextAndPanel(textPanelPosition, textPanelSize, LetterAppeared, snippets); // 文字框
-            // 人像背景框，以及名字和文本的分割线
-            Main.spriteBatch.Draw(PortraitPanel.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            // 人像框背景，以及名字和文本的分割线
+            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Overlay.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             // 钱币、物品、偏好之类
             DrawTextPanelExtra(textPanelPosition, textPanelSize, rectangle, money, Main.npcChatCornerItem);
             // 肖像
             PortraitDrawer.DrawPortrait(Main.spriteBatch, textColor, rectangle);
             DrawButtons(focusText, focusText2, linePositioning);
+            // 人像框
+            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
             // 判断鼠标是否处于对话栏界面
             if (new Rectangle((int)textPanelPosition.X, (int)textPanelPosition.Y, (int)textPanelSize.X, (int)textPanelSize.Y).Contains(new Point(Main.mouseX, Main.mouseY))) {
@@ -73,14 +75,13 @@ namespace DialogueTweak.Interfaces
 
         internal static void DrawButtons(string focusText, string focusText2, float linePositioning) {
             bool shouldDrawButton = Main.InGameUI.CurrentState is not UIVirtualKeyboard || !PlayerInput.UsingGamepad;
-            if (shouldDrawButton) {
-                // 在交互按钮和对话之间一条浅黑线，如果没有交互按钮就不Draw了（绘制条件和交互按钮一致）
-                byte breakPixel = 2; // 左右都有[breakPixel]个像素的空隙
-                Main.spriteBatch.Draw(GreyPixel.Value, PanelPosition + new Vector2(breakPixel * 2, linePositioning * LineSpacing - LineSpacing), null, Color.White * 0.9f, 0f, Vector2.Zero, new Vector2(TextureAssets.ChatBack.Width() - breakPixel * 4, 3f), SpriteEffects.None, 0f);
+            if (!shouldDrawButton) return;
+            
+            // 在交互按钮和对话之间一条浅黑线，如果没有交互按钮就不Draw了（绘制条件和交互按钮一致）
+            Main.spriteBatch.Draw(ModAsset.ButtonSeperator.Value, PanelPosition + new Vector2(0, linePositioning * LineSpacing - LineSpacing), Color.White * 0.9f);
 
-                // 按钮
-                ButtonHandler.DrawButtons((int)(linePositioning * LineSpacing - LineSpacing + PanelPosition.Y), focusText, focusText2);
-            }
+            // 按钮
+            ButtonHandler.DrawButtons((int)(linePositioning * LineSpacing - LineSpacing + PanelPosition.Y), focusText, focusText2);
         }
 
         /// <summary>绘制钱币、任务物品和快乐值之类的杂项显示</summary>
@@ -112,7 +113,7 @@ namespace DialogueTweak.Interfaces
             }
 
             // 自己加的一个显示幸福值的小功能
-            if (Main.LocalPlayer.sign == -1 && Main.npc.IndexInRange(Main.LocalPlayer.talkNPC)) {
+            if (Configuration.Instance.DisplayPreference && Main.LocalPlayer.sign == -1 && Main.npc.IndexInRange(Main.LocalPlayer.talkNPC)) {
                 position = new Vector2((float)PanelPosition.X + panelRectangle.Width, (float)PanelPosition.Y - 18);
                 var npc = Main.npc[Main.LocalPlayer.talkNPC];
                 npc.GetNPCPreferenceSorted(out var NPCPreferences, out var biomePreferences);
@@ -132,7 +133,7 @@ namespace DialogueTweak.Interfaces
 
                         Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), texture.Width() + 2, texture.Height() + 2);
                         if (rect.Contains(new Point(Main.mouseX, Main.mouseY))) {
-                            DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.instance.Name}.{preference.Level}")}: {Lang.GetNPCNameValue(preference.NpcId)}", panelRectangle);
+                            DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{preference.Level}")}: {Lang.GetNPCNameValue(preference.NpcId)}", panelRectangle);
                         }
                     }
                 }
@@ -147,7 +148,7 @@ namespace DialogueTweak.Interfaces
                                 texture = ModContent.Request<Texture2D>(modBiome.BestiaryIcon, AssetRequestMode.ImmediateLoad).Value;
                                 frame = new(0, 0, 30, 30); // tML限制了icon必须为30x30
                             }
-                            name = modBiome.DisplayName.GetTranslation(Language.ActiveCulture);
+                            name = modBiome.DisplayName.Value;
                         }
                         var origin = frame.Size() / 2f;
                         position.X -= frame.Width + 4; // 调整到绘制位置，以实现一排排列的效果
@@ -158,7 +159,7 @@ namespace DialogueTweak.Interfaces
 
                         Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), frame.Width + 2, frame.Height + 2);
                         if (rect.Contains(new Point(Main.mouseX, Main.mouseY))) {
-                            DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.instance.Name}.{biome.Affection}")}: {name}", panelRectangle);
+                            DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{biome.Affection}")}: {name}", panelRectangle);
                         }
                     }
                 }
@@ -204,7 +205,7 @@ namespace DialogueTweak.Interfaces
             // 输入法缓冲文本与光标闪动
             if (Main.editSign && linesCount <= MAX_LINES) {
                 string compositionString = Platform.Get<IImeService>().CompositionString;
-                if (compositionString != null && compositionString.Length > 0) {
+                if (compositionString is {Length: > 0}) {
                     snippets.Add(new TextSnippet(compositionString, new Color(255, 240, 20)));
                 }
                 if (Main.instance.textBlinkerState == 1) {
@@ -242,7 +243,7 @@ namespace DialogueTweak.Interfaces
             if (Main.npcChatText != PrevText) {
                 LetterAppeared = 0;
             }
-            if (Main.LocalPlayer.sign > -1 || !ModContent.GetInstance<Configuration>().TextScrolling) {
+            if (Main.LocalPlayer.sign > -1 || !Configuration.Instance.TextScrolling) {
                 LetterAppeared = 1145141919; // 标牌没有缓慢出现机制
                 return;
             }
@@ -298,8 +299,8 @@ namespace DialogueTweak.Interfaces
             if (money != 0)
                 amountOfLines++;
 
-            if (Main.npcChatCornerItem > 0)
-                amountOfLines++;
+            // if (Main.npcChatCornerItem > 0)
+            //     amountOfLines++;
 
             linePositioning = (amountOfLines <= 2 ? 2.2f : amountOfLines) + 3f; // float更方便细调，其实就是为了手柄编辑标牌的对称感
             if (Main.editSign && !UIVirtualKeyboard.ShouldHideText) { // 手柄下编辑标牌时底部没有按钮，会缩回去

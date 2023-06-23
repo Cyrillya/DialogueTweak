@@ -92,25 +92,6 @@ namespace DialogueTweak
 								}
 								return true;
 							}
-						case "ReplacePortrait": {
-								if (args.Length <= 3) {
-									HandleAssets.IconInfos.Add(new IconInfo(
-										IconType.Portrait, // This icon is for portrait.
-										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string // Texture Path (With Mod Name) ("None" for not drawing portrait.)
-										));
-								}
-								else {
-									HandleAssets.IconInfos.Add(new IconInfo(
-										IconType.Portrait, // This icon is for portrait.
-										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string, // Texture Path (With Mod Name) ("None" for not drawing portrait.)
-										args[3] as Func<bool>, // Available
-										args[4] as Func<Rectangle> // Frame Rectangle
-										));
-								}
-								return true;
-							}
 						case "OnPostPortraitDraw": {
 								PortraitDrawer.OnPortraitDraw += args[1] as Action<SpriteBatch, Color, Rectangle>;
 								return true;

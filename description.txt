@@ -16,5 +16,5 @@ Mod制作者可以在PostSetupContent调用Mod.Call简单地为他们的NPC自�
 参见本Mod的Github页面并阅读README-zhCN.md来获取更多信息。
 您也可以查看DialogueTweak.ModCall.cs来获取相关代码。
 
-Github: https://github.com/Crapsky233/DialogueTweak
+Github: https://github.com/Cyrillya/DialogueTweak
 Forum: https://forums.terraria.org/index.php?threads/dialogue-panel-rework-a-mod-that-makes-your-npc-dialogue-panel-better.111694/
