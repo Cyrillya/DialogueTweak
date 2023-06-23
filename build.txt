@@ -1,5 +1,5 @@
 displayName = Dialogue Panel Rework
 author = Cyrilly
-version = 1.5.1
+version = 1.5.2
 side = Client
 homepage = https://forums.terraria.org/index.php?threads/dialogue-panel-rework-a-mod-that-makes-your-npc-dialogue-panel-better.111694/

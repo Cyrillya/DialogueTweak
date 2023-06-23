@@ -148,7 +148,7 @@ namespace DialogueTweak.Interfaces
                                 texture = ModContent.Request<Texture2D>(modBiome.BestiaryIcon, AssetRequestMode.ImmediateLoad).Value;
                                 frame = new(0, 0, 30, 30); // tML限制了icon必须为30x30
                             }
-                            name = modBiome.DisplayName.Value;
+                            name = modBiome.DisplayName.GetTranslation(LanguageManager.Instance.ActiveCulture);
                         }
                         var origin = frame.Size() / 2f;
                         position.X -= frame.Width + 4; // 调整到绘制位置，以实现一排排列的效果

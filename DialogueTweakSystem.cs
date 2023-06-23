@@ -15,14 +15,14 @@ internal class DialogueTweakSystem : ModSystem
         }
         
         // 标牌正在编辑时，原版对话框会在IngameFancyUI.Draw中被绘制，这里移除这个绘制
-        On_IngameFancyUI.Draw += (orig, batch, time) => {
+        On.Terraria.UI.IngameFancyUI.Draw += (orig, batch, time) => {
             _fancyUIDrawing = true;
             bool result = orig.Invoke(batch, time);
             _fancyUIDrawing = false;
             return result;
         };
 
-        On_Main.GUIChatDraw += (orig, self) => {
+        On.Terraria.Main.GUIChatDraw += (orig, self) => {
             if (_fancyUIDrawing && !Configuration.Instance.VanillaUI) {
                 return;
             }

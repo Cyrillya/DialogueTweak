@@ -166,7 +166,7 @@ namespace DialogueTweak.Interfaces
             NPCLoader.OnChatButtonClicked(false);
             if (talkNPC.type == NPCID.Dryad) {
                 SoundEngine.PlaySound(SoundID.MenuTick);
-                Main.npcChatText = Lang.GetDryadWorldStatusDialog(out _);
+                Main.npcChatText = Lang.GetDryadWorldStatusDialog();
             }
 
             else if (talkNPC.type == NPCID.Guide) {
@@ -356,7 +356,7 @@ namespace DialogueTweak.Interfaces
                                 flag3 = true;
                                 SoundEngine.PlaySound(SoundID.Chat);
                                 Main.LocalPlayer.anglerQuestsFinished++;
-                                Main.LocalPlayer.GetAnglerReward(talkNPC, Main.anglerQuestItemNetIDs[Main.anglerQuest]);
+                                Main.LocalPlayer.GetAnglerReward(talkNPC);
                             }
                         }
 

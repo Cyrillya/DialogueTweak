@@ -153,7 +153,7 @@
                                 var name = ShopHelper.BiomeNameByKey(biome.Biome.NameKey);
                                 // 对于模组群系，直接获取DisplayName的翻译
                                 if (biome.Biome is ModBiome modBiome) {
-                                    name = modBiome.DisplayName.Value;
+                                    name = modBiome.DisplayName.GetTranslation(LanguageManager.Instance.ActiveCulture);
                                 }
 
                                 Main.NewText(
