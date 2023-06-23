@@ -15,7 +15,7 @@ public class Configuration : ModConfig
     [DefaultValue(true)]
     public bool DisplayPreference;
 
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     public bool BestiryPortrait;
 
     [DefaultValue(false)]

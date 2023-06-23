@@ -3,6 +3,7 @@ using System.Reflection;
 using Terraria.DataStructures;
 using Terraria.GameContent.Achievements;
 using Terraria.GameContent.Personalities;
+using Terraria.ID;
 
 namespace DialogueTweak.Interfaces
 {
@@ -166,7 +167,21 @@ namespace DialogueTweak.Interfaces
             NPCLoader.OnChatButtonClicked(false);
             if (talkNPC.type == NPCID.Dryad) {
                 SoundEngine.PlaySound(SoundID.MenuTick);
-                Main.npcChatText = Lang.GetDryadWorldStatusDialog(out _);
+                Main.npcChatText = Lang.GetDryadWorldStatusDialog(out var worldIsEntirelyPure);
+                if (Main.CanDryadPlayStardewAnimation(Main.LocalPlayer, Main.npc[Main.LocalPlayer.talkNPC])) {
+                    NPC.PreventJojaColaDialog = true;
+                    NPC.RerollDryadText = 2;
+                    Main.LocalPlayer.ConsumeItem(5275, reverseOrder: true);
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                        NetMessage.SendData(144);
+                    else
+                        NPC.HaveDryadDoStardewAnimation();
+
+                    Main.npcChatText = Language.GetTextValue("StardewTalk.PlayerGivesCola");
+                }
+                else if (worldIsEntirelyPure) {
+                    AchievementsHelper.HandleSpecialEvent(Main.LocalPlayer, AchievementHelperID.Special.PurifyEntireWorld);
+                }
             }
 
             else if (talkNPC.type == NPCID.Guide) {
@@ -259,6 +274,8 @@ namespace DialogueTweak.Interfaces
             else if (talkNPC.type == NPCID.Dryad) {
                 focusText = Language.GetText("LegacyInterface.28").Value;
                 focusText2 = Language.GetText("LegacyInterface.49").Value;
+                if (Main.CanDryadPlayStardewAnimation(Main.LocalPlayer, Main.npc[Main.LocalPlayer.talkNPC]))
+                    focusText2 = Language.GetTextValue("StardewTalk.GiveColaButtonText");
             }
             else if (NPCID.Sets.IsTownPet[talkNPC.type]) {
                 focusText = Language.GetTextValue("UI.PetTheAnimal");
@@ -297,7 +314,7 @@ namespace DialogueTweak.Interfaces
                 focusText = Language.GetText("LegacyInterface.28").Value;
                 focusText2 = Language.GetTextValue("GameUI.Music");
             }
-            else if (talkNPC.type == NPCID.Merchant || talkNPC.type == NPCID.ArmsDealer || talkNPC.type == NPCID.Demolitionist || talkNPC.type == NPCID.Clothier || talkNPC.type == NPCID.GoblinTinkerer || talkNPC.type == NPCID.Wizard || talkNPC.type == NPCID.Mechanic || talkNPC.type == NPCID.SantaClaus || talkNPC.type == NPCID.Truffle || talkNPC.type == NPCID.Steampunker || talkNPC.type == NPCID.DyeTrader || talkNPC.type == NPCID.Cyborg || talkNPC.type == NPCID.Painter || talkNPC.type == NPCID.WitchDoctor || talkNPC.type == NPCID.Pirate) {
+            else if (talkNPC.type is NPCID.Merchant or NPCID.ArmsDealer or NPCID.Demolitionist or NPCID.Clothier or NPCID.GoblinTinkerer or NPCID.Wizard or NPCID.Mechanic or NPCID.SantaClaus or NPCID.Truffle or NPCID.Steampunker or NPCID.DyeTrader or NPCID.Cyborg or NPCID.Painter or NPCID.WitchDoctor or NPCID.Pirate) {
                 focusText = Language.GetText("LegacyInterface.28").Value;
                 if (talkNPC.type == NPCID.GoblinTinkerer)
                     focusText2 = Language.GetText("LegacyInterface.19").Value;

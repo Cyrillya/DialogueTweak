@@ -27,12 +27,14 @@ namespace DialogueTweak.Interfaces
                 return;
             }
 
+            string textValue = HandleJojaColaText();
+
             int panelValue = 230;
             Color panelColor = new(panelValue, panelValue, panelValue, panelValue);
-            int textValue = (Main.mouseTextColor * 2 + 255) / 3;
-            Color textColor = new(textValue, textValue, textValue, textValue);
+            int textColorValue = (Main.mouseTextColor * 2 + 255) / 3;
+            Color textColor = new(textColorValue, textColorValue, textColorValue, textColorValue);
 
-            PrepareCache(ref _textDisplayCache, out TextSnippet[] snippets, out int amountOfLines);
+            PrepareCache(textValue, ref _textDisplayCache, out TextSnippet[] snippets, out int amountOfLines);
             if (Main.editSign) {
                 PrepareBlinker(ref Main.instance.textBlinkerCount, ref Main.instance.textBlinkerState);
 
@@ -71,6 +73,24 @@ namespace DialogueTweak.Interfaces
                     Main.mouseLeftRelease = false;
                 }
             }
+        }
+
+        public string HandleJojaColaText() {
+            string textValue = Main.npcChatText;
+            bool num2 = Main.LocalPlayer.talkNPC != -1 && Main.CanDryadPlayStardewAnimation(Main.LocalPlayer, Main.npc[Main.LocalPlayer.talkNPC]);
+            if (Main.LocalPlayer.talkNPC != -1 && Main.npc[Main.LocalPlayer.talkNPC].ai[0] == 24f && NPC.RerollDryadText == 2)
+                NPC.RerollDryadText = 1;
+
+            if (num2 && NPC.RerollDryadText == 1 && Main.npc[Main.LocalPlayer.talkNPC].ai[0] != 24f && Main.LocalPlayer.talkNPC != -1 && Main.npc[Main.LocalPlayer.talkNPC].active && Main.npc[Main.LocalPlayer.talkNPC].type == 20) {
+                NPC.RerollDryadText = 0;
+                Main.npcChatText = Main.npc[Main.LocalPlayer.talkNPC].GetChat();
+                NPC.PreventJojaColaDialog = true;
+            }
+
+            if (num2 && !NPC.PreventJojaColaDialog)
+                textValue = Language.GetTextValue("StardewTalk.PlayerHasColaAndIsHoldingIt");
+
+            return textValue;
         }
 
         internal static void DrawButtons(string focusText, string focusText2, float linePositioning) {
@@ -308,8 +328,8 @@ namespace DialogueTweak.Interfaces
             }
         }
 
-        internal static void PrepareCache(ref TextDisplayCache textDisplayCache, out TextSnippet[] snippets, out int amountOfLines) {
-            textDisplayCache.PrepareCache(Main.npcChatText); // 处理对话文本（换行、统计行数之类）
+        internal static void PrepareCache(string textValue, ref TextDisplayCache textDisplayCache, out TextSnippet[] snippets, out int amountOfLines) {
+            textDisplayCache.PrepareCache(textValue); // 处理对话文本（换行、统计行数之类）
             snippets = textDisplayCache.Snippets;
             amountOfLines = textDisplayCache.AmountOfLines;
         }
