@@ -34,7 +34,7 @@ namespace DialogueTweak.Interfaces
             int textColorValue = (Main.mouseTextColor * 2 + 255) / 3;
             Color textColor = new(textColorValue, textColorValue, textColorValue, textColorValue);
 
-            PrepareCache(textValue, ref _textDisplayCache, out TextSnippet[] snippets, out int amountOfLines);
+            PrepareCache(textValue, ref _textDisplayCache, out TextSnippet[] snippets, out int amountOfLines, out float lastLineLength);
             if (Main.editSign) {
                 PrepareBlinker(ref Main.instance.textBlinkerCount, ref Main.instance.textBlinkerState);
 
@@ -43,11 +43,11 @@ namespace DialogueTweak.Interfaces
                 }
             }
             PrepareVirtualKeyboard(amountOfLines);
-            PrepareLinesFocuses(ref amountOfLines, out string focusText, out string focusText2, out int money, out float linePositioning);
+            PrepareLinesFocuses(lastLineLength, ref amountOfLines, out string focusText, out string focusText2, out int money, out float linePositioning);
             DrawPanel(linePositioning, panelColor, out Rectangle rectangle);
 
-            var textPanelPosition = PanelPosition + new Vector2(120, 45f);
-            var textPanelSize = new Vector2(370f, amountOfLines * LineSpacing);
+            var textPanelPosition = PanelPosition + new Vector2(116, 42f);
+            var textPanelSize = new Vector2(378f, amountOfLines * LineSpacing + 8f);
 
             DrawTextAndPanel(textPanelPosition, textPanelSize, LetterAppeared, snippets); // 文字框
             // 人像框背景，以及名字和文本的分割线
@@ -220,8 +220,10 @@ namespace DialogueTweak.Interfaces
                     }
                 }
             }
+            
             var font = FontAssets.MouseText.Value;
-            var basePos = textPanelPosition + new Vector2(5);
+            var basePos = textPanelPosition + new Vector2(7, 8);
+            
             // 输入法缓冲文本与光标闪动
             if (Main.editSign && linesCount <= MAX_LINES) {
                 string compositionString = Platform.Get<IImeService>().CompositionString;
@@ -232,6 +234,7 @@ namespace DialogueTweak.Interfaces
                     snippets.Add(new TextSnippet("|"));
                 }
             }
+            
             ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, snippets.ToArray(), basePos, 0, Vector2.Zero, Vector2.One, out _);
         }
 
@@ -308,7 +311,7 @@ namespace DialogueTweak.Interfaces
         }
 
         /// <summary>决定按钮文本以及用于绘制的基于行数的定位</summary>
-        internal static void PrepareLinesFocuses(ref int amountOfLines, out string focusText, out string focusText2, out int money, out float linePositioning) {
+        internal static void PrepareLinesFocuses(float lastLineLength, ref int amountOfLines, out string focusText, out string focusText2, out int money, out float linePositioning) {
             amountOfLines++;
 
             // 判断一下：如果有钱币显示（税收官，护士之类的）则多加一行
@@ -316,11 +319,11 @@ namespace DialogueTweak.Interfaces
             focusText2 = "";
             money = 0;
             ChatMethods.HandleFocusText(ref focusText, ref focusText2, ref money);
-            if (money != 0)
+            if (money != 0 && lastLineLength > 240)
                 amountOfLines++;
 
-            // if (Main.npcChatCornerItem > 0)
-            //     amountOfLines++;
+            if (Main.npcChatCornerItem > 0 && lastLineLength > 300)
+                amountOfLines++;
 
             linePositioning = (amountOfLines <= 2 ? 2.2f : amountOfLines) + 3f; // float更方便细调，其实就是为了手柄编辑标牌的对称感
             if (Main.editSign && !UIVirtualKeyboard.ShouldHideText) { // 手柄下编辑标牌时底部没有按钮，会缩回去
@@ -328,10 +331,11 @@ namespace DialogueTweak.Interfaces
             }
         }
 
-        internal static void PrepareCache(string textValue, ref TextDisplayCache textDisplayCache, out TextSnippet[] snippets, out int amountOfLines) {
+        internal static void PrepareCache(string textValue, ref TextDisplayCache textDisplayCache, out TextSnippet[] snippets, out int amountOfLines, out float lastLineLength) {
             textDisplayCache.PrepareCache(textValue); // 处理对话文本（换行、统计行数之类）
             snippets = textDisplayCache.Snippets;
             amountOfLines = textDisplayCache.AmountOfLines;
+            lastLineLength = textDisplayCache.LastLineLength;
         }
     }
 }

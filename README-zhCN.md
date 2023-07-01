@@ -134,7 +134,6 @@ private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
 ```CSharp
 public override void PostSetupContent() {
 	if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
-		dialogueTweakLoaded = true;
 		dialogueTweak.Call(
 			"AddButton",
 			NPCID.Angler,

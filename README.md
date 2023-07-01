@@ -174,7 +174,6 @@ The following example adds a button using the close texture of this mod reads "C
 ```CSharp
 public override void PostSetupContent() {
 	if (ModLoader.TryGetMod("DialogueTweak", out Mod dialogueTweak)) {
-		dialogueTweakLoaded = true;
 		dialogueTweak.Call(
 			"AddButton",
 			NPCID.Angler,

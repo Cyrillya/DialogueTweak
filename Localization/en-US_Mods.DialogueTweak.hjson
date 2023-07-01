@@ -12,15 +12,6 @@ Configs: {
 			Tooltip: Shows NPC's preferences for biomes and other NPCs, this is a qol feature added by this mod
 		}
 
-		BestiryPortrait: {
-			Label: Display NPC Chat Portrait as Bestiary Portrait
-			Tooltip:
-				'''
-				Draw NPC chat portraits in the way that bestiary portraits are drawn
-				If there is a problem with the default portrait display, try enable this option
-				'''
-		}
-
 		VanillaUI: {
 			Tooltip:
 				'''
@@ -29,6 +20,22 @@ Configs: {
 				'''
 			Label: Use Vanilla Chat GUI
 		}
+
+		PortraitDrawStyle: {
+			Label: Portrait Style
+			Tooltip:
+				'''
+				Change the way the NPC chat portraits are drawn
+				If there is a problem with the default portrait display, try change the style
+				'''
+		}
+	}
+
+	PortraitStyle: {
+		Tooltip: ""
+		LiveReaction.Label: Live Reaction
+		Static.Label: Static
+		Bestiary.Label: Bestiary
 	}
 }
 
