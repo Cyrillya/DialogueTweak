@@ -91,8 +91,12 @@ internal class PortraitDrawer : ModSystem
         // 根据缩放调整位置
         int inflateValue = (int)(offset * extraZoom);
         source.Inflate(inflateValue, inflateValue);
-        var screenOffset = (talkNPC.Center - Main.Camera.Center) * extraZoom;
-        source.Offset((int)screenOffset.X, (int) (screenOffset.Y * Main.LocalPlayer.gravDir));
+        var screenOffset = (talkNPC.Center - DialogueTweakSystem.RecordedScreenCenter) * extraZoom;
+        if (Main.LocalPlayer.gravDir is -1) {
+            screenOffset.Y = -screenOffset.Y;
+            screenOffset.Y += Main.LocalPlayer.height + 8f;
+        }
+        source.Offset((int)screenOffset.X, (int)screenOffset.Y);
                 
         sb.Draw(Main.screenTarget, previewBox, source, Color.White, 0f, Vector2.Zero, effects, 0f);
     }

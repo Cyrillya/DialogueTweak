@@ -2,6 +2,7 @@
 
 internal class DialogueTweakSystem : ModSystem
 {
+    public static Vector2 RecordedScreenCenter;
     private UserInterface _userInterface;
     private UIState _ui;
     private bool _fancyUIDrawing;
@@ -27,6 +28,11 @@ internal class DialogueTweakSystem : ModSystem
                 return;
             }
             orig.Invoke(self);
+        };
+
+        On.Terraria.Main.DoDraw_UpdateCameraPosition += orig => {
+            orig();
+            RecordedScreenCenter = Main.Camera.Center;
         };
     }
 

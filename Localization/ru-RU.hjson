@@ -1,0 +1,40 @@
+Mods.DialogueTweak: {
+Configs: {
+	Configuration: {
+		TextScrolling: {
+			// Tooltip: Determines whether NPC dialogue text will appear letter by letter
+			// Label: Text Scrolling
+		}
+
+		// DisplayName: Configuration
+
+		DisplayPreference: {
+			// Label: Display NPC Living Preferences
+			// Tooltip: Shows NPC's preferences for biomes and other NPCs, this is a qol feature added by this mod
+		}
+
+		BestiryPortrait: {
+			// Label: Display NPC Chat Portrait as Bestiary Portrait
+			/* Tooltip:
+				'''
+				Draw NPC chat portraits in the way that bestiary portraits are drawn
+				If there is a problem with the default portrait display, try enable this option
+				''' */
+		}
+
+		VanillaUI: {
+			/* Tooltip:
+				'''
+				Allows you to open the vanilla dialogue panel in the game
+				If the UI of this mod is not compatible with other mods or there are bugs, try enable this option
+				''' */
+			// Label: Use Vanilla Chat GUI
+		}
+	}
+}
+
+Hate: Ненавидит
+Dislike: Не нравится
+Like: Нравится
+Love: Любит
+}

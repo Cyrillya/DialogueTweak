@@ -1,3 +1,4 @@
+Mods.DialogueTweak: {
 Configs: {
 	Configuration: {
 		TextScrolling: {
@@ -36,3 +37,4 @@ Hate: Hassen
 Dislike: Nicht mögen
 Like: Gefällt
 Love: Lieben
+}

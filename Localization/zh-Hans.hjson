@@ -1,3 +1,4 @@
+Mods.DialogueTweak: {
 Configs: {
 	Configuration: {
 		TextScrolling: {
@@ -36,3 +37,4 @@ Hate: 讨厌
 Dislike: 不喜
 Like: 喜欢
 Love: 喜爱
+}
