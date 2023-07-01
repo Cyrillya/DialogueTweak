@@ -8,16 +8,16 @@
 # Mod.Call (替代项)
 以下是所有可选的覆盖类型.
 ### ReplaceExtraButtonIcon
-```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的Extra图标，阅读下文了解有关参数的详细信息.
+```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string/Func<string> texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的Extra图标，阅读下文了解有关参数的详细信息.
 
 ### ReplaceShopButtonIcon
-```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的Shop图标，阅读下文了解有关参数的详细信息.
+```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string/Func<string> texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的Shop图标，阅读下文了解有关参数的详细信息.
 
 ### ReplaceHappinessButtonIcon
-```"ReplaceHappinessButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的快乐值按钮图标，阅读下文了解有关参数的详细信息.
+```"ReplaceHappinessButtonIcon", int/List<int> NPCIDs, string/Func<string> texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的快乐值按钮图标，阅读下文了解有关参数的详细信息.
 
 ### ReplaceBackButtonIcon
-```"ReplaceBackButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的退出按钮图标，阅读下文了解有关参数的详细信息.
+```"ReplaceBackButtonIcon", int/List<int> NPCIDs, string/Func<string> texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```更改指定NPC的退出按钮图标，阅读下文了解有关参数的详细信息.
 
 ## 参数
 ### 1.) 覆盖类型 - ```string```
@@ -26,7 +26,7 @@
 ### 2.) NPC ID - ```int/List<int>```
 你需要表明你想要覆盖的NPC对象的ID，使用```ModContent.NPCType<>()```来获取你的Mod中相应NPC的ID. 如果要覆盖标牌请使用**-1**
 
-### 3.) 贴图 - ```string```
+### 3.) 贴图 - ```string/Func<string>```
 你需要表明用于替代图标的贴图. 请输入贴图路径. 如果你想要使用NPC的头像贴图替换Shop和Extra按钮图标请直接输入**Head**.
 
 ### 4.) 可见性 - ```Func<bool>```

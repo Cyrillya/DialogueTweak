@@ -5,10 +5,10 @@
     {
         // 覆盖Icon的List，有一些默认值
         internal static List<IconInfo> IconInfos = new List<IconInfo>() {
-            new(IconType.Shop, new List<int> { NPCID.Guide }, $"DialogueTweak/{ModAsset.Icon_HelpPath}"),
-            new(IconType.Extra, new List<int> { NPCID.Guide }, $"DialogueTweak/{ModAsset.Icon_HammerPath}"),
-            new(IconType.Shop, new List<int> { NPCID.OldMan }, $"DialogueTweak/{ModAsset.Icon_Old_ManPath}"),
-            new(IconType.Shop, new List<int> { NPCID.Nurse, NPCID.Angler, NPCID.TaxCollector }, "Head")
+            new(IconType.Shop, new List<int> { NPCID.Guide }, () => $"DialogueTweak/{ModAsset.Icon_HelpPath}"),
+            new(IconType.Extra, new List<int> { NPCID.Guide }, () => $"DialogueTweak/{ModAsset.Icon_HammerPath}"),
+            new(IconType.Shop, new List<int> { NPCID.OldMan }, () => $"DialogueTweak/{ModAsset.Icon_Old_ManPath}"),
+            new(IconType.Shop, new List<int> { NPCID.Nurse, NPCID.Angler, NPCID.TaxCollector }, () => "Head")
         };
         internal static List<ButtonInfo> ButtonInfos = new();
         public override void PostSetupContent() {

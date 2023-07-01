@@ -12,19 +12,19 @@ Dialogue Panel Rework, aka Dialogue Tweak, is a mod that completely reworks NPC 
 
 ### ReplaceExtraButtonIcon
 
-```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the extra button icon with your custom icon. Read below for specifics on the parameters.
+```"ReplaceExtraButtonIcon", int/List<int> NPCIDs, string/Func<string> texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the extra button icon with your custom icon. Read below for specifics on the parameters.
 
 ### ReplaceShopButtonIcon
 
-```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the shop button icon with your custom icon. Read below for specifics on the parameters.
+```"ReplaceShopButtonIcon", int/List<int> NPCIDs, string/Func<string> texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the shop button icon with your custom icon. Read below for specifics on the parameters.
 
 ### ReplaceHappinessButtonIcon
 
-```"ReplaceHappinessButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the happiness button icon with your custom icon. Read below for specifics on the parameters.
+```"ReplaceHappinessButtonIcon", int/List<int> NPCIDs, string/Func<string> texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the happiness button icon with your custom icon. Read below for specifics on the parameters.
 
 ### ReplaceBackButtonIcon
 
-```"ReplaceBackButtonIcon", int/List<int> NPCIDs, string texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the back button icon with your custom icon. Read below for specifics on the parameters.
+```"ReplaceBackButtonIcon", int/List<int> NPCIDs, string/Func<string> texture, [Func<bool> replacementAvailable], [Func<Rectangle> frame]```Replaces the back button icon with your custom icon. Read below for specifics on the parameters.
 
 ## Arguments
 
@@ -36,7 +36,7 @@ The first argument should be the replacement type you want. The type table is li
 
 Your NPC's ID number is needed. Use ```ModContent.NPCType<>()``` to submit your ID. Use **-1** if you want to acess signs.
 
-### 3.) Texture - ```string```
+### 3.) Texture - ```string/Func<string>```
 
 You have to specify the texture that replaces icons. Use your texture's path. Use **Head** for button icons if you want to replace icon with the NPC's head.
 

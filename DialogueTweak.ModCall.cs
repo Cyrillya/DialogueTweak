@@ -21,14 +21,14 @@ namespace DialogueTweak
 									HandleAssets.IconInfos.Add(new IconInfo(
 										IconType.Extra, // This icon is for extra button.
 										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										AsFuncString(args[2]) // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
 										));
 								}
 								else {
 									HandleAssets.IconInfos.Add(new IconInfo(
 										IconType.Extra, // This icon is for extra button.
 										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										AsFuncString(args[2]), // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
 										args[3] as Func<bool>, // Available
 										args[4] as Func<Rectangle> // Frame Rectangle
 										));
@@ -40,14 +40,14 @@ namespace DialogueTweak
 									HandleAssets.IconInfos.Add(new IconInfo(
 										IconType.Shop, // This icon is for shop button.
 										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										AsFuncString(args[2]) // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
 										));
 								}
 								else {
 									HandleAssets.IconInfos.Add(new IconInfo(
 										IconType.Shop, // This icon is for shop button.
 										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										AsFuncString(args[2]), // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
 										args[3] as Func<bool>, // Available
 										args[4] as Func<Rectangle> // Frame Rectangle
 										));
@@ -59,14 +59,14 @@ namespace DialogueTweak
 									HandleAssets.IconInfos.Add(new IconInfo(
 										IconType.Happiness, // This icon is for happiness button.
 										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										AsFuncString(args[2]) // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
 										));
 								}
 								else {
 									HandleAssets.IconInfos.Add(new IconInfo(
 										IconType.Happiness, // This icon is for happiness button.
 										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										AsFuncString(args[2]), // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
 										args[3] as Func<bool>, // Available
 										args[4] as Func<Rectangle> // Frame Rectangle
 										));
@@ -78,14 +78,14 @@ namespace DialogueTweak
 									HandleAssets.IconInfos.Add(new IconInfo(
 										IconType.Back, // This icon is for back button.
 										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										AsFuncString(args[2]) // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
 										));
 								}
 								else {
 									HandleAssets.IconInfos.Add(new IconInfo(
 										IconType.Back, // This icon is for back button.
 										AsListOfInt(args[1]), // NPC IDs
-										args[2] as string, // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
+										AsFuncString(args[2]), // Texture Path (With Mod Name) ("Head" for overriding icon to the NPC's head.)
 										args[3] as Func<bool>, // Available
 										args[4] as Func<Rectangle> // Frame Rectangle
 										));
@@ -143,6 +143,8 @@ namespace DialogueTweak
 			}
 
             static List<int> AsListOfInt(object data) => data is List<int> ? data as List<int> : new List<int>() { Convert.ToInt32(data) };
+
+            static Func<string> AsFuncString(object data) => data is Func<string> ? data as Func<string> : () => data as string;
 
 			return false;
 		}
