@@ -44,7 +44,7 @@ namespace DialogueTweak.Interfaces
             }
             PrepareVirtualKeyboard(amountOfLines);
             PrepareLinesFocuses(lastLineLength, ref amountOfLines, out string focusText, out string focusText2, out int money, out float linePositioning);
-            DrawPanel(linePositioning, panelColor, out Rectangle rectangle);
+            DrawPanel(linePositioning, panelColor, out var rectangle);
 
             var textPanelPosition = PanelPosition + new Vector2(116, 42f);
             var textPanelSize = new Vector2(378f, amountOfLines * LineSpacing + 8f);
@@ -96,12 +96,14 @@ namespace DialogueTweak.Interfaces
         internal static void DrawButtons(string focusText, string focusText2, float linePositioning) {
             bool shouldDrawButton = Main.InGameUI.CurrentState is not UIVirtualKeyboard || !PlayerInput.UsingGamepad;
             if (!shouldDrawButton) return;
+
+            float fontFixOffset = 28f - LineSpacing;
             
             // 在交互按钮和对话之间一条浅黑线，如果没有交互按钮就不Draw了（绘制条件和交互按钮一致）
-            Main.spriteBatch.Draw(ModAsset.ButtonSeperator.Value, PanelPosition + new Vector2(0, linePositioning * LineSpacing - LineSpacing), Color.White * 0.9f);
+            Main.spriteBatch.Draw(ModAsset.ButtonSeperator.Value, PanelPosition + new Vector2(0, linePositioning * LineSpacing - LineSpacing + fontFixOffset), Color.White * 0.9f);
 
             // 按钮
-            ButtonHandler.DrawButtons((int)(linePositioning * LineSpacing - LineSpacing + PanelPosition.Y), focusText, focusText2);
+            ButtonHandler.DrawButtons((int)(linePositioning * LineSpacing - LineSpacing + fontFixOffset + PanelPosition.Y), focusText, focusText2);
         }
 
         /// <summary>绘制钱币、任务物品和快乐值之类的杂项显示</summary>
@@ -241,7 +243,7 @@ namespace DialogueTweak.Interfaces
         internal static void DrawPanel(float linePositioning, Color color, out Rectangle rectangle) {
             // 没事别乱改参数了呜呜呜，这里是背景板。中间加一段防止文字太长了的延续特判，当然再长我就不管了，直接让他写出格吧
             linePositioning = Math.Clamp(linePositioning, 0f, 22f);
-            int height = (int)(2 + linePositioning * LineSpacing);
+            int height = (int)(2 + linePositioning * LineSpacing - (LineSpacing - 28f) * 3.4f);
             Main.spriteBatch.Draw(
                 texture: TextureAssets.ChatBack.Value,
                 position: PanelPosition,
@@ -325,7 +327,15 @@ namespace DialogueTweak.Interfaces
             if (Main.npcChatCornerItem > 0 && lastLineLength > 300)
                 amountOfLines++;
 
-            linePositioning = (amountOfLines <= 2 ? 2.2f : amountOfLines) + 3f; // float更方便细调，其实就是为了手柄编辑标牌的对称感
+            linePositioning = amountOfLines + 3f; // float更方便细调，其实就是为了手柄编辑标牌的对称感
+            if (amountOfLines <= 2) {
+                linePositioning = 5.2f;
+            }
+            // 由于UI的位置是行距和行数决定的，所以这里要做一些特判，防止玩家自用字体导致的UI错位
+            if (linePositioning * LineSpacing < 5.2f * 28f) {
+                linePositioning = 5.2f * 28f / LineSpacing;
+            }
+
             if (Main.editSign && !UIVirtualKeyboard.ShouldHideText) { // 手柄下编辑标牌时底部没有按钮，会缩回去
                 linePositioning -= 1.85f;
             }
