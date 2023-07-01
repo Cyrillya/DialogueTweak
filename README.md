@@ -139,7 +139,7 @@ There are only one Mod.Call for adding buttons now. I think that's enough though
 
 ### AddButton
 
-```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string texture, Action hoverAction, [Func<bool> replacementAvailable]```Adds a new button.
+```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string/Func<string> texture, Action hoverAction, [Func<bool> replacementAvailable]```Adds a new button.
 
 ## Arguments
 
@@ -153,9 +153,9 @@ Your NPC's ID number is needed. Use ```ModContent.NPCType<>()``` to submit your 
 
 ### 3.) Button Text - ```Func<string>```
 
-This is the text which will be shown in the button. It is ```Func<string>``` so you can use Language.GetTextValue or something else.
+This is the text which will be shown in the button. It is ```Func<string>``` so you can use `Language.GetTextValue` or something else.
 
-### 4.) Icon Texture - ```string```
+### 4.) Icon Texture - ```string/Func<string>```
 
 You have to specify the icon texture of the button. Use your texture's path. If you use "" aka nothing, no icon will be shown.
 

@@ -108,7 +108,7 @@ private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
 # Mod.Call (添加按钮)
 目前只有一个添加按钮的Mod.Call，不过我觉得应该够用了.
 ### AddButton
-```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string texture, Action hoverAction, [Func<bool> replacementAvailable]```添加一个新按钮.
+```"AddButton", int/List<int> NPCIDs, Func<string> buttonText, string/Func<string> texture, Action hoverAction, [Func<bool> replacementAvailable]```添加一个新按钮.
 
 ## Arguments
 ### 1.) 按钮类型 - ```string```
@@ -118,9 +118,9 @@ private void DrawSomething(SpriteBatch sb, Color textColor, Rectangle panel) {
 你需要表明你想要覆盖的NPC对象的ID，使用```ModContent.NPCType<>()```来获取你的Mod中相应NPC的ID. 你也可以用原版NPC的ID来修改原版NPC.
 
 ### 3.) 按钮文本 - ```Func<string>```
-这是按钮将会显示的文本. 类型为```Func<string>```因此你可以使用Language.GetTextValue或者其他别的玩意.
+这是按钮将会显示的文本. 类型为```Func<string>```因此你可以使用 `Language.GetTextValue` 或者其他别的玩意.
 
-### 4.) 图标贴图 - ```string```
+### 4.) 图标贴图 - ```string/Func<string>```
 你需要表明用于图标的贴图. 请输入贴图路径. 不填的话就不会显示图标.
 
 ### 5.) 悬停Action - ```Action```

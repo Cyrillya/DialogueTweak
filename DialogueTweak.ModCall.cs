@@ -117,7 +117,7 @@ namespace DialogueTweak
 									HandleAssets.ButtonInfos.Add(new ButtonInfo(
 										AsListOfInt(args[1]), // NPC IDs
 										args[2] as Func<string>, // NPC Button Text
-										args[3] as string, // Icon Texture Path (With Mod Name)
+										AsFuncString(args[3]), // Icon Texture Path (With Mod Name)
 										args[4] as Action // Hover Action
 										));
 								}
@@ -125,7 +125,7 @@ namespace DialogueTweak
 									HandleAssets.ButtonInfos.Add(new ButtonInfo(
 										AsListOfInt(args[1]), // NPC IDs
 										args[2] as Func<string>, // NPC Button Text
-										args[3] as string, // Icon Texture Path (With Mod Name)
+										AsFuncString(args[3]), // Icon Texture Path (With Mod Name)
 										args[4] as Action, // Hover Action
 										args[5] as Func<bool> // Available
 										));

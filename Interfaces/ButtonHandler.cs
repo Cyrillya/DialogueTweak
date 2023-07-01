@@ -215,7 +215,7 @@
             DrawButtonText(shopText, moveOnShopButton ? 2 : 1.5f, value, buttonOffset, shadowColor, chatColor, scale, pos, out var drawCenter);
             if (scale <= 0.7f && moveOnShopButton) { // 缩放程度太高的放在上面时会在面板下方显示文本
                 Vector2 bottom = new Vector2(ScreenWidth / 2, statY + height + 30);
-                DrawButtonText(shopText, 1.5f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
+                DrawButtonText(shopText, 1.2f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
             }
 
             // 手柄支持，这个是最右边
@@ -266,7 +266,7 @@
             DrawButtonText(shopText, moveOnExtraButton ? 2 : 1.5f, value, buttonOffset, shadowColor, chatColor, scale, pos, out var drawCenter);
             if (scale <= 0.7f && moveOnExtraButton) { // 缩放程度太高的放在上面时会在面板下方显示文本
                 Vector2 bottom = new Vector2(ScreenWidth / 2, statY + height + 30);
-                DrawButtonText(shopText, 1.5f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
+                DrawButtonText(shopText, 1.2f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
             }
 
             // 手柄支持，这个是右中
@@ -285,6 +285,7 @@
             bool useText = button.buttonText is not null && button.buttonText().Trim() != string.Empty; // 确实有文本
             bool useIcon = button.iconTexture != "";
             string text = !useText ? "" : button.buttonText().Trim();
+            Asset<Texture2D> iconTexture = null;
 
             Vector2 pos = new Vector2(ChatUI.PanelPosition.X + 122 + offsetX, statY + 10);
             int height = 44;
@@ -292,9 +293,9 @@
             DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(width, height), Color.White);
             // 对应图像（即icon）
             if (useIcon) {
-                if (button.texture is null) button.texture = ModContent.Request<Texture2D>(button.iconTexture);
+                iconTexture = ModContent.Request<Texture2D>(button.iconTexture, AssetRequestMode.ImmediateLoad);
                 var iconOffset = new Vector2(!useText ? width : 44, height) / 2f;
-                SpriteBatch.Draw(button.texture.Value, pos + iconOffset, null, Color.White * 0.9f, 0f, new Vector2(button.texture.Width(), button.texture.Height()) / 2f, 1f, SpriteEffects.None, 0f);
+                SpriteBatch.Draw(iconTexture.Value, pos + iconOffset, null, Color.White * 0.9f, 0f, new Vector2(iconTexture.Width(), iconTexture.Height()) / 2f, 1f, SpriteEffects.None, 0f);
             }
             Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, width, height);
             if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
@@ -317,14 +318,14 @@
             if (useText) {
                 // 还有一个文字提示
                 DynamicSpriteFont value = FontAssets.MouseText.Value;
-                float scale = DecideTextScale(text, value, buttonRectangle.Width - (useIcon ? button.texture.Width() + 16f : 0)); // 减少值是为了给icon腾出空间
+                float scale = DecideTextScale(text, value, buttonRectangle.Width - (useIcon ? iconTexture.Width() + 16f : 0)); // 减少值是为了给icon腾出空间
                 Color shadowColor = !button.focused ? Color.Black : Color.Brown;
                 Vector2 buttonOrigin = new Vector2(buttonRectangle.Width, buttonRectangle.Height) / 2f;
                 
                 DrawButtonText(text, button.focused ? 2 : 1.5f, value, buttonOrigin, shadowColor, chatColor, scale, pos, out _);
                 if (scale <= 0.7f && button.focused) { // 缩放程度太高的放在上面时会在面板下方显示文本
                     Vector2 bottom = new Vector2(ScreenWidth / 2, statY + height + 30);
-                    DrawButtonText(text, 1.5f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
+                    DrawButtonText(text, 1.2f, FontAssets.MouseText.Value, Vector2.Zero, Color.Black, chatColor, 1f, bottom, out _);
                 }
             }
         }
