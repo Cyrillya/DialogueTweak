@@ -105,6 +105,12 @@ internal class PortraitDrawer : ModSystem
         source.Inflate(inflateValue, inflateValue);
         var screenOffset = (talkNPC.Center - Main.Camera.Center) * extraZoom;
         source.Offset((int) screenOffset.X, (int) (screenOffset.Y * Main.LocalPlayer.gravDir));
+        var uiZoomOffset = -Vector2.One * Main.ScreenSize.ToVector2() * 0.5f * extraZoom * (Main.UIScale - 1f);
+        if (Main.LocalPlayer.gravDir is -1f) uiZoomOffset.Y = -1f * Main.screenHeight * 0.5f * 1 * (Main.UIScale - 1f);
+        if (Main.LocalPlayer.gravDir is 1f)
+            source.Offset((int) uiZoomOffset.X, (int) uiZoomOffset.Y);
+        else
+            source.Offset((int) uiZoomOffset.X, (int) (-uiZoomOffset.Y * (Main.GameZoomTarget + 1f)));
 
         sb.Draw(Main.screenTarget, previewBox, source, Color.White, 0f, Vector2.Zero, effects, 0f);
     }
