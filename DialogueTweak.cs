@@ -26,7 +26,12 @@ public partial class DialogueTweak : Mod
     // Test code
     /*
     public override void PostSetupContent() {
-        DialogueTweakHelper.ReplaceButtonIcon(ReplacementType.Extra, NPCID.GoblinTinkerer, () => "Terraria/Images/UI/Bestiary/Icon_Tags_Shadow", frame: () => {
+	    DialogueTweakHelper.ReplaceButtonIcon(
+		    DialogueTweakHelper.ReplacementType.Shop,
+		    NPCID.Guide, // NPC ID
+		    "Head"); // Then the NPC's head texture will be shown
+		    
+        DialogueTweakHelper.ReplaceButtonIcon(DialogueTweakHelper.ReplacementType.Extra, NPCID.GoblinTinkerer, () => "Terraria/Images/UI/Bestiary/Icon_Tags_Shadow", frame: () => {
             if (Main.LocalPlayer.direction == -1)
                 return new Rectangle(0, 0, 80, 80);
             return new Rectangle(0, 0, 30, 30);

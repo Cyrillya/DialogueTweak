@@ -27,7 +27,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<Publicize Include="tModLoader"/>
+		<Publicize Include="tModLoader" />
 		<PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
 	</ItemGroup>
 </Project>

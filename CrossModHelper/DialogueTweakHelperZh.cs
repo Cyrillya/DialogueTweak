@@ -4,16 +4,17 @@ using Microsoft.Xna.Framework;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-// Change the namespace to yours!
+// 记得把命名空间改成你自己的！
 namespace DialogueTweak.CrossModHelper;
 
 /// <summary>
-/// Cross-mod support helper class for Dialogue Panel Rework (DialogueTweak)
+/// 更好的NPC对话框(DialogueTweak)的跨Mod支持辅助类
 /// </summary>
-public static class DialogueTweakHelper
+public static class DialogueTweakHelperZh
 {
     /// <summary>
-    /// The replacement types for icon replacements. Don't change the name
+    /// 替换图标的可用替换类型
+    /// 不要改名字
     /// </summary>
     public enum ReplacementType
     {
@@ -24,14 +25,14 @@ public static class DialogueTweakHelper
     }
 
     /// <summary>
-    /// Replace the button icon with your custom icon.
+    /// 将按钮图标替换为你自定义的图标。
     /// </summary>
-    /// <param name="replacementType">Which icon type you are replacing</param>
-    /// <param name="npcType">Your NPC ID(s) is needed. Use <see cref="ModContent.NPCType"/> to submit your ID. Use <b>-1</b> if you want to acess signs.</param>
-    /// <param name="texturePath">You have to specify the texture that replaces icons. Use your texture's path. Use <b>Head</b> for button icons if you want to replace</param>
-    /// <param name="availability">You can decide if your replacement is used. This is useful if your NPC has multiple functions that display different icons.</param>
-    /// <param name="frame">You can customize the frame of the texture. It is useful to display different parts of the texture in different situations.</param>
-    /// <param name="customTextOffset">You can customize the distance from the left side of the box containing the text to the left side of the button. The invisible box is the right part of the entire button excluding the icon, and the text will be drawn in its center. Check "how_offset_works.png" for image explanation</param>
+    /// <param name="replacementType">你想要替代的图标类型</param>
+    /// <param name="npcType">你需要表明你想要覆盖的NPC对象的ID，使用<see cref="ModContent.NPCType"/>来获取你的Mod中相应NPC的ID. 如果要覆盖标牌请使用<b>-1</b></param>
+    /// <param name="texturePath">你需要表明用于替代图标的贴图. 请输入贴图路径. 如果你想要使用NPC的头像贴图替换Shop和Extra按钮图标请直接输入<b>Head</b></param>
+    /// <param name="availability">你可以决定是否应用该替代. 这对于有多种功能并想要不同的图标贴图的NPC来说十分有用</param>
+    /// <param name="frame">你可以自定义覆盖贴图的绘制帧. 以在不同状况下显示一个贴图的不同部分</param>
+    /// <param name="customTextOffset">您可以自定义包含文本的边界框的左侧到按钮框的左侧的距离。边界框(boundingBox)是整个按钮中除图标外的右侧部分，文本将绘制在这个隐形的框的中心。参考“how_offset_works.png”中的图文解释</param>
     public static void ReplaceButtonIcon(ReplacementType replacementType, List<int> npcType, Func<string> texturePath,
         Func<bool> availability = null, Func<Rectangle> frame = null, Func<float> customTextOffset = null) {
         if (!ModLoader.TryGetMod("DialogueTweak", out var dialogue)) {
@@ -58,15 +59,15 @@ public static class DialogueTweakHelper
         ReplaceButtonIcon(replacementType, new List<int> {npcType}, () => texturePath, availability, frame, customTextOffset);
 
     /// <summary>
-    /// Add a button for specific NPCs.
+    /// 为指定的NPC添加按钮
     /// </summary>
-    /// <param name="npcType">NPC ID(s) is needed. Use <see cref="ModContent.NPCType"/> to submit your ID. You can also tweak vanilla NPCs by using vanilla NPC ID.</param>
-    /// <param name="buttonText">This is the text which will be shown in the button. It is <see cref="Func{TResult}"/> so you can use <see cref="Language.GetTextValue"/> or something else.</param>
-    /// <param name="iconTexturePath">You have to specify the icon texture of the button. Use your texture's path. If you use "" or <see langword="null"/>, no icon will be shown.</param>
-    /// <param name="hoverCallback">The action that will be called when the client hovers over the button. Use this to define the behavior when the button is pressed.</param>
-    /// <param name="availability">You can decide if your button should be shown.</param>
-    /// <param name="frame">You can customize the frame of the texture. It is useful to display different parts of the texture in different situations.</param>
-    /// <param name="customTextOffset">You can customize the distance from the left side of the box containing the text to the left side of the button. The invisible box is the right part of the entire button excluding the icon, and the text will be drawn in its center. Check "how_offset_works.png" for image explanation</param>
+    /// <param name="npcType">你需要表明你想要覆盖的NPC对象的ID，使用<see cref="ModContent.NPCType"/>来获取你的Mod中相应NPC的ID. 你也可以用原版NPC的ID来修改原版NPC</param>
+    /// <param name="buttonText">这是按钮将会显示的文本. 类型为<see cref="Func{TResult}"/>因此你可以使用<see cref="Language.GetTextValue"/>来获取翻译后的文本。也可以在不同情况下显示不同的文本</param>
+    /// <param name="iconTexturePath">你需要表明用于图标的贴图. 请输入贴图路径. 不填或填 <see langword="null"/>的话就不会显示图标</param>
+    /// <param name="hoverCallback">当客户端将鼠标悬停在按钮上时将调用的操作. 使用它来定义按下按钮时的行为</param>
+    /// <param name="availability">你可以决定是否显示该按钮</param>
+    /// <param name="frame">你可以自定义按钮图标的绘制帧. 以在不同状况下显示一个贴图的不同部分</param>
+    /// <param name="customTextOffset">您可以自定义包含文本的边界框的左侧到按钮框的左侧的距离。边界框(boundingBox)是整个按钮中除图标外的右侧部分，文本将绘制在这个隐形的框的中心。参考“how_offset_works.png”中的图文解释</param>
     public static void AddButton(List<int> npcType, Func<string> buttonText, Func<string> iconTexturePath,
         Action hoverCallback, Func<bool> availability = null, Func<Rectangle> frame = null,
         Func<float> customTextOffset = null) {
