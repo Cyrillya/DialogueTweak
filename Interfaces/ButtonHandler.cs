@@ -80,7 +80,7 @@ internal class ButtonHandler
         if (useExtraButton) {
             var pos = GetDrawPosition();
             DrawMainButton(_extraFrame, Extra.Value, pos, bottom, buttonWidth, focusText2.Trim(), ExtraButtonCallback,
-                _shopCustomOffset, ref moveOnExtraButton);
+                _extraCustomOffset, ref moveOnExtraButton);
             offsetX += buttonWidth + spacing;
 
             // 手柄支持，这个是右中
@@ -154,6 +154,7 @@ internal class ButtonHandler
         bool useIcon = tex is not null;
         int height = 44;
         var size = new Vector2(width, height);
+        var customOffset = customTextOffset?.Invoke();
 
         // 按钮
         DrawPanel(SpriteBatch, ButtonPanel.Value, drawPosition, size, Color.White);
@@ -161,21 +162,32 @@ internal class ButtonHandler
         // 对应图像（即icon）
         var iconOffset = Vector2.Zero;
         if (useIcon) {
-            // 图标偏移
-            iconOffset = new Vector2(22, height) / 2f;
-            if (!useText) {
-                // 没有文本时，图标居中
-                iconOffset.X = (width - frame.Width) / 2f;
+            // If offset is there, the fixed offset will be ignored and the icon is centered on the space between the left border and the text(offset)
+            if (customOffset is not null) {
+                // 高度居中，但左侧固定和框有个距离
+                var origin = frame.Size() / 2f;
+                var iconPosition = drawPosition + new Vector2(customOffset.Value, height) / 2f;
+
+                SpriteBatch.Draw(tex, iconPosition, frame, Color.White * 0.9f, 0f, origin, 1f,
+                    SpriteEffects.None, 0f);
             }
+            else {
+                // 图标偏移
+                iconOffset = new Vector2(22, height) / 2f;
+                if (!useText) {
+                    // 没有文本时，图标居中
+                    iconOffset.X = (width - frame.Width) / 2f;
+                }
 
-            // 高度居中，但左侧固定和框有个距离
-            var origin = new Vector2(0f, frame.Height / 2f);
+                // 高度居中，但左侧固定和框有个距离
+                var origin = new Vector2(0f, frame.Height / 2f);
 
-            SpriteBatch.Draw(tex, drawPosition + iconOffset, frame, Color.White * 0.9f, 0f, origin, 1f,
-                SpriteEffects.None, 0f);
+                SpriteBatch.Draw(tex, drawPosition + iconOffset, frame, Color.White * 0.9f, 0f, origin, 1f,
+                    SpriteEffects.None, 0f);
 
-            // 为文本绘制作准备
-            iconOffset.X += frame.Width + 4f;
+                // 为文本绘制作准备
+                iconOffset.X += frame.Width + 4f;
+            }
         }
 
         var buttonRectangle = new Rectangle((int) drawPosition.X, (int) drawPosition.Y, width, height);
@@ -183,13 +195,15 @@ internal class ButtonHandler
 
         // 还有一个文字提示
         if (useText) {
-            iconOffset.X = customTextOffset?.Invoke() ?? iconOffset.X;
+            if (customOffset is not null) {
+                iconOffset.X = customOffset.Value;
+            }
             drawPosition.X += iconOffset.X;
             // 为什么要-8? 去除按钮板的边框大小
             width -= (int) iconOffset.X + 8;
             height -= 8;
             buttonRectangle = new Rectangle((int) drawPosition.X, (int) drawPosition.Y, width, height);
-            MainButtonText(buttonRectangle, buttonText, panelBottom, moveOnButton);
+            MainButtonText(buttonRectangle, buttonText, panelBottom, moveOnButton, customOffset is not null);
         }
     }
 
@@ -214,7 +228,7 @@ internal class ButtonHandler
     }
 
     private static void MainButtonText(Rectangle boundingBox, string buttonText, Vector2 panelBottom,
-        bool moveOnButton) {
+        bool moveOnButton, bool useCustomOffset) {
         // Utils.DrawBorderString(SpriteBatch, "⏹", boundingBox.Location.ToVector2(), Color.White);
         // Utils.DrawBorderString(SpriteBatch, "⏹", boundingBox.BottomRight(), Color.White);
 
@@ -229,8 +243,8 @@ internal class ButtonHandler
         var pos = boundingBox.Center();
         pos.X -= stringSize.X / 2f;
         pos.Y -= font.LineSpacing / 4f;
-        if (stringSize.X < boundingBox.Width * 0.7f && stringSize.X < 100f) {
-            pos.X -= (10f - stringSize.X * 0.1f);
+        if (!useCustomOffset && stringSize.X < boundingBox.Width * 0.7f && stringSize.X < 100f) {
+            pos.X -= 10f - stringSize.X * 0.1f;
         }
         // Main.NewText(stringSize);
 

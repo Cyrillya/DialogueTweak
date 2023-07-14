@@ -23,7 +23,7 @@ public partial class DialogueTweak : Mod
 			iconInfo.Frame = args[4] as Func<Rectangle>;
 		}
 		if (args.Length > 5) {
-			iconInfo.CustomOffset = args[4] as Func<float>;
+			iconInfo.CustomOffset = args[5] as Func<float>;
 		}
 		HandleAssets.IconInfos.Add(iconInfo);
 	}
