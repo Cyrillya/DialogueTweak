@@ -1,5 +1,14 @@
-﻿using ReLogic.Text;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using ReLogic.Graphics;
+using ReLogic.Text;
+using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Chat;
+using Terraria.GameInput;
+using Terraria.Localization;
+using Terraria.UI.Chat;
 
 namespace DialogueTweak.Interfaces;
 

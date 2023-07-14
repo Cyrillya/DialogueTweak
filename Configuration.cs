@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using DialogueTweak.Interfaces;
 using Terraria.ModLoader.Config;
 
 namespace DialogueTweak;

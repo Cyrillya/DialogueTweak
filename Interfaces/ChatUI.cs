@@ -1,6 +1,19 @@
-﻿using ReLogic.Localization.IME;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using ReLogic.Localization.IME;
 using ReLogic.OS;
+using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Chat;
+using Terraria.GameContent.UI.States;
+using Terraria.GameInput;
+using Terraria.Localization;
+using Terraria.ModLoader;
+using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace DialogueTweak.Interfaces
 {

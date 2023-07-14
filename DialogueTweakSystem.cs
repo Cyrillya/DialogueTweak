@@ -1,4 +1,11 @@
-﻿namespace DialogueTweak;
+﻿using System.Collections.Generic;
+using DialogueTweak.Interfaces;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.ModLoader;
+using Terraria.UI;
+
+namespace DialogueTweak;
 
 internal class DialogueTweakSystem : ModSystem
 {

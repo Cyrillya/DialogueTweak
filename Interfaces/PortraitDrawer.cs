@@ -1,5 +1,11 @@
-﻿using System.Reflection;
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
+using Terraria.ID;
+using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace DialogueTweak.Interfaces;

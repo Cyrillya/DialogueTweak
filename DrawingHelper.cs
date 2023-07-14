@@ -1,4 +1,16 @@
-﻿namespace DialogueTweak
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using ReLogic.Graphics;
+using Terraria;
+using Terraria.GameContent;
+using Terraria.GameContent.Personalities;
+using Terraria.Graphics.Shaders;
+using Terraria.ID;
+using Terraria.UI.Chat;
+
+namespace DialogueTweak
 {
     internal static class DrawingHelper
     {

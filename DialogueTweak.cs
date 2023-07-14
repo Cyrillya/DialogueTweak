@@ -1,26 +1,10 @@
-﻿global using DialogueTweak.Interfaces;
-global using Microsoft.Xna.Framework;
-global using Microsoft.Xna.Framework.Graphics;
-global using Mono.Cecil.Cil;
-global using MonoMod.Cil;
-global using ReLogic.Content;
-global using ReLogic.Graphics;
-global using System;
-global using System.Collections.Generic;
-global using System.Linq;
-global using Terraria;
-global using Terraria.Audio;
-global using Terraria.GameContent;
-global using Terraria.GameContent.Personalities;
-global using Terraria.GameContent.UI.States;
-global using Terraria.GameInput;
-global using Terraria.Graphics.Shaders;
-global using Terraria.ID;
-global using Terraria.Localization;
-global using Terraria.ModLoader;
-global using Terraria.UI;
-global using Terraria.UI.Chat;
-global using Terraria.UI.Gamepad;
+﻿using System;
+using System.Collections.Generic;
+using DialogueTweak.CrossModHelper;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace DialogueTweak;
 
@@ -36,4 +20,27 @@ public partial class DialogueTweak : Mod
         Instance = null;
         Configuration.Instance = null;
     }
+
+    // Test code
+    /*
+    public override void PostSetupContent() {
+        DprHelper.AddButton(
+            NPCID.Angler,
+            () => "Sandstorm (1 Gold)",
+            () => "Terraria/Images/UI/Bestiary/Icon_Tags_Shadow",
+            () => {
+                if (Main.mouseLeft && Main.mouseLeftRelease)
+                    Main.NewText("这是假的关闭按钮哦");
+            },
+            () => true,
+            () => {
+                if (Main.LocalPlayer.direction == -1)
+                    return new Rectangle(0, 0, 22, 22);
+                return new Rectangle(10, 10, 11, 11);
+            },
+            () => {
+                return 44f;
+            });
+    }
+    */
 }

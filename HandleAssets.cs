@@ -1,4 +1,11 @@
-﻿namespace DialogueTweak
+﻿using System.Collections.Generic;
+using DialogueTweak.Interfaces;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+
+namespace DialogueTweak
 {
     // 一个贴图库，使用贴图时可以直接从这里调用
     internal class HandleAssets : ModSystem
