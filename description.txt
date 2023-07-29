@@ -1,4 +1,4 @@
-This mod completely reworked NPC dialogue panel and sign editing panel. Inspired by the mobile version.
+This mod completely reworks NPC dialogue panel and sign editing panel. Inspired by the mobile version.
 Text scrolling is added. You can hold left to make it scroll faster.
 Mods that also modified NPC dialogue panel might not work with this mod.
 If issues happend, please leave a comment on this mod's Steam Workshop page.

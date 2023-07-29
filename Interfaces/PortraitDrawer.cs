@@ -55,8 +55,10 @@ internal class PortraitDrawer : ModSystem
         var previewBox = new Rectangle((int) position.X + 17, (int) position.Y + 18, 92, 94);
 
         if (talkNPC.active) {
+            bool screenTargetUnavailable = Main.screenTarget is null || Main.screenTarget.IsDisposed ||
+                                           !Lighting.NotRetro || Main.WaveQuality <= 0;
             if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Bestiary
-                or Configuration.PortraitStyle.Static) {
+                    or Configuration.PortraitStyle.Static || screenTargetUnavailable) {
                 EntryIcon ??= new UnlockableNPCEntryIcon(talkNPC.type) {
                     _npcCache = {scale = 2f}
                 };

@@ -14,6 +14,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
+using Terraria.ID;
 
 namespace DialogueTweak.Interfaces
 {
@@ -94,7 +95,7 @@ namespace DialogueTweak.Interfaces
             if (Main.LocalPlayer.talkNPC != -1 && Main.npc[Main.LocalPlayer.talkNPC].ai[0] == 24f && NPC.RerollDryadText == 2)
                 NPC.RerollDryadText = 1;
 
-            if (num2 && NPC.RerollDryadText == 1 && Main.npc[Main.LocalPlayer.talkNPC].ai[0] != 24f && Main.LocalPlayer.talkNPC != -1 && Main.npc[Main.LocalPlayer.talkNPC].active && Main.npc[Main.LocalPlayer.talkNPC].type == 20) {
+            if (num2 && NPC.RerollDryadText == 1 && Main.npc[Main.LocalPlayer.talkNPC].ai[0] != 24f && Main.LocalPlayer.talkNPC != -1 && Main.npc[Main.LocalPlayer.talkNPC].active && Main.npc[Main.LocalPlayer.talkNPC].type == NPCID.Dryad) {
                 NPC.RerollDryadText = 0;
                 Main.npcChatText = Main.npc[Main.LocalPlayer.talkNPC].GetChat();
                 NPC.PreventJojaColaDialog = true;
