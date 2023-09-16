@@ -2,6 +2,7 @@
 using DialogueTweak.Interfaces;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -49,18 +50,33 @@ internal class DialogueTweakSystem : ModSystem
         _userInterface.Update(gameTime);
     }
 
+    private static bool DialoguePanelEnabled =>
+        (Main.npcChatText != "" || Main.LocalPlayer.sign != -1) && !Main.editChest;
+
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
         int dialogIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: NPC / Sign Dialog"));
         if (dialogIndex != -1) {
-            layers[dialogIndex].Active = Configuration.Instance.VanillaUI;
+            layers[dialogIndex].Active &= Configuration.Instance.VanillaUI;
+            layers.Insert(dialogIndex + 1, new LegacyGameInterfaceLayer(
+                "DialogueTweak: Panel Style Toggle Button",
+                delegate {
+                    var position = ChatUI.PanelPosition;
+                    position.X += TextureAssets.ChatBack.Width();
+                    position.Y += (Main.instance._textDisplayCache.AmountOfLines + 2) * 30;
+                    position.Y -= 36f;
+                    DrawingHelper.DrawGUISwapButton(position);
+                    return true;
+                }, InterfaceScaleType.UI) {
+                Active = Configuration.Instance.VanillaUI && DialoguePanelEnabled && Configuration.Instance.ShowSwapButton
+            });
             layers.Insert(dialogIndex, new LegacyGameInterfaceLayer(
                 "DialogueTweak: Reworked Dialog Panel",
                 delegate {
-                    if (!Configuration.Instance.VanillaUI && (Main.npcChatText != "" || Main.LocalPlayer.sign != -1) && !Main.editChest) {
-                        _userInterface.Draw(Main.spriteBatch, _lastUpdateUiGameTime);
-                    }
+                    _userInterface.Draw(Main.spriteBatch, _lastUpdateUiGameTime);
                     return true;
-                }, InterfaceScaleType.UI));
+                }, InterfaceScaleType.UI) {
+                Active = !Configuration.Instance.VanillaUI && DialoguePanelEnabled
+            });
         }
     }
 }

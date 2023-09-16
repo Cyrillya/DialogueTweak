@@ -26,6 +26,9 @@ public class Configuration : ModConfig
     [DefaultValue(false)]
     public bool VanillaUI;
 
+    [DefaultValue(true)]
+    public bool ShowSwapButton;
+
     [DefaultValue(PortraitStyle.LiveReaction)]
     [DrawTicks]
     public PortraitStyle PortraitDrawStyle;

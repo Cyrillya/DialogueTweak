@@ -29,6 +29,15 @@ Configs: {
 				If there is a problem with the default portrait display, try change the style
 				''' */
 		}
+
+		ShowSwapButton: {
+			// Label: Toggle GUI Style Button
+			/* Tooltip:
+				'''
+				A shortcut displayed in the upper right corner of the dialogue panel
+				to switch between vanilla and modded dialogue panels
+				''' */
+		}
 	}
 
 	PortraitStyle: {
@@ -37,6 +46,11 @@ Configs: {
 		// Static.Label: Static
 		// Bestiary.Label: Bestiary
 	}
+}
+
+UISwitch: {
+	// ToVanilla: Switch to vanilla panel
+	// ToModded: Switch to modded panel
 }
 
 Hate: Odio

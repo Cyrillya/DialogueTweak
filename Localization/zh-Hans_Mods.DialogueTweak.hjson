@@ -29,6 +29,15 @@ Configs: {
 				如果默认的肖像样式出问题了，可以尝试改成其他样式
 				'''
 		}
+
+		ShowSwapButton: {
+			Label: 对话面板切换按钮
+			Tooltip:
+				'''
+				在对话面板右上角显示一个按钮
+				用于在原版和Mod对话面板之间快捷切换
+				'''
+		}
 	}
 
 	PortraitStyle: {
@@ -37,6 +46,11 @@ Configs: {
 		Static.Label: 静态
 		Bestiary.Label: 图鉴
 	}
+}
+
+UISwitch: {
+	ToVanilla: 切换到原版对话面板
+	ToModded: 切换到Mod对话面板
 }
 
 Hate: 讨厌

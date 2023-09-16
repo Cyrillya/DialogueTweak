@@ -6,6 +6,7 @@ using ReLogic.Content;
 using ReLogic.Localization.IME;
 using ReLogic.OS;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Chat;
 using Terraria.GameContent.UI.States;
@@ -15,6 +16,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 using Terraria.ID;
+using Terraria.ModLoader.Config;
 
 namespace DialogueTweak.Interfaces
 {
@@ -122,16 +124,16 @@ namespace DialogueTweak.Interfaces
 
         /// <summary>绘制钱币、任务物品和快乐值之类的杂项显示</summary>
         internal static void DrawTextPanelExtra(Vector2 textPanelPosition, Vector2 textPanelSize, Rectangle panelRectangle, int money, int itemType) {
-            Vector2 position = textPanelPosition + textPanelSize;
+            Vector2 textPanelRightBottom = textPanelPosition + textPanelSize;
 
             if (money != 0) {
                 // 钱币绘制，因原版代码问题要调一下位置
-                ItemSlot.DrawMoney(Main.spriteBatch, "", position.X - 130, position.Y - 65, Utils.CoinsSplit(money), horizontal: true);
+                ItemSlot.DrawMoney(Main.spriteBatch, "", textPanelRightBottom.X - 130, textPanelRightBottom.Y - 65, Utils.CoinsSplit(money), horizontal: true);
             }
 
             // 任务物品展示
             if (itemType != 0) {
-                position -= Vector2.One * 4f;
+                textPanelRightBottom -= Vector2.One * 4f;
                 Item Item = new Item();
                 Item.netDefaults(itemType);
                 float num3 = 1f;
@@ -140,17 +142,18 @@ namespace DialogueTweak.Interfaces
                 if (value.Width > 32 || value.Height > 32)
                     num3 = ((value.Width <= value.Height) ? (32f / (float)value.Height) : (32f / (float)value.Width));
 
-                Main.spriteBatch.Draw(value, position, null, Item.GetAlpha(Color.White), 0f, new Vector2(value.Width, value.Height), num3, SpriteEffects.None, 0f);
+                Main.spriteBatch.Draw(value, textPanelRightBottom, null, Item.GetAlpha(Color.White), 0f, new Vector2(value.Width, value.Height), num3, SpriteEffects.None, 0f);
                 if (Item.color != default(Color))
-                    Main.spriteBatch.Draw(value, position, null, Item.GetColor(Item.color), 0f, new Vector2(value.Width, value.Height), num3, SpriteEffects.None, 0f);
+                    Main.spriteBatch.Draw(value, textPanelRightBottom, null, Item.GetColor(Item.color), 0f, new Vector2(value.Width, value.Height), num3, SpriteEffects.None, 0f);
 
-                if (new Rectangle((int)position.X - (int)((float)value.Width * num3), (int)position.Y - (int)((float)value.Height * num3), (int)((float)value.Width * num3), (int)((float)value.Height * num3)).Contains(new Point(Main.mouseX, Main.mouseY)))
+                if (new Rectangle((int)textPanelRightBottom.X - (int)((float)value.Width * num3), (int)textPanelRightBottom.Y - (int)((float)value.Height * num3), (int)((float)value.Width * num3), (int)((float)value.Height * num3)).Contains(new Point(Main.mouseX, Main.mouseY)))
                     Main.instance.MouseText(Item.Name, -11, 0);
             }
 
             // 自己加的一个显示幸福值的小功能
+            bool preferenceHovered = false;
             if (Configuration.Instance.DisplayPreference && Main.LocalPlayer.sign == -1 && Main.npc.IndexInRange(Main.LocalPlayer.talkNPC)) {
-                position = new Vector2((float)PanelPosition.X + panelRectangle.Width, (float)PanelPosition.Y - 18);
+                textPanelRightBottom = new Vector2((float)PanelPosition.X + panelRectangle.Width, (float)PanelPosition.Y - 18);
                 var npc = Main.npc[Main.LocalPlayer.talkNPC];
                 npc.GetNPCPreferenceSorted(out var NPCPreferences, out var biomePreferences);
                 foreach (var preference in NPCPreferences) {
@@ -161,14 +164,15 @@ namespace DialogueTweak.Interfaces
                     if (head > 0 && head < NPCHeadLoader.NPCHeadCount) {
                         var texture = TextureAssets.NpcHead[head];
                         var origin = texture.Size() / 2f;
-                        position.X -= texture.Width() + 4; // 调整到绘制位置，以实现一排排列的效果
-                        var drawPos = new Vector2(position.X + origin.X, position.Y);
+                        textPanelRightBottom.X -= texture.Width() + 4; // 调整到绘制位置，以实现一排排列的效果
+                        var drawPos = new Vector2(textPanelRightBottom.X + origin.X, textPanelRightBottom.Y);
                         var outlineColor = DrawingHelper.AffectionLevelColor(preference.Level);
 
                         DrawingHelper.DrawIconWithOutline(texture.Value, drawPos, origin, outlineColor, npc);
 
                         Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), texture.Width() + 2, texture.Height() + 2);
                         if (rect.Contains(new Point(Main.mouseX, Main.mouseY))) {
+                            preferenceHovered = true;
                             DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{preference.Level}")}: {Lang.GetNPCNameValue(preference.NpcId)}", panelRectangle);
                         }
                     }
@@ -187,18 +191,24 @@ namespace DialogueTweak.Interfaces
                             name = modBiome.DisplayName.Value;
                         }
                         var origin = frame.Size() / 2f;
-                        position.X -= frame.Width + 4; // 调整到绘制位置，以实现一排排列的效果
-                        var drawPos = new Vector2(position.X + origin.X, position.Y);
+                        textPanelRightBottom.X -= frame.Width + 4; // 调整到绘制位置，以实现一排排列的效果
+                        var drawPos = new Vector2(textPanelRightBottom.X + origin.X, textPanelRightBottom.Y);
                         var outlineColor = DrawingHelper.AffectionLevelColor(biome.Affection);
 
                         DrawingHelper.DrawIconWithOutline(texture, drawPos, origin, outlineColor, npc, frame);
 
                         Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), frame.Width + 2, frame.Height + 2);
                         if (rect.Contains(new Point(Main.mouseX, Main.mouseY))) {
+                            preferenceHovered = true;
                             DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{biome.Affection}")}: {name}", panelRectangle);
                         }
                     }
                 }
+            }
+            
+            // 切换回原版UI的按钮，当悬停在幸福度图标上面时不显示防止文字重叠
+            if (Configuration.Instance.ShowSwapButton && !preferenceHovered) {
+                DrawingHelper.DrawGUISwapButton(panelRectangle.TopRight());
             }
         }
 
