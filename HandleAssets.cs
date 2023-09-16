@@ -17,6 +17,7 @@ namespace DialogueTweak
             new(IconType.Shop, new List<int> { NPCID.Guide }, () => $"DialogueTweak/{ModAsset.Icon_HelpPath}"),
             new(IconType.Extra, new List<int> { NPCID.Guide }, () => $"DialogueTweak/{ModAsset.Icon_HammerPath}"),
             new(IconType.Extra, new List<int> { NPCID.DD2Bartender }, () => $"Terraria/Images/Item_{ItemID.DD2ElderCrystal}"),
+            new(IconType.Extra, new List<int> { NPCID.Painter }, () => $"Terraria/Images/Item_{ItemID.FirstEncounter}"),
             new(IconType.Shop, new List<int> { NPCID.OldMan }, () => $"DialogueTweak/{ModAsset.Icon_Old_ManPath}"),
             new(IconType.Shop, new List<int> { NPCID.Nurse, NPCID.TaxCollector }, () => "Head"),
             new(IconType.Shop, new List<int> { NPCID.Angler }, () => {

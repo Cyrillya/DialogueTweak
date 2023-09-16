@@ -265,6 +265,9 @@ public static class ChatMethods
             Main.npcChatText = Language.GetTextValue("PartyGirlSpecialText.Music" + Main.rand.Next(1, 4));
             Main.swapMusic = !Main.swapMusic;
         }
+        else if (talkNPC.type == NPCID.Painter) {
+            OpenShop(25);
+        }
     }
 
     // NPC对话选项显示字样
@@ -354,10 +357,13 @@ public static class ChatMethods
             focusText = Language.GetText("LegacyInterface.28").Value;
             focusText2 = Language.GetTextValue("GameUI.Music");
         }
+        else if (talkNPC.type is NPCID.Painter) {
+            focusText = Language.GetText("LegacyInterface.28").Value;
+            focusText2 = Language.GetTextValue("GameUI.PainterDecor");
+        }
         else if (talkNPC.type is NPCID.Merchant or NPCID.ArmsDealer or NPCID.Demolitionist or NPCID.Clothier
                  or NPCID.GoblinTinkerer or NPCID.Wizard or NPCID.Mechanic or NPCID.SantaClaus or NPCID.Truffle
-                 or NPCID.Steampunker or NPCID.DyeTrader or NPCID.Cyborg or NPCID.Painter or NPCID.WitchDoctor
-                 or NPCID.Pirate) {
+                 or NPCID.Steampunker or NPCID.DyeTrader or NPCID.Cyborg or NPCID.WitchDoctor or NPCID.Pirate) {
             focusText = Language.GetText("LegacyInterface.28").Value;
             if (talkNPC.type == NPCID.GoblinTinkerer)
                 focusText2 = Language.GetText("LegacyInterface.19").Value;
