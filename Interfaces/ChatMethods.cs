@@ -140,7 +140,7 @@ public static class ChatMethods
             }
 
             shopFrame = shopFrameOverride ?? shop.Frame();
-            extraFrame = extraFrameOverride ?? extra.Frame();
+            extraFrame = extraFrameOverride ?? extra?.Frame() ?? default;
             return;
         }
 
