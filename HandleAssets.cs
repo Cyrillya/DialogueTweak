@@ -14,11 +14,11 @@ internal class HandleAssets : ModSystem
 {
     // 覆盖Icon的List，有一些默认值
     internal static List<IconInfo> IconInfos = [
-        new IconInfo(IconType.Shop, NPCID.Guide, $"DialogueTweak/{ModAsset.Icon_HelpPath}"),
-        new IconInfo(IconType.Extra, NPCID.Guide, $"DialogueTweak/{ModAsset.Icon_HammerPath}"),
+        new IconInfo(IconType.Shop, NPCID.Guide, $"DialogueTweak/{ModAsset.Icon_Help_Path}"),
+        new IconInfo(IconType.Extra, NPCID.Guide, $"DialogueTweak/{ModAsset.Icon_Hammer_Path}"),
         new IconInfo(IconType.Extra, NPCID.DD2Bartender, $"Terraria/Images/Item_{ItemID.DD2ElderCrystal}"),
         new IconInfo(IconType.Extra, NPCID.Painter, $"Terraria/Images/Item_{ItemID.FirstEncounter}"),
-        new IconInfo(IconType.Shop, NPCID.OldMan, $"DialogueTweak/{ModAsset.Icon_Old_ManPath}"),
+        new IconInfo(IconType.Shop, NPCID.OldMan, $"DialogueTweak/{ModAsset.Icon_Old_Man_Path}"),
         new IconInfo(IconType.Shop, NPCID.Angler, "QuestFish"),
         new IconInfo(IconType.Extra, NPCID.Dryad, "Terraria/Images/Projectile_995") {
             Frame = () => new Rectangle(6, 108, 24, 32),

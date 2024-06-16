@@ -6,8 +6,7 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Solaestas.tModLoader.ModBuilder" Version="1.4.1" />
-		<PackageReference Update="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" />
+		<PackageReference Include="Solaestas.tModLoader.ModBuilder" Version="1.6.1" />
 		<PackageReference Update="tModLoader.CodeAssist" Version="0.1.0" />
 	</ItemGroup>
 </Project>
