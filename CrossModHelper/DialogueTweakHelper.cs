@@ -95,4 +95,18 @@ public static class DialogueTweakHelper
         Action hoverCallback, Func<bool> availability = null, Func<Rectangle> frame = null,
         Func<float> customTextOffset = null) =>
         AddButton(new List<int> {npcType}, buttonText, () => iconTexturePath, hoverCallback, availability, frame, customTextOffset);
+
+    /// <summary>
+    /// Disable the panel rework for the given NPC type, if condition is met.
+    /// </summary>
+    /// <param name="npcType">NPC ID(s) is needed. Use <see cref="ModContent.NPCType"/> to submit your ID. You can also tweak vanilla NPCs by using vanilla NPC ID.</param>
+    /// <param name="disableCondition">Under what condition should the rework panel be disabled. Leave it blank will cause it to be disabled at any time</param>
+    public static void DisablePanelRework(int npcType, Func<bool> disableCondition = null) {
+        if (!ModLoader.TryGetMod("DialogueTweak", out var dialogue)) {
+            return;
+        }
+
+        disableCondition ??= () => true;
+        dialogue.Call("DisablePanelRework", npcType, disableCondition);
+    }
 }

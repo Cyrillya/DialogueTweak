@@ -95,6 +95,12 @@ public partial class DialogueTweak : Mod
 						HandleAssets.ButtonInfos.Add(buttonInfo);
 						return true;
 					}
+					case "DisablePanelRework": {
+						int npcId = Convert.ToInt32(args[1]);
+						var condition = args[2] as Func<bool>;
+						DialogueTweakSystem.ReworkDisableConditions[npcId] = condition;
+						return true;
+					}
 					default:
 						Logger.Error($"Replacement type \"{msg}\" not found.");
 						return false;

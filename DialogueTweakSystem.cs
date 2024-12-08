@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DialogueTweak.Interfaces;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -10,9 +11,15 @@ namespace DialogueTweak;
 
 internal class DialogueTweakSystem : ModSystem
 {
+    internal static Dictionary<int, Func<bool>> ReworkDisableConditions = new ();
     private UserInterface _userInterface;
     private UIState _ui;
     private bool _fancyUIDrawing;
+
+    private bool IsReworkPanelDisabled => Main.LocalPlayer.talkNPC >= 0 && DialoguePanelEnabled &&
+                                         Main.npc.IndexInRange(Main.LocalPlayer.talkNPC) &&
+                                         ReworkDisableConditions.TryGetValue(Main.npc[Main.LocalPlayer.talkNPC].type,
+                                             out var disableCondition) && disableCondition.Invoke();
 
     public override void Load() {
         if (!Main.dedServ) {
@@ -21,7 +28,7 @@ internal class DialogueTweakSystem : ModSystem
             _userInterface = new UserInterface();
             _userInterface.SetState(_ui);
         }
-        
+
         // 标牌正在编辑时，原版对话框会在IngameFancyUI.Draw中被绘制，这里移除这个绘制
         On_IngameFancyUI.Draw += (orig, batch, time) => {
             _fancyUIDrawing = true;
@@ -31,9 +38,16 @@ internal class DialogueTweakSystem : ModSystem
         };
 
         On_Main.GUIChatDraw += (orig, self) => {
+            // do vanilla logic if rework panel is disabled via mod.call
+            if (IsReworkPanelDisabled) {
+                orig.Invoke(self);
+                return;
+            }
+
             if (_fancyUIDrawing && !Configuration.Instance.VanillaUI) {
                 return;
             }
+
             orig.Invoke(self);
         };
     }
@@ -44,8 +58,9 @@ internal class DialogueTweakSystem : ModSystem
     }
 
     private GameTime _lastUpdateUiGameTime;
+
     public override void UpdateUI(GameTime gameTime) {
-        if (Configuration.Instance.VanillaUI) return;
+        if (Configuration.Instance.VanillaUI || IsReworkPanelDisabled) return;
         _lastUpdateUiGameTime = gameTime;
         _userInterface.Update(gameTime);
     }
@@ -56,7 +71,7 @@ internal class DialogueTweakSystem : ModSystem
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
         int dialogIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: NPC / Sign Dialog"));
         if (dialogIndex != -1) {
-            layers[dialogIndex].Active &= Configuration.Instance.VanillaUI;
+            layers[dialogIndex].Active &= Configuration.Instance.VanillaUI || IsReworkPanelDisabled;
             layers.Insert(dialogIndex + 1, new LegacyGameInterfaceLayer(
                 "DialogueTweak: Panel Style Toggle Button",
                 delegate {
@@ -67,7 +82,8 @@ internal class DialogueTweakSystem : ModSystem
                     DrawingHelper.DrawGUISwapButton(position);
                     return true;
                 }, InterfaceScaleType.UI) {
-                Active = Configuration.Instance.VanillaUI && DialoguePanelEnabled && Configuration.Instance.ShowSwapButton
+                Active = Configuration.Instance.VanillaUI && DialoguePanelEnabled &&
+                         Configuration.Instance.ShowSwapButton && !IsReworkPanelDisabled
             });
             layers.Insert(dialogIndex, new LegacyGameInterfaceLayer(
                 "DialogueTweak: Reworked Dialog Panel",
@@ -75,7 +91,7 @@ internal class DialogueTweakSystem : ModSystem
                     _userInterface.Draw(Main.spriteBatch, _lastUpdateUiGameTime);
                     return true;
                 }, InterfaceScaleType.UI) {
-                Active = !Configuration.Instance.VanillaUI && DialoguePanelEnabled
+                Active = !Configuration.Instance.VanillaUI && DialoguePanelEnabled && !IsReworkPanelDisabled
             });
         }
     }

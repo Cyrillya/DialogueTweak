@@ -96,4 +96,18 @@ public static class DialogueTweakHelperZh
         Action hoverCallback, Func<bool> availability = null, Func<Rectangle> frame = null,
         Func<float> customTextOffset = null) =>
         AddButton(new List<int> {npcType}, buttonText, () => iconTexturePath, hoverCallback, availability, frame, customTextOffset);
+
+    /// <summary>
+    /// 在特定条件下禁用NPC的对话框重制
+    /// </summary>
+    /// <param name="npcType">你需要表明NPC对象的ID，使用<see cref="ModContent.NPCType"/>来获取你的Mod中相应NPC的ID. 你也可以用原版NPC的ID来修改原版NPC</param>
+    /// <param name="disableCondition">在何种情况下对话框重制会被禁用。留空会使其在任何情况下均被禁用</param>
+    public static void DisablePanelRework(int npcType, Func<bool> disableCondition = null) {
+        if (!ModLoader.TryGetMod("DialogueTweak", out var dialogue)) {
+            return;
+        }
+
+        disableCondition ??= () => true;
+        dialogue.Call("DisablePanelRework", npcType, disableCondition);
+    }
 }
