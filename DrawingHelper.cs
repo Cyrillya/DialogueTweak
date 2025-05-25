@@ -96,6 +96,8 @@ internal static class DrawingHelper
 
         if (!isHovered) return;
 
+        Main.LocalPlayer.mouseInterface = true;
+
         var config = Configuration.Instance;
         string key = $"Mods.DialogueTweak.UISwitch.To{(config.VanillaUI ? "Modded" : "Vanilla")}";
         UICommon.TooltipMouseText(Language.GetTextValue(key));

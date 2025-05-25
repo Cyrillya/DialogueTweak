@@ -146,8 +146,18 @@ namespace DialogueTweak.Interfaces
                 if (Item.color != default(Color))
                     Main.spriteBatch.Draw(value, textPanelRightBottom, null, Item.GetColor(Item.color), 0f, new Vector2(value.Width, value.Height), num3, SpriteEffects.None, 0f);
 
-                if (new Rectangle((int)textPanelRightBottom.X - (int)((float)value.Width * num3), (int)textPanelRightBottom.Y - (int)((float)value.Height * num3), (int)((float)value.Width * num3), (int)((float)value.Height * num3)).Contains(new Point(Main.mouseX, Main.mouseY)))
+                if (new Rectangle((int)textPanelRightBottom.X - (int)((float)value.Width * num3), (int)textPanelRightBottom.Y - (int)((float)value.Height * num3), (int)((float)value.Width * num3), (int)((float)value.Height * num3)).Contains(new Point(Main.mouseX, Main.mouseY))) {
+                    Main.cursorOverride = CursorOverrideID.Magnifiers;
+                    if (Main.mouseLeftRelease && Main.mouseLeft) {
+                        if (!Main.drawingPlayerChat)
+                            Main.OpenPlayerChat();
+
+                        if (ChatManager.AddChatText(FontAssets.MouseText.Value, ItemTagHandler.GenerateTag(Item), Vector2.One))
+                            SoundEngine.PlaySound(12);
+                    }
+
                     Main.instance.MouseText(Item.Name, -11, 0);
+                }
             }
 
             // 自己加的一个显示幸福值的小功能
