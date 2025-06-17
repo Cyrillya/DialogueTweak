@@ -69,9 +69,11 @@ namespace DialogueTweak.Interfaces
             // 人像框背景，以及名字和文本的分割线
             Main.spriteBatch.Draw(ModAsset.PortraitPanel_Overlay.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             // 钱币、物品、偏好之类
-            DrawTextPanelExtra(textPanelPosition, textPanelSize, rectangle, money, Main.npcChatCornerItem);
+            DrawTextPanelExtra(textPanelPosition, textPanelSize, rectangle, money, Main.npcChatCornerItem, out int preferenceTextWidth);
             // 肖像
             PortraitDrawer.DrawPortrait(Main.spriteBatch, textColor, rectangle);
+            // NPC/标牌名字
+            DrawName(Main.spriteBatch, textColor, rectangle, preferenceTextWidth);
             DrawButtons(focusText, focusText2, linePositioning);
             // 人像框
             Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
@@ -122,8 +124,38 @@ namespace DialogueTweak.Interfaces
             ButtonHandler.DrawButtons((int)(linePositioning * LineSpacing - LineSpacing + fontFixOffset + PanelPosition.Y), focusText, focusText2);
         }
 
+        internal static void DrawName(SpriteBatch sb, Color textColor, Rectangle panel, int preferenceTextWidth) {
+            string text = null;
+            if (Main.LocalPlayer.talkNPC >= 0 && Main.LocalPlayer.sign == -1 && Main.npc[Main.LocalPlayer.talkNPC] is not null && Main.npc[Main.LocalPlayer.talkNPC].active) {
+                var talkNPC = Main.npc[Main.LocalPlayer.talkNPC];
+                text = talkNPC.GivenOrTypeName;
+            }
+
+            if (Main.LocalPlayer.sign != -1) {
+                int i = Main.LocalPlayer.sign;
+                if (Main.sign[i] is not null && WorldGen.InWorld(Main.sign[i].x, Main.sign[i].y) && Main.tile[Main.sign[i].x, Main.sign[i].y].HasTile) {
+                    text = Lang._mapLegendCache.FromTile(Main.Map[Main.sign[i].x, Main.sign[i].y], Main.sign[i].x, Main.sign[i].y);
+                }
+            }
+            
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            float x = 270f + (Main.screenWidth - 800) / 2;
+            float y = 108;
+            float width = panel.Right - x;
+            float textWidth = FontAssets.DeathText.Value.MeasureString(text).X * 0.54f;
+            
+            // don't show name text if it overlaps with preference text
+            if (preferenceTextWidth + textWidth > width)
+                return;
+
+            Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, text, x, y, textColor, Color.Black, Vector2.Zero, 0.54f);
+        }
+
         /// <summary>绘制钱币、任务物品和快乐值之类的杂项显示</summary>
-        internal static void DrawTextPanelExtra(Vector2 textPanelPosition, Vector2 textPanelSize, Rectangle panelRectangle, int money, int itemType) {
+        internal static void DrawTextPanelExtra(Vector2 textPanelPosition, Vector2 textPanelSize, Rectangle panelRectangle, int money, int itemType, out int preferenceTextWidth) {
+            preferenceTextWidth = 0;
             Vector2 textPanelRightBottom = textPanelPosition + textPanelSize;
 
             if (money != 0) {
@@ -180,10 +212,10 @@ namespace DialogueTweak.Interfaces
 
                         DrawingHelper.DrawIconWithOutline(texture.Value, drawPos, origin, outlineColor, npc);
 
-                        Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), texture.Width() + 2, texture.Height() + 2);
+                        Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), texture.Width() + 4, texture.Height() + 2);
                         if (rect.Contains(new Point(Main.mouseX, Main.mouseY))) {
                             preferenceHovered = true;
-                            DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{preference.Level}")}: {Lang.GetNPCNameValue(preference.NpcId)}", panelRectangle);
+                            DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{preference.Level}")}: {Lang.GetNPCNameValue(preference.NpcId)}", panelRectangle, out preferenceTextWidth);
                         }
                     }
                 }
@@ -207,10 +239,10 @@ namespace DialogueTweak.Interfaces
 
                         DrawingHelper.DrawIconWithOutline(texture, drawPos, origin, outlineColor, npc, frame);
 
-                        Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), frame.Width + 2, frame.Height + 2);
+                        Rectangle rect = new((int)(drawPos.X - origin.X - 2), (int)(drawPos.Y - origin.Y - 2), frame.Width + 4, frame.Height + 2);
                         if (rect.Contains(new Point(Main.mouseX, Main.mouseY))) {
                             preferenceHovered = true;
-                            DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{biome.Affection}")}: {name}", panelRectangle);
+                            DrawingHelper.DrawTextTopPanel($"{Language.GetTextValue($"Mods.{DialogueTweak.Instance.Name}.{biome.Affection}")}: {name}", panelRectangle, out preferenceTextWidth);
                         }
                     }
                 }

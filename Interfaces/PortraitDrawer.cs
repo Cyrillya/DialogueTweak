@@ -79,10 +79,6 @@ internal class PortraitDrawer : ModSystem
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None,
             RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
-        // 名字，用DeathText因为它大而且清晰
-        Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, talkNPC.GivenOrTypeName,
-            270f + (Main.screenWidth - 800) / 2, 108, textColor, Color.Black, Vector2.Zero, 0.54f);
-
         // Post
         OnPostNPCPortraitDraw?.Invoke(sb, textColor, panel, talkNPC);
     }
@@ -208,12 +204,6 @@ internal class PortraitDrawer : ModSystem
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None,
             RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
-
-        // 名字
-        string text =
-            Lang._mapLegendCache.FromTile(Main.Map[Main.sign[i].x, Main.sign[i].y], Main.sign[i].x, Main.sign[i].y);
-        Utils.DrawBorderStringFourWay(sb, FontAssets.DeathText.Value, text, 270f + (Main.screenWidth - 800) / 2, 108,
-            textColor, Color.Black, Vector2.Zero, 0.54f);
 
         // Post
         OnPostSignPortraitDraw?.Invoke(sb, textColor, panel, i);

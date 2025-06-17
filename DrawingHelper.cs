@@ -47,10 +47,11 @@ internal static class DrawingHelper
     }
 
     /// <summary>在面板右上方绘制文字</summary>
-    public static void DrawTextTopPanel(string text, Rectangle panelRectangle) {
-        Vector2 top = new Vector2(panelRectangle.X + panelRectangle.Width, panelRectangle.Y + 12f);
+    public static void DrawTextTopPanel(string text, Rectangle panelRectangle, out int textWidth) {
+        Vector2 top = new Vector2(panelRectangle.Right, panelRectangle.Y + 12f);
         DynamicSpriteFont font = FontAssets.MouseText.Value;
         var stringSize = ChatManager.GetStringSize(font, text, Vector2.One);
+        textWidth = (int) stringSize.X;
         top.X -= stringSize.X;
         Color textColor = new Color(Main.mouseTextColor, (int) ((double) Main.mouseTextColor / 1.1),
             Main.mouseTextColor / 2, Main.mouseTextColor);
