@@ -1,56 +1,52 @@
 Configs: {
 	Configuration: {
 		TextScrolling: {
-			// Tooltip: Determines whether NPC dialogue text will appear letter by letter
-			// Label: Text Scrolling
+			Tooltip: Включает анимацию плавного появления текста в диалоговой панели
+			Label: Анимация появления текста по буквам
 		}
 
-		// DisplayName: Configuration
+		DisplayName: Конфигурация
 
 		DisplayPreference: {
-			// Label: Display NPC Living Preferences
-			// Tooltip: Shows NPC's preferences for biomes and other NPCs, this is a qol feature added by this mod
+			Label: Показывать предпочтения НИПов в условиях проживания
+			Tooltip: Добавляет маленькие иконки биомов и голов других НИПов над диалоговой панелью, отображающие отношение этого НИПа к ним
 		}
 
 		VanillaUI: {
-			/* Tooltip:
+			Tooltip:
 				'''
-				Allows you to open the vanilla dialogue panel in the game
-				If the UI of this mod is not compatible with other mods or there are bugs, try enable this option
-				''' */
-			// Label: Use Vanilla Chat GUI
+				Отключает диалоговую панель из мода и заменяет её на ванильную
+				Включите эту настройку, если панель из мода плохо работает с НИПами из других модов или вызывает баги
+				'''
+			Label: Использовать диалоговую панель из ваниллы
 		}
 
 		PortraitDrawStyle: {
-			// Label: Portrait Style
-			/* Tooltip:
-				'''
-				Change the way the NPC chat portraits are drawn
-				If there is a problem with the default portrait display, try change the style
-				''' */
+			Label: Стиль портретов в диалогах
+			Tooltip: Устанавливает способ отображения НИПа на его портрете в диалоговой панели
 		}
 
 		ShowSwapButton: {
-			// Label: Toggle GUI Style Button
-			/* Tooltip:
+			Label: Кнопка для переключения между диалоговыми панелями
+			Tooltip:
 				'''
-				A shortcut displayed in the upper right corner of the dialogue panel
-				to switch between vanilla and modded dialogue panels
-				''' */
+				Добавляет кнопку переключения между ванильной и модовой диалоговыми панелями справа сверху от диалогового окна
+				Используйте, чтобы было удобнее сравнивать новую диалоговую панель с ванильной
+				'''
 		}
 	}
 
 	PortraitStyle: {
-		// Tooltip: ""
-		// LiveReaction.Label: Live Reaction
-		// Static.Label: Static
-		// Bestiary.Label: Bestiary
+		Tooltip: ""
+		LiveReaction.Label: в прямом эфире
+		Static.Label: статичный
+		Bestiary.Label: как в бестиарии
 	}
 }
 
 UISwitch: {
-	// ToVanilla: Switch to vanilla panel
-	// ToModded: Switch to modded panel
+	ToVanilla: Переключиться на панель из ваниллы
+	ToModded: Переключиться на панель из мода
 }
 
 Hate: Ненавидит
