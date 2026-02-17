@@ -12,6 +12,11 @@ Configs: {
 			Tooltip: Добавляет маленькие иконки биомов и голов других НИПов над диалоговой панелью, отображающие отношение этого НИПа к ним
 		}
 
+		DisplayHappiness: {
+			// Label: Display NPC Happiness Percentage
+			// Tooltip: Shows NPC's happiness percentage (price modifier). This is a qol feature from Terraria v1.4.5
+		}
+
 		VanillaUI: {
 			Tooltip:
 				'''
@@ -39,8 +44,13 @@ Configs: {
 	PortraitStyle: {
 		Tooltip: ""
 		LiveReaction.Label: в прямом эфире
-		Static.Label: статичный
-		Bestiary.Label: как в бестиарии
+		// LiveReaction.Tooltip: ""
+		// Portrait.Label: Portrait
+		// Portrait.Tooltip: Terraria v1.4.5 style
+		// Retro.Label: Full Body
+		// Retro.Tooltip: ""
+		// Profile.Label: Profile
+		// Profile.Tooltip: ""
 	}
 }
 

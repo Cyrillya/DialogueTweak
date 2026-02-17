@@ -12,6 +12,11 @@ Configs: {
 			Tooltip: 显示NPC对环境和其他NPC的喜好，这是此Mod添加的辅助功能
 		}
 
+		DisplayHappiness: {
+			Label: 显示NPC幸福度百分比
+			Tooltip: 显示NPC幸福度百分比（价格修正）。这是原版v1.4.5中的一个功能
+		}
+
 		VanillaUI: {
 			Tooltip:
 				'''
@@ -43,8 +48,13 @@ Configs: {
 	PortraitStyle: {
 		// Tooltip: ""
 		LiveReaction.Label: 实时
-		Static.Label: 静态
-		Bestiary.Label: 图鉴
+		LiveReaction.Tooltip: ""
+		Portrait.Label: 肖像
+		Portrait.Tooltip: v1.4.5肖像样式
+		Retro.Label: 全身
+		Retro.Tooltip: ""
+		Profile.Label: 侧写
+		Profile.Tooltip: ""
 	}
 }
 

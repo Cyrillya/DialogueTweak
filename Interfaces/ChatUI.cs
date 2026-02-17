@@ -1,27 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+
+using DialogueTweak.Port;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using ReLogic.Content;
 using ReLogic.Localization.IME;
 using ReLogic.OS;
+
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Chat;
 using Terraria.GameContent.UI.States;
 using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Config;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using Terraria.ID;
-using Terraria.ModLoader.Config;
 
 namespace DialogueTweak.Interfaces
 {
     public class ChatUI : UIState
     {
+        private static bool NewVersionPortrait => Main.LocalPlayer.sign == -1 && Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Portrait or Configuration.PortraitStyle.Profile;
+
         private static TextDisplayCache _textDisplayCache = new();
 
         internal static Asset<Texture2D> BiomeIconTags;
@@ -68,6 +75,10 @@ namespace DialogueTweak.Interfaces
             DrawTextAndPanel(textPanelPosition, textPanelSize, LetterAppeared, snippets); // 文字框
             // 人像框背景，以及名字和文本的分割线
             Main.spriteBatch.Draw(ModAsset.PortraitPanel_Overlay.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            // 如果是1.4.5版本肖像，因为有些肖像会出框，所以把框放在前面绘制
+            if (NewVersionPortrait)
+                Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
             // 钱币、物品、偏好之类
             DrawTextPanelExtra(textPanelPosition, textPanelSize, rectangle, money, Main.npcChatCornerItem, out int preferenceTextWidth);
             // 肖像
@@ -75,8 +86,11 @@ namespace DialogueTweak.Interfaces
             // NPC/标牌名字
             DrawName(Main.spriteBatch, textColor, rectangle, preferenceTextWidth);
             DrawButtons(focusText, focusText2, linePositioning);
+
             // 人像框
-            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            // 如果是1.4.5版本肖像，因为有些肖像会出框，所以把框放在前面绘制，这里不绘制
+            if (!NewVersionPortrait)
+                Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
             // 判断鼠标是否处于对话栏界面
             if (new Rectangle((int)textPanelPosition.X, (int)textPanelPosition.Y, (int)textPanelSize.X, (int)textPanelSize.Y).Contains(new Point(Main.mouseX, Main.mouseY))) {
@@ -191,6 +205,38 @@ namespace DialogueTweak.Interfaces
                     Main.instance.MouseText(Item.Name, -11, 0);
                 }
             }
+
+            // 1.4.5的显示幸福值功能
+            if (Configuration.Instance.DisplayHappiness && Main.LocalPlayer.sign == -1) {
+                // 1.4.5原版数据
+                int shopHappinessTextOffsetX = 26;
+                int shopHappinessTextOffsetY = 98;
+                int shopHappinessIconOffsetX = 12;
+                int shopHappinessIconOffsetY = 108;
+                // 本模组修正值
+                int offsetX = 4;
+                int offsetY = -122;
+                // 最终值
+                int textOffsetX = shopHappinessTextOffsetX + offsetX;
+                int textOffsetY = shopHappinessTextOffsetY + offsetY;
+                int iconOffsetX = shopHappinessIconOffsetX + offsetX;
+                int iconOffsetY = shopHappinessIconOffsetY + offsetY;
+
+
+                Texture2D texture = NewAssetsHandler.Request("Images/UI/NPCHappiness").Value;
+
+                double priceAdjustment = Main.LocalPlayer.currentShoppingSettings.PriceAdjustment;
+
+                int frameX = ((!(priceAdjustment <= 0.82f)) ? ((priceAdjustment <= 1f) ? 1 : ((!(priceAdjustment <= 1.1f)) ? 3 : 2)) : 0);
+                Rectangle frame = texture.Frame(4, 1, frameX);
+
+                Vector2 iconPos = new Vector2(PanelPosition.X + iconOffsetX, PanelPosition.Y + iconOffsetY);
+                Main.spriteBatch.Draw(texture, iconPos, frame, Color.White, 0f, frame.Size() / 2f, 1f, SpriteEffects.None, 0f);
+
+                string happinessText = priceAdjustment.ToString("P0");
+                Utils.DrawBorderStringFourWay(Main.spriteBatch, FontAssets.MouseText.Value, happinessText, PanelPosition.X + textOffsetX, PanelPosition.Y + textOffsetY, Color.White * ((float) (int) Main.mouseTextColor / 255f), Color.Black, Vector2.Zero);
+            }
+
 
             // 自己加的一个显示幸福值的小功能
             bool preferenceHovered = false;

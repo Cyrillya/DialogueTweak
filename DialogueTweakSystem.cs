@@ -76,6 +76,7 @@ internal class DialogueTweakSystem : ModSystem
                 "DialogueTweak: Panel Style Toggle Button",
                 delegate {
                     var position = ChatUI.PanelPosition;
+                    position.X += TextureAssets.ChatBack.Width() + 34;
                     DrawingHelper.DrawGUISwapButton(position);
                     return true;
                 }, InterfaceScaleType.UI) {

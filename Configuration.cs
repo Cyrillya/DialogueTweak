@@ -9,8 +9,9 @@ public class Configuration : ModConfig
     public enum PortraitStyle : int
     {
         LiveReaction,
-        Static,
-        Bestiary
+        Portrait,
+        Retro,
+        Profile
     }
     
     public static Configuration Instance;
@@ -22,6 +23,9 @@ public class Configuration : ModConfig
 
     [DefaultValue(true)]
     public bool DisplayPreference;
+
+    [DefaultValue(true)]
+    public bool DisplayHappiness;
 
     [DefaultValue(false)]
     public bool VanillaUI;
@@ -35,9 +39,5 @@ public class Configuration : ModConfig
         
     public override void OnLoaded() {
         Instance = this;
-    }
-
-    public override void OnChanged() {
-        PortraitDrawer.EntryIcon = null; // Refresh
     }
 }

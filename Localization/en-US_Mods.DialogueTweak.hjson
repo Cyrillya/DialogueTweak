@@ -9,7 +9,12 @@ Configs: {
 
 		DisplayPreference: {
 			Label: Display NPC Living Preferences
-			Tooltip: Shows NPC's preferences for biomes and other NPCs, this is a qol feature added by this mod
+			Tooltip: Shows NPC's preferences for biomes and other NPCs. This is a qol feature added by this mod
+		}
+
+		DisplayHappiness: {
+			Label: Display NPC Happiness Percentage
+			Tooltip: Shows NPC's happiness percentage (price modifier). This is a qol feature from Terraria v1.4.5
 		}
 
 		VanillaUI: {
@@ -43,8 +48,13 @@ Configs: {
 	PortraitStyle: {
 		Tooltip: ""
 		LiveReaction.Label: Live Reaction
-		Static.Label: Static
-		Bestiary.Label: Bestiary
+		LiveReaction.Tooltip: ""
+		Portrait.Label: Portrait
+		Portrait.Tooltip: Terraria v1.4.5 style
+		Retro.Label: Full Body
+		Retro.Tooltip: ""
+		Profile.Label: Profile
+		Profile.Tooltip: ""
 	}
 }
 

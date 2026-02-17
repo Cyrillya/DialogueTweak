@@ -1,6 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+
+using DialogueTweak.Port;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+using ReLogic.Content;
+
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
@@ -12,8 +19,7 @@ namespace DialogueTweak.Interfaces;
 
 internal class PortraitDrawer : ModSystem
 {
-    public static UnlockableNPCEntryIcon EntryIcon;
-
+    private static NPC _portraitDummy = new NPC();
     public static event Action<SpriteBatch, Color, Rectangle> OnPortraitDraw;
     public static event Action<SpriteBatch, Color, Rectangle, NPC> OnPreNPCPortraitDraw;
     public static event Action<SpriteBatch, Color, Rectangle, NPC> OnPostNPCPortraitDraw;
@@ -52,22 +58,17 @@ internal class PortraitDrawer : ModSystem
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null,
             Main.UIScaleMatrix);
 
-        var previewBox = new Rectangle((int) position.X + 17, (int) position.Y + 18, 92, 94);
+        var previewBox = new Rectangle((int) position.X + 16, (int) position.Y + 16, 96, 96);
 
         if (talkNPC.active) {
             bool screenTargetUnavailable = Main.screenTarget is null || Main.screenTarget.IsDisposed ||
                                            !Lighting.NotRetro || Main.WaveQuality <= 0;
-            if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Bestiary
-                    or Configuration.PortraitStyle.Static || screenTargetUnavailable) {
-                EntryIcon ??= new UnlockableNPCEntryIcon(talkNPC.type) {
-                    _npcCache = {scale = 2f}
-                };
-
-                if (EntryIcon._npcNetId != talkNPC.type) {
-                    EntryIcon = new UnlockableNPCEntryIcon(talkNPC.type);
-                }
-
-                DrawNPCInBestiary(sb, previewBox);
+            if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Portrait) {
+                DrawNPCPortraitDetailed(sb, talkNPC, previewBox);
+            }
+            else if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Profile
+                    or Configuration.PortraitStyle.Retro || screenTargetUnavailable) {
+                DrawNPCInBestiary(sb, talkNPC, previewBox);
             }
             else {
                 DrawNPCRenderedInWorld(sb, talkNPC, previewBox);
@@ -81,6 +82,16 @@ internal class PortraitDrawer : ModSystem
 
         // Post
         OnPostNPCPortraitDraw?.Invoke(sb, textColor, panel, talkNPC);
+    }
+
+    private void DrawNPCPortraitDetailed(SpriteBatch sb, NPC talkNPC, Rectangle previewBox) {
+        if (!NewSourceCode.NPCPortraits.TryGetValue(talkNPC.type, out var value))
+            return;
+
+        value.GetDrawData(out var texture, out var drawFrame);
+        if (texture == null)
+            return;
+        sb.Draw(texture, previewBox.Center.ToVector2(), null, Color.White, 0f, texture.Size() / 2f, 1f, SpriteEffects.None, 0f);
     }
 
     private void DrawNPCRenderedInWorld(SpriteBatch sb, NPC talkNPC, Rectangle previewBox) {
@@ -113,43 +124,78 @@ internal class PortraitDrawer : ModSystem
         sb.Draw(Main.screenTarget, previewBox, source, Color.White, 0f, Vector2.Zero, effects, 0f);
     }
 
-    private void DrawNPCInBestiary(SpriteBatch sb, Rectangle previewBox) {
-        var info = new BestiaryUICollectionInfo {
-            UnlockState = BestiaryEntryUnlockState.CanShowPortraitOnly_1
-        };
-
-        var settings = new EntryIconDrawSettings {
-            iconbox = previewBox,
-            IsPortrait = true
-        };
-
-        if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Bestiary) {
-            EntryIcon?.Update(info, previewBox, settings);
-            EntryIcon._npcCache.spriteDirection = -EntryIcon._npcCache.spriteDirection;
-        }
-        else {
-            EntryIcon._npcCache.spriteDirection = 1;
-        }
-
-        if (!NPCID.Sets.NPCBestiaryDrawOffset.TryGetValue(EntryIcon._npcNetId, out var bestiaryDrawModifiers) ||
-            !bestiaryDrawModifiers.PortraitScale.HasValue || bestiaryDrawModifiers.PortraitScale.Value is 1f) {
-            EntryIcon._npcCache.scale = 1.5f;
-        }
-
-        var oldRect = sb.GraphicsDevice.ScissorRectangle;
-
-        sb.GraphicsDevice.ScissorRectangle = previewBox;
-
-        if (EntryIcon is not null) {
-            try {
-                EntryIcon?.Draw(info, sb, settings);
+    private void DrawNPCInBestiary(SpriteBatch sb, NPC talkNPC, Rectangle previewBox)
+    {
+        var center = previewBox.Center.ToVector2();
+        if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Profile)
+        {
+            NPC dummy = _portraitDummy;
+            dummy.SetDefaults(talkNPC.type);
+            dummy.whoAmI = talkNPC.whoAmI;
+            dummy.GivenName = talkNPC.GivenName;
+            dummy.townNpcVariationIndex = talkNPC.townNpcVariationIndex;
+            dummy.FindFrame();
+            dummy.direction = dummy.spriteDirection = 1;
+            int num14 = 16;
+            dummy.scale = 3f;
+            int num15 = -dummy.width / 2;
+            if (NPCID.Sets.IsTownPet[dummy.type])
+            {
+                num14 = -20;
+                dummy.scale = 3f;
+                int num16 = 96;
+                num16 -= talkNPC.frame.Width;
+                num16 /= 2;
+                num16 /= 6;
+                num16 *= 6;
+                num15 = -36 + num16;
+                dummy.direction = dummy.spriteDirection = -1;
             }
-            catch {
-                EntryIcon = null;
+            Dictionary<int, Vector2> nPCPortraitsCloseUpOffsets = NewSourceCode.NPCPortraitsCloseUpOffsets;
+            dummy.position = center + new Vector2(num15, 48 + num14);
+            Vector2 value = Vector2.Zero;
+            if (nPCPortraitsCloseUpOffsets.TryGetValue(talkNPC.type, out value))
+            {
+                dummy.position += value;
             }
+            dummy.IsABestiaryIconDummy = true;
+            sb.End();
+            Rectangle scissorRectangle = sb.GraphicsDevice.ScissorRectangle;
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, ScissorState, null,
+                Main.UIScaleMatrix);
+            sb.GraphicsDevice.ScissorRectangle = previewBox;
+            Main.instance.DrawNPCDirect(sb, dummy, behindTiles: false, Vector2.Zero);
+            sb.End();
+            sb.GraphicsDevice.ScissorRectangle = scissorRectangle;
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null,
+                Main.UIScaleMatrix);
         }
-
-        sb.GraphicsDevice.ScissorRectangle = oldRect;
+        if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Retro)
+        {
+            NPC dummy = _portraitDummy;
+            dummy.SetDefaults(talkNPC.type);
+            dummy.whoAmI = talkNPC.whoAmI;
+            dummy.GivenName = talkNPC.GivenName;
+            dummy.townNpcVariationIndex = talkNPC.townNpcVariationIndex;
+            dummy.FindFrame();
+            dummy.direction = dummy.spriteDirection = 1;
+            if (NPCID.Sets.IsTownPet[dummy.type])
+            {
+                dummy.direction = dummy.spriteDirection = -1;
+            }
+            int num17 = -dummy.height;
+            dummy.scale = 2f;
+            int num18 = -dummy.width / 2;
+            Dictionary<int, Vector2> nPCPortraitsFullBodyRetroOffsets = NewSourceCode.NPCPortraitsFullBodyRetroOffsets;
+            dummy.position = center + new Vector2(num18, 48 + num17);
+            Vector2 value2 = Vector2.Zero;
+            if (nPCPortraitsFullBodyRetroOffsets.TryGetValue(talkNPC.type, out value2))
+            {
+                dummy.position += value2;
+            }
+            dummy.IsABestiaryIconDummy = true;
+            Main.instance.DrawNPCDirect(sb, dummy, behindTiles: false, Vector2.Zero);
+        }
     }
 
     // 标牌
@@ -175,7 +221,7 @@ internal class PortraitDrawer : ModSystem
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null,
             Main.UIScaleMatrix);
 
-        var preview = new Rectangle((int) position.X + 17, (int) position.Y + 18, 92, 94);
+        var previewBox = new Rectangle((int) position.X + 16, (int) position.Y + 16, 96, 96);
 
         var tileObjectData = TileObjectData.GetTileData(tile);
         int tileSize = Math.Max(tileObjectData.CoordinateFullHeight, tileObjectData.CoordinateFullWidth) + 20;
@@ -198,7 +244,7 @@ internal class PortraitDrawer : ModSystem
         var screenOffset = (signCenter - Main.Camera.Center) * extraZoom;
         source.Offset((int) screenOffset.X, (int) (screenOffset.Y * Main.LocalPlayer.gravDir));
 
-        sb.Draw(Main.screenTarget, preview, source, Color.White, 0f, Vector2.Zero, effects, 0f);
+        sb.Draw(Main.screenTarget, previewBox, source, Color.White, 0f, Vector2.Zero, effects, 0f);
 
         // 还原
         sb.End();
@@ -213,4 +259,10 @@ internal class PortraitDrawer : ModSystem
         if (OnPortraitDraw is not null)
             OnPortraitDraw.Invoke(sb, textColor, panel);
     }
+
+    private static RasterizerState ScissorState = new RasterizerState
+    {
+        CullMode = CullMode.None,
+        ScissorTestEnable = true
+    };
 }
