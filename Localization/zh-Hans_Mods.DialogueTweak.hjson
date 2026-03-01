@@ -1,7 +1,7 @@
 Configs: {
 	Configuration: {
-		TextScrolling: {
-			Tooltip: 决定NPC对话文本是否会一个一个字地出现
+		TextScrollingMode: {
+			Tooltip: 修改NPC对话文本一个一个字地出现的速度，可以禁用
 			Label: 文本滚动
 		}
 
@@ -35,6 +35,11 @@ Configs: {
 				'''
 		}
 
+		PortraitAnimation: {
+			Label: 肖像动画
+			Tooltip: NPC在说话时肖像是否有弹跳动画
+		}
+
 		ShowSwapButton: {
 			Label: 对话面板切换按钮
 			Tooltip:
@@ -43,6 +48,18 @@ Configs: {
 				用于在原版和Mod对话面板之间快捷切换
 				'''
 		}
+	}
+
+	TextScrollingSpeed: {
+		Tooltip: ""
+		Slow.Label: 缓慢
+		Slow.Tooltip: ""
+		Regular.Label: 默认
+		Regular.Tooltip: ""
+		Fast.Label: 快速
+		Fast.Tooltip: ""
+		Disabled.Label: 禁用
+		Disabled.Tooltip: ""
 	}
 
 	PortraitStyle: {

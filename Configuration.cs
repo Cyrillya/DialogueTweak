@@ -13,13 +13,22 @@ public class Configuration : ModConfig
         Retro,
         Profile
     }
-    
+
+    public enum TextScrollingSpeed : int
+    {
+        Slow,
+        Regular,
+        Fast,
+        Disabled
+    }
+
     public static Configuration Instance;
         
     public override ConfigScope Mode => ConfigScope.ClientSide;
 
-    [DefaultValue(true)]
-    public bool TextScrolling;
+    [DefaultValue(TextScrollingSpeed.Regular)]
+    [DrawTicks]
+    public TextScrollingSpeed TextScrollingMode;
 
     [DefaultValue(true)]
     public bool DisplayPreference;
@@ -36,7 +45,10 @@ public class Configuration : ModConfig
     [DefaultValue(PortraitStyle.LiveReaction)]
     [DrawTicks]
     public PortraitStyle PortraitDrawStyle;
-        
+
+    [DefaultValue(true)]
+    public bool PortraitAnimation;
+
     public override void OnLoaded() {
         Instance = this;
     }

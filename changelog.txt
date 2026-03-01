@@ -1,0 +1,9 @@
+NPC portrait now bounces when an NPC is talking, just as 1.4.5. This can be disabled in mod config
+Text scrolling speed can now be configured
+Fixed 'Live Reaction' portrait style showing the wrong region of the screen when 'Remove Forced Minimum Zoom' is off and resolution is above 1080p
+Fixed some display issues when fps is above 60
+
+NPC 肖像现在会在 NPC 说话时跳动，与 1.4.5 版本相同。此功能可在模组配置中禁用
+现在可以配置文本滚动速度
+修复了“实时”肖像样式在“禁用强制最小缩放”关闭且分辨率高于 1080p 时显示区域错误的问题
+修复了帧率高于 60 时出现的一些显示问题

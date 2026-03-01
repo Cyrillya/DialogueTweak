@@ -27,8 +27,6 @@ namespace DialogueTweak.Interfaces
 {
     public class ChatUI : UIState
     {
-        private static bool NewVersionPortrait => Main.LocalPlayer.sign == -1 && Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Portrait or Configuration.PortraitStyle.Profile;
-
         private static TextDisplayCache _textDisplayCache = new();
 
         internal static Asset<Texture2D> BiomeIconTags;
@@ -45,6 +43,8 @@ namespace DialogueTweak.Interfaces
         public static float LineSpacing => FontAssets.MouseText.Value.LineSpacing;
 
         public override void Draw(SpriteBatch spriteBatch) {
+            UpdateTextScrolling();
+
             if (Main.LocalPlayer.talkNPC < 0 && Main.LocalPlayer.sign == -1) {
                 Main.npcChatText = "";
                 return;
@@ -72,12 +72,9 @@ namespace DialogueTweak.Interfaces
             var textPanelPosition = PanelPosition + new Vector2(116, 42f);
             var textPanelSize = new Vector2(378f, amountOfLines * LineSpacing + 8f);
 
-            DrawTextAndPanel(textPanelPosition, textPanelSize, LetterAppeared, snippets); // 文字框
+            DrawTextAndPanel(textPanelPosition, textPanelSize, LetterAppeared, snippets); // 文字框=
             // 人像框背景，以及名字和文本的分割线
-            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Overlay.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            // 如果是1.4.5版本肖像，因为有些肖像会出框，所以把框放在前面绘制
-            if (NewVersionPortrait)
-                Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Seperate.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
             // 钱币、物品、偏好之类
             DrawTextPanelExtra(textPanelPosition, textPanelSize, rectangle, money, Main.npcChatCornerItem, out int preferenceTextWidth);
@@ -86,11 +83,6 @@ namespace DialogueTweak.Interfaces
             // NPC/标牌名字
             DrawName(Main.spriteBatch, textColor, rectangle, preferenceTextWidth);
             DrawButtons(focusText, focusText2, linePositioning);
-
-            // 人像框
-            // 如果是1.4.5版本肖像，因为有些肖像会出框，所以把框放在前面绘制，这里不绘制
-            if (!NewVersionPortrait)
-                Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, PanelPosition + new Vector2(0, 15f), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
             // 判断鼠标是否处于对话栏界面
             if (new Rectangle((int)textPanelPosition.X, (int)textPanelPosition.Y, (int)textPanelSize.X, (int)textPanelSize.Y).Contains(new Point(Main.mouseX, Main.mouseY))) {
@@ -376,27 +368,37 @@ namespace DialogueTweak.Interfaces
         }
 
         // Text scrolling 文字滚动机制
-        public override void Update(GameTime gameTime) {
+        public void UpdateTextScrolling() {
             if (Main.npcChatText != PrevText) {
                 LetterAppeared = 0;
+                PortraitDrawer.DoNPCPortraitHop();
+                PrevText = Main.npcChatText;
             }
-            if (Main.LocalPlayer.sign > -1 || !Configuration.Instance.TextScrolling) {
+            if (Main.LocalPlayer.sign > -1 || Configuration.Instance.TextScrollingMode is Configuration.TextScrollingSpeed.Disabled) {
                 LetterAppeared = 1145141919; // 标牌没有缓慢出现机制
                 return;
             }
-            PrevText = Main.npcChatText;
             if (!Main.npc.IndexInRange(Main.LocalPlayer.talkNPC) || Main.npc[Main.LocalPlayer.talkNPC] is null || !Main.npc[Main.LocalPlayer.talkNPC].active) {
                 return;
             }
             if (LetterAppeared < TotalLetters + 1) {
-                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 2.5f : 4f;
+                float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 1.25f : 2f;
+                switch (Configuration.Instance.TextScrollingMode) {
+                    case Configuration.TextScrollingSpeed.Slow:
+                        speakingRateMultipiler *= 0.6f;
+                        break;
+                    case Configuration.TextScrollingSpeed.Fast:
+                        speakingRateMultipiler *= 1.75f;
+                        break;
+                }
                 if (CursorAtTextPanel) {
-                    speakingRateMultipiler *= 1.2f;
-                    if (Main.mouseLeft) {
+                    if (Main.mouseRight) {
                         speakingRateMultipiler *= 3f; // 快速吟唱
                     }
                 }
-                LetterAppeared += ChatMethods.HandleSpeakingRate(Main.npc[Main.LocalPlayer.talkNPC].type) * speakingRateMultipiler;
+                float regularSecondsPerFrame = 1f / 60f;
+                float fpsFactor = (float) Main._drawInterfaceGameTime.ElapsedGameTime.TotalSeconds / regularSecondsPerFrame;
+                LetterAppeared += ChatMethods.HandleSpeakingRate(Main.npc[Main.LocalPlayer.talkNPC].type) * speakingRateMultipiler * fpsFactor;
             }
             CursorAtTextPanel = false;
         }

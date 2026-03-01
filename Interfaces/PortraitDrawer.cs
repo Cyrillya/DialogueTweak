@@ -19,6 +19,8 @@ namespace DialogueTweak.Interfaces;
 
 internal class PortraitDrawer : ModSystem
 {
+    private static bool NewVersionPortrait => Main.LocalPlayer.sign == -1 && Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Portrait or Configuration.PortraitStyle.Profile;
+
     private static NPC _portraitDummy = new NPC();
     public static event Action<SpriteBatch, Color, Rectangle> OnPortraitDraw;
     public static event Action<SpriteBatch, Color, Rectangle, NPC> OnPreNPCPortraitDraw;
@@ -97,7 +99,7 @@ internal class PortraitDrawer : ModSystem
     private void DrawNPCRenderedInWorld(SpriteBatch sb, NPC talkNPC, Rectangle previewBox) {
         int npcSize = Math.Max(talkNPC.height, talkNPC.width) + 20;
         int offset = npcSize / 2;
-        float extraZoom = Main.GameZoomTarget - 1f;
+        float extraZoom = Main.GameViewMatrix.Zoom.X - 1f;
 
         // 根据重力方向调整位置
         var effects = SpriteEffects.None;
@@ -255,9 +257,56 @@ internal class PortraitDrawer : ModSystem
         OnPostSignPortraitDraw?.Invoke(sb, textColor, panel, i);
     }
 
-    internal static void DrawPortrait(SpriteBatch sb, Color textColor, Rectangle panel) {
+    private static float npcChatPortraitFrameCounter;
+
+    public static void DoNPCPortraitHop()
+    {
+        npcChatPortraitFrameCounter = 0;
+        if (!Configuration.Instance.PortraitAnimation)
+            npcChatPortraitFrameCounter = 2.01f;
+    }
+
+    internal static void DrawPortrait(SpriteBatch sb, Color textColor, Rectangle panel)
+    {
+        int offsetY = 0;
+        npcChatPortraitFrameCounter += (float) Main._drawInterfaceGameTime.ElapsedGameTime.TotalSeconds;
+        if (npcChatPortraitFrameCounter <= 2f)
+        {
+            double num9 = 80.0;
+            float num10 = 0.25f;
+            float num11 = (float) EaseOutBounce(Utils.Clamp((int)(npcChatPortraitFrameCounter * 60f), 0.0, num9) / num9);
+            offsetY = (int)(-56f * num10 * (1f - num11));
+        }
+
+        panel.Y += offsetY;
+
+        var position = panel.Location.ToVector2();
+        var previewBox = new Rectangle((int) position.X + 14, (int) position.Y + 14, 100, 100);
+
+        Main.spriteBatch.Draw(ModAsset.PortraitPanel_Overlay.Value, previewBox.Location.ToVector2(), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        // 如果是1.4.5版本肖像，因为有些肖像会出框，所以把框放在前面绘制
+        if (NewVersionPortrait)
+            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, previewBox.Location.ToVector2(), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
         if (OnPortraitDraw is not null)
             OnPortraitDraw.Invoke(sb, textColor, panel);
+
+        // 如果是1.4.5版本肖像，因为有些肖像会出框，所以把框放在前面绘制，这里不绘制
+        if (!NewVersionPortrait)
+            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, previewBox.Location.ToVector2(), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+    }
+
+    public static double EaseOutBounce(double x)
+    {
+        return BounceEaseOut(x, 4, 2.0);
+    }
+
+    private static double BounceEaseOut(double t, int bounces, double elasticity)
+    {
+        double num = (double) bounces * Math.PI;
+        double num2 = Math.Pow(1.0 - t, elasticity);
+        double num3 = Math.Abs(Math.Sin(t * num));
+        return 1.0 - num2 * num3;
     }
 
     private static RasterizerState ScissorState = new RasterizerState

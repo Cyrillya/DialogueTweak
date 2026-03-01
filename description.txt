@@ -1,5 +1,5 @@
 This mod completely reworks NPC dialogue panel and sign editing panel. Inspired by the mobile version.
-Text scrolling is added. You can hold left to make it scroll faster.
+Text scrolling is added. You can hold right to make it scroll faster.
 Mods that also modified NPC dialogue panel might not work with this mod.
 If issues happend, please leave a comment on this mod's Steam Workshop page.
 
@@ -8,7 +8,7 @@ For more information, visit the mod's github page below and read the README.md.
 You can also check out DialogueTweak.ModCall.cs for the relevant code.
 
 本Mod完全重制了NPC对话框UI，设计基于手机版UI但有所改善。
-给对话文本增加了文本滚动。你可以按住左键来让它出现得快一点。
+给对话文本增加了文本滚动。你可以按住右键来让它出现得快一点。
 同样修改了NPC对话框的Mod可能和此Mod不兼容。
 如果使用过程中遇到问题请在Steam创意工坊页面下留言。
 

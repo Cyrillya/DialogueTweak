@@ -1,7 +1,7 @@
 Configs: {
 	Configuration: {
-		TextScrolling: {
-			Tooltip: Determines whether NPC dialogue text will appear letter by letter
+		TextScrollingMode: {
+			Tooltip: Determines how fast NPC dialogue text will appear letter by letter. This can be disabled
 			Label: Text Scrolling
 		}
 
@@ -35,6 +35,11 @@ Configs: {
 				'''
 		}
 
+		PortraitAnimation: {
+			Label: Portrait Animation
+			Tooltip: Determines whether NPC portraits will have the bouncing animation when they are talking
+		}
+
 		ShowSwapButton: {
 			Label: Toggle GUI Style Button
 			Tooltip:
@@ -43,6 +48,18 @@ Configs: {
 				to switch between vanilla and modded dialogue panels
 				'''
 		}
+	}
+
+	TextScrollingSpeed: {
+		Tooltip: ""
+		Slow.Label: Slow
+		Slow.Tooltip: ""
+		Regular.Label: Default
+		Regular.Tooltip: ""
+		Fast.Label: Fast
+		Fast.Tooltip: ""
+		Disabled.Label: Disabled
+		Disabled.Tooltip: ""
 	}
 
 	PortraitStyle: {
