@@ -14,6 +14,13 @@ public class Configuration : ModConfig
         Profile
     }
 
+    public enum PortraitFallbackStyle : int
+    {
+        LiveReaction,
+        Retro,
+        Profile
+    }
+
     public enum TextScrollingSpeed : int
     {
         Slow,
@@ -45,6 +52,10 @@ public class Configuration : ModConfig
     [DefaultValue(PortraitStyle.LiveReaction)]
     [DrawTicks]
     public PortraitStyle PortraitDrawStyle;
+
+    [DefaultValue(PortraitFallbackStyle.LiveReaction)]
+    [DrawTicks]
+    public PortraitFallbackStyle PortraitFbStyle;
 
     [DefaultValue(true)]
     public bool PortraitAnimation;

@@ -35,6 +35,15 @@ Configs: {
 				'''
 		}
 
+		PortraitFbStyle: {
+			Label: Portrait Fallback Style
+			Tooltip:
+				'''
+				Change the way the NPC chat portraits are drawn, if the NPC don't have v1.4.5 portrait
+				Only works when 'Portrait Style' is set to 'Portrait'
+				'''
+		}
+
 		PortraitAnimation: {
 			Label: Portrait Animation
 			Tooltip: Determines whether NPC portraits will have the bouncing animation when they are talking
@@ -68,6 +77,16 @@ Configs: {
 		LiveReaction.Tooltip: ""
 		Portrait.Label: Portrait
 		Portrait.Tooltip: Terraria v1.4.5 style
+		Retro.Label: Full Body
+		Retro.Tooltip: ""
+		Profile.Label: Profile
+		Profile.Tooltip: ""
+	}
+
+	PortraitFallbackStyle: {
+		Tooltip: ""
+		LiveReaction.Label: Live Reaction
+		LiveReaction.Tooltip: ""
 		Retro.Label: Full Body
 		Retro.Tooltip: ""
 		Profile.Label: Profile

@@ -30,6 +30,15 @@ Configs: {
 			Label: Стиль портретов в диалогах
 			Tooltip: Устанавливает способ отображения НИПа на его портрете в диалоговой панели
 		}
+
+		PortraitFbStyle: {
+			Label: Portrait Fallback Style
+			Tooltip:
+				'''
+				Change the way the NPC chat portraits are drawn, if the NPC don't have v1.4.5 portrait
+				Only works when 'Portrait Style' is set to 'Portrait'
+				'''
+		}
 		
 		PortraitAnimation: {
 			Label: Анимация портрета
@@ -64,6 +73,16 @@ Configs: {
 		LiveReaction.Tooltip: ""
 		Portrait.Label: Портрет
 		Portrait.Tooltip: Terraria 1.4.5 
+		Retro.Label: Целиком
+		Retro.Tooltip: ""
+		Profile.Label: Профиль
+		Profile.Tooltip: ""
+	}
+
+	PortraitFallbackStyle: {
+		Tooltip: ""
+		LiveReaction.Label: Live Reaction
+		LiveReaction.Tooltip: ""
 		Retro.Label: Целиком
 		Retro.Tooltip: ""
 		Profile.Label: Профиль

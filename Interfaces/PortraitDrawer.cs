@@ -66,11 +66,22 @@ internal class PortraitDrawer : ModSystem
             bool screenTargetUnavailable = Main.screenTarget is null || Main.screenTarget.IsDisposed ||
                                            !Lighting.NotRetro || Main.WaveQuality <= 0;
             if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Portrait) {
-                DrawNPCPortraitDetailed(sb, talkNPC, previewBox);
+                bool success = DrawNPCPortraitDetailed(sb, talkNPC, previewBox);
+
+                if (!success)
+                {
+                    if (Configuration.Instance.PortraitFbStyle is Configuration.PortraitFallbackStyle.Profile
+                            or Configuration.PortraitFallbackStyle.Retro || screenTargetUnavailable) {
+                        DrawNPCInBestiary(sb, talkNPC, previewBox, Configuration.Instance.PortraitFbStyle is Configuration.PortraitFallbackStyle.Profile);
+                    }
+                    else {
+                        DrawNPCRenderedInWorld(sb, talkNPC, previewBox);
+                    }
+                }
             }
             else if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Profile
                     or Configuration.PortraitStyle.Retro || screenTargetUnavailable) {
-                DrawNPCInBestiary(sb, talkNPC, previewBox);
+                DrawNPCInBestiary(sb, talkNPC, previewBox, Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Profile);
             }
             else {
                 DrawNPCRenderedInWorld(sb, talkNPC, previewBox);
@@ -86,14 +97,16 @@ internal class PortraitDrawer : ModSystem
         OnPostNPCPortraitDraw?.Invoke(sb, textColor, panel, talkNPC);
     }
 
-    private void DrawNPCPortraitDetailed(SpriteBatch sb, NPC talkNPC, Rectangle previewBox) {
+    private bool DrawNPCPortraitDetailed(SpriteBatch sb, NPC talkNPC, Rectangle previewBox) {
         if (!NewSourceCode.NPCPortraits.TryGetValue(talkNPC.type, out var value))
-            return;
+            return false;
 
         value.GetDrawData(out var texture, out var drawFrame);
         if (texture == null)
-            return;
+            return false;
+        DrawPortraitPanelFront(previewBox);
         sb.Draw(texture, previewBox.Center.ToVector2(), null, Color.White, 0f, texture.Size() / 2f, 1f, SpriteEffects.None, 0f);
+        return true;
     }
 
     private void DrawNPCRenderedInWorld(SpriteBatch sb, NPC talkNPC, Rectangle previewBox) {
@@ -124,12 +137,15 @@ internal class PortraitDrawer : ModSystem
             source.Offset((int) uiZoomOffset.X, (int) (-uiZoomOffset.Y * (Main.GameZoomTarget + 1f)));
 
         sb.Draw(Main.screenTarget, previewBox, source, Color.White, 0f, Vector2.Zero, effects, 0f);
+        
+        DrawPortraitPanelFront(previewBox);
     }
 
-    private void DrawNPCInBestiary(SpriteBatch sb, NPC talkNPC, Rectangle previewBox)
+    private void DrawNPCInBestiary(SpriteBatch sb, NPC talkNPC, Rectangle previewBox, bool profile)
     {
+        DrawPortraitPanelFront(previewBox);
         var center = previewBox.Center.ToVector2();
-        if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Profile)
+        if (profile)
         {
             NPC dummy = _portraitDummy;
             dummy.SetDefaults(talkNPC.type);
@@ -161,18 +177,12 @@ internal class PortraitDrawer : ModSystem
                 dummy.position += value;
             }
             dummy.IsABestiaryIconDummy = true;
-            sb.End();
-            Rectangle scissorRectangle = sb.GraphicsDevice.ScissorRectangle;
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, ScissorState, null,
-                Main.UIScaleMatrix);
-            sb.GraphicsDevice.ScissorRectangle = previewBox;
-            Main.instance.DrawNPCDirect(sb, dummy, behindTiles: false, Vector2.Zero);
-            sb.End();
-            sb.GraphicsDevice.ScissorRectangle = scissorRectangle;
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null,
-                Main.UIScaleMatrix);
+            previewBox.Y -= 50;
+            previewBox.Height += 50;
+            DrawInScissor(sb, previewBox,
+                () => Main.instance.DrawNPCDirect(sb, dummy, behindTiles: false, Vector2.Zero));
         }
-        if (Configuration.Instance.PortraitDrawStyle is Configuration.PortraitStyle.Retro)
+        else
         {
             NPC dummy = _portraitDummy;
             dummy.SetDefaults(talkNPC.type);
@@ -255,6 +265,26 @@ internal class PortraitDrawer : ModSystem
 
         // Post
         OnPostSignPortraitDraw?.Invoke(sb, textColor, panel, i);
+        
+        DrawPortraitPanelFront(previewBox);
+    }
+
+    private void DrawInScissor(SpriteBatch sb, Rectangle boundingBox, Action drawAction)
+    {
+        sb.End();
+        Rectangle scissorRectangle = sb.GraphicsDevice.ScissorRectangle;
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, ScissorState, null,
+            Main.UIScaleMatrix);
+        boundingBox.X = (int)(boundingBox.X * Main.UIScaleMatrix.M11);
+        boundingBox.Y = (int)(boundingBox.Y * Main.UIScaleMatrix.M11);
+        boundingBox.Width = (int)(boundingBox.Width * Main.UIScaleMatrix.M11);
+        boundingBox.Height = (int)(boundingBox.Height * Main.UIScaleMatrix.M11);
+        sb.GraphicsDevice.ScissorRectangle = boundingBox;
+        drawAction.Invoke();
+        sb.End();
+        sb.GraphicsDevice.ScissorRectangle = scissorRectangle;
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, null, null, null,
+            Main.UIScaleMatrix);
     }
 
     private static float npcChatPortraitFrameCounter;
@@ -284,17 +314,13 @@ internal class PortraitDrawer : ModSystem
         var previewBox = new Rectangle((int) position.X + 14, (int) position.Y + 14, 100, 100);
 
         Main.spriteBatch.Draw(ModAsset.PortraitPanel_Overlay.Value, previewBox.Location.ToVector2(), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-        // 如果是1.4.5版本肖像，因为有些肖像会出框，所以把框放在前面绘制
-        if (NewVersionPortrait)
-            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, previewBox.Location.ToVector2(), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
         if (OnPortraitDraw is not null)
             OnPortraitDraw.Invoke(sb, textColor, panel);
-
-        // 如果是1.4.5版本肖像，因为有些肖像会出框，所以把框放在前面绘制，这里不绘制
-        if (!NewVersionPortrait)
-            Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, previewBox.Location.ToVector2(), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
     }
+    
+    private void DrawPortraitPanelFront(Rectangle previewBox) =>
+        Main.spriteBatch.Draw(ModAsset.PortraitPanel_Front.Value, previewBox.Location.ToVector2(), null, Color.White * 0.92f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
     public static double EaseOutBounce(double x)
     {
