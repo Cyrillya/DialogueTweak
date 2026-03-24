@@ -1,8 +1,8 @@
 Configs: {
 	Configuration: {
 		TextScrollingMode: {
-			Tooltip: Determines how fast NPC dialogue text will appear letter by letter. This can be disabled
 			Label: Text Scrolling
+			Tooltip: Determines how fast NPC dialogue text will appear letter by letter. This can be disabled
 		}
 
 		DisplayName: Configuration
@@ -18,12 +18,12 @@ Configs: {
 		}
 
 		VanillaUI: {
+			Label: Use Vanilla Chat GUI
 			Tooltip:
 				'''
 				Allows you to open the vanilla dialogue panel in the game
 				If the UI of this mod is not compatible with other mods or there are bugs, try enable this option
 				'''
-			Label: Use Vanilla Chat GUI
 		}
 
 		PortraitDrawStyle: {

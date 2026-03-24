@@ -1,8 +1,8 @@
 Configs: {
 	Configuration: {
 		TextScrollingMode: {
-			Tooltip: 修改NPC对话文本一个一个字地出现的速度，可以禁用
 			Label: 文本滚动
+			Tooltip: 修改NPC对话文本一个一个字地出现的速度，可以禁用
 		}
 
 		DisplayName: 配置选项
@@ -18,12 +18,12 @@ Configs: {
 		}
 
 		VanillaUI: {
+			Label: 使用原版对话面板
 			Tooltip:
 				'''
 				允许你在游戏内开启原版对话面板
 				若该模组的UI不兼容其他模组或出现BUG，可以尝试开启此选项
 				'''
-			Label: 使用原版对话面板
 		}
 
 		PortraitDrawStyle: {

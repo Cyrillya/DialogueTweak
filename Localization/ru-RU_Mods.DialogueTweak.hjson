@@ -1,8 +1,8 @@
 Configs: {
 	Configuration: {
-		TextScrolling: {
-			Tooltip: Включает анимацию плавного появления текста в диалоговой панели
+		TextScrollingMode: {
 			Label: Анимация появления текста по буквам
+			Tooltip: Определяет скорость анимации плавного появления текста в диалоговой панели
 		}
 
 		DisplayName: Конфигурация
@@ -13,22 +13,27 @@ Configs: {
 		}
 
 		DisplayHappiness: {
-			// Label: Display NPC Happiness Percentage
-			// Tooltip: Shows NPC's happiness percentage (price modifier). This is a qol feature from Terraria v1.4.5
+			Label: Отображать уровень счастья НИПов
+			Tooltip: Показывает уровень счастья НИПа в процентах (на основе множителя цены). Взято из нововведения Terraria 1.4.5
 		}
 
 		VanillaUI: {
+			Label: Использовать ванильную диалоговую панель
 			Tooltip:
 				'''
 				Отключает диалоговую панель из мода и заменяет её на ванильную
 				Включите эту настройку, если панель из мода плохо работает с НИПами из других модов или вызывает баги
 				'''
-			Label: Использовать диалоговую панель из ваниллы
 		}
 
 		PortraitDrawStyle: {
 			Label: Стиль портретов в диалогах
 			Tooltip: Устанавливает способ отображения НИПа на его портрете в диалоговой панели
+		}
+		
+		PortraitAnimation: {
+			Label: Анимация портрета
+			Tooltip: Добавляет анимацию подпрыгивания портрета НИПа во время открытия диалогового окна
 		}
 
 		ShowSwapButton: {
@@ -36,26 +41,38 @@ Configs: {
 			Tooltip:
 				'''
 				Добавляет кнопку переключения между ванильной и модовой диалоговыми панелями справа сверху от диалогового окна
-				Используйте, чтобы было удобнее сравнивать новую диалоговую панель с ванильной
+				Используйте для удобного сравнения новой диалоговой панели с ванильной
 				'''
 		}
+	}
+	
+	TextScrollingSpeed: {
+		Tooltip: ""
+		Slow.Label: Медленная
+		Slow.Tooltip: ""
+		Regular.Label: По умолчанию
+		Regular.Tooltip: ""
+		Fast.Label: Быстрая
+		Fast.Tooltip: ""
+		Disabled.Label: Отключена
+		Disabled.Tooltip: ""
 	}
 
 	PortraitStyle: {
 		Tooltip: ""
-		LiveReaction.Label: в прямом эфире
-		// LiveReaction.Tooltip: ""
-		// Portrait.Label: Portrait
-		// Portrait.Tooltip: Terraria v1.4.5 style
-		// Retro.Label: Full Body
-		// Retro.Tooltip: ""
-		// Profile.Label: Profile
-		// Profile.Tooltip: ""
+		LiveReaction.Label: Live Reaction
+		LiveReaction.Tooltip: ""
+		Portrait.Label: Портрет
+		Portrait.Tooltip: Terraria 1.4.5 
+		Retro.Label: Целиком
+		Retro.Tooltip: ""
+		Profile.Label: Профиль
+		Profile.Tooltip: ""
 	}
 }
 
 UISwitch: {
-	ToVanilla: Переключиться на панель из ваниллы
+	ToVanilla: Переключиться на ванильную панель
 	ToModded: Переключиться на панель из мода
 }
 
