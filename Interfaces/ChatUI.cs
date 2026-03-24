@@ -385,10 +385,10 @@ namespace DialogueTweak.Interfaces
                 float speakingRateMultipiler = GameCulture.FromCultureName(GameCulture.CultureName.Chinese).IsActive ? 1.25f : 2f;
                 switch (Configuration.Instance.TextScrollingMode) {
                     case Configuration.TextScrollingSpeed.Slow:
-                        speakingRateMultipiler *= 0.6f;
+                        speakingRateMultipiler *= 0.5f;
                         break;
                     case Configuration.TextScrollingSpeed.Fast:
-                        speakingRateMultipiler *= 1.75f;
+                        speakingRateMultipiler *= 1.5f;
                         break;
                 }
                 if (CursorAtTextPanel) {
@@ -396,9 +396,7 @@ namespace DialogueTweak.Interfaces
                         speakingRateMultipiler *= 3f; // 快速吟唱
                     }
                 }
-                float regularSecondsPerFrame = 1f / 60f;
-                float fpsFactor = (float) Main._drawInterfaceGameTime.ElapsedGameTime.TotalSeconds / regularSecondsPerFrame;
-                LetterAppeared += ChatMethods.HandleSpeakingRate(Main.npc[Main.LocalPlayer.talkNPC].type) * speakingRateMultipiler * fpsFactor;
+                LetterAppeared += ChatMethods.HandleSpeakingRate(Main.npc[Main.LocalPlayer.talkNPC].type) * speakingRateMultipiler * DialogueTweakSystem.CurrentRefreshRateFactor;
             }
             CursorAtTextPanel = false;
         }

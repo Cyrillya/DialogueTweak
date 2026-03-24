@@ -269,12 +269,12 @@ internal class PortraitDrawer : ModSystem
     internal static void DrawPortrait(SpriteBatch sb, Color textColor, Rectangle panel)
     {
         int offsetY = 0;
-        npcChatPortraitFrameCounter += (float) Main._drawInterfaceGameTime.ElapsedGameTime.TotalSeconds;
-        if (npcChatPortraitFrameCounter <= 2f)
+        npcChatPortraitFrameCounter += DialogueTweakSystem.CurrentRefreshRateFactor;
+        if (npcChatPortraitFrameCounter <= 120f)
         {
             double num9 = 80.0;
             float num10 = 0.25f;
-            float num11 = (float) EaseOutBounce(Utils.Clamp((int)(npcChatPortraitFrameCounter * 60f), 0.0, num9) / num9);
+            float num11 = (float) EaseOutBounce(Utils.Clamp((int)npcChatPortraitFrameCounter, 0.0, num9) / num9);
             offsetY = (int)(-56f * num10 * (1f - num11));
         }
 
