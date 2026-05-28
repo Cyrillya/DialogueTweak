@@ -19,7 +19,7 @@ internal class TextDisplayCache
     private int _lastScreenHeight;
     public float LastLineLength;
 
-    public TextSnippet[] Snippets { get; private set; }
+    public List<TextSnippet> Snippets { get; private set; }
     public int AmountOfLines { get; private set; }
 
     public void PrepareCache(string text) {
@@ -56,7 +56,7 @@ internal class TextDisplayCache
 
             if (inputMode == InputMode.XBoxGamepadUI) {
                 KeyConfiguration keyConfiguration = PlayerInput.CurrentProfile.InputModes[inputMode];
-                string input = PlayerInput.BuildCommand("", true, keyConfiguration.KeyStatus["MouseRight"]);
+                string input = PlayerInput.BuildCommand("", keyConfiguration.KeyStatus["MouseRight"]);
                 input = input.Replace(": ", "");
                 text = text.Replace("<right>", input);
             }
@@ -72,7 +72,7 @@ internal class TextDisplayCache
 
             if (inputMode2 == InputMode.XBoxGamepadUI) {
                 KeyConfiguration keyConfiguration2 = PlayerInput.CurrentProfile.InputModes[inputMode2];
-                string input = PlayerInput.BuildCommand("", true, keyConfiguration2.KeyStatus["MouseLeft"]);
+                string input = PlayerInput.BuildCommand("", keyConfiguration2.KeyStatus["MouseLeft"]);
                 input = input.Replace(": ", "");
                 text = text.Replace("<left>", input);
             }
@@ -85,10 +85,10 @@ internal class TextDisplayCache
     }
 
     // 针对textSnippet特殊文本的换行
-    public static TextSnippet[] WordwrapString(string text, DynamicSpriteFont font, int maxWidth,
+    public static List<TextSnippet> WordwrapString(string text, DynamicSpriteFont font, int maxWidth,
         out float lastLineLength) {
         float workingLineLength = 0f; // 当前行长度
-        TextSnippet[] originalSnippets = ChatManager.ParseMessage(text, Color.White).ToArray();
+        List<TextSnippet> originalSnippets = ChatManager.ParseMessage(text, Color.White);
         ChatManager.ConvertNormalSnippets(originalSnippets);
         List<TextSnippet> finalSnippets = new() {new TextSnippet()};
 
@@ -138,7 +138,7 @@ internal class TextDisplayCache
                 finalSnippets.Add(new TextSnippet(cacheString, snippet.Color));
             }
             else {
-                float length = snippet.GetStringLength(font);
+                float length = font.MeasureString(snippet.Text).X;
                 workingLineLength += length;
                 // 超了 - 换行再添加，注意起始长度
                 if (workingLineLength > maxWidth) {
@@ -151,7 +151,7 @@ internal class TextDisplayCache
         }
 
         lastLineLength = workingLineLength;
-        return finalSnippets.ToArray();
+        return finalSnippets;
     }
 
     // https://unicode-table.com/cn/blocks/cjk-unified-ideographs/ 中日韩统一表意文字

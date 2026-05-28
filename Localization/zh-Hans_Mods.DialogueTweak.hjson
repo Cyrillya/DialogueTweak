@@ -26,24 +26,6 @@ Configs: {
 				'''
 		}
 
-		PortraitDrawStyle: {
-			Label: 肖像样式
-			Tooltip:
-				'''
-				决定NPC聊天界面肖像的绘制样式
-				如果默认的肖像样式出问题了，可以尝试改成其他样式
-				'''
-		}
-
-		PortraitFbStyle: {
-			Label: 备用肖像样式
-			Tooltip:
-				'''
-				决定没有v1.4.5肖像的NPC的聊天界面肖像的绘制样式
-				仅当“肖像样式”设为“肖像”时可用
-				'''
-		}
-
 		PortraitAnimation: {
 			Label: 肖像动画
 			Tooltip: NPC在说话时肖像是否有弹跳动画
@@ -69,28 +51,6 @@ Configs: {
 		Fast.Tooltip: ""
 		Disabled.Label: 禁用
 		Disabled.Tooltip: ""
-	}
-
-	PortraitStyle: {
-		// Tooltip: ""
-		LiveReaction.Label: 实时
-		LiveReaction.Tooltip: ""
-		Portrait.Label: 肖像
-		Portrait.Tooltip: v1.4.5肖像样式
-		Retro.Label: 全身
-		Retro.Tooltip: ""
-		Profile.Label: 侧写
-		Profile.Tooltip: ""
-	}
-
-	PortraitFallbackStyle: {
-		// Tooltip: ""
-		LiveReaction.Label: 实时
-		LiveReaction.Tooltip: ""
-		Retro.Label: 全身
-		Retro.Tooltip: ""
-		Profile.Label: 侧写
-		Profile.Tooltip: ""
 	}
 }
 

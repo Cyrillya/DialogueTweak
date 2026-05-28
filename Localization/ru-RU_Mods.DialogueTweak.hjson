@@ -26,20 +26,6 @@ Configs: {
 				'''
 		}
 
-		PortraitDrawStyle: {
-			Label: Стиль портретов в диалогах
-			Tooltip: Устанавливает способ отображения НИПа на его портрете в диалоговой панели
-		}
-
-		PortraitFbStyle: {
-			Label: Стиль при отсутствии портрета
-			Tooltip:
-				'''
-				Устанавливает способ отображения портрета в диалоговой панели для НИПов, у которых нет своего портрета из 1.4.5
-				Применяется только если настройка «Стиль портретов в диалогах» установлена на «Портрет»
-				'''
-		}
-		
 		PortraitAnimation: {
 			Label: Анимация портрета
 			Tooltip: Добавляет анимацию подпрыгивания портрета НИПа во время открытия диалогового окна
@@ -54,7 +40,7 @@ Configs: {
 				'''
 		}
 	}
-	
+
 	TextScrollingSpeed: {
 		Tooltip: ""
 		Slow.Label: Медленная
@@ -65,28 +51,6 @@ Configs: {
 		Fast.Tooltip: ""
 		Disabled.Label: Отключена
 		Disabled.Tooltip: ""
-	}
-
-	PortraitStyle: {
-		Tooltip: ""
-		LiveReaction.Label: В прямом эфире
-		LiveReaction.Tooltip: ""
-		Portrait.Label: Портрет
-		Portrait.Tooltip: Стиль Terraria 1.4.5 
-		Retro.Label: Целиком
-		Retro.Tooltip: ""
-		Profile.Label: Профиль
-		Profile.Tooltip: ""
-	}
-
-	PortraitFallbackStyle: {
-		Tooltip: ""
-		LiveReaction.Label: В прямом эфире
-		LiveReaction.Tooltip: ""
-		Retro.Label: Целиком
-		Retro.Tooltip: ""
-		Profile.Label: Профиль
-		Profile.Tooltip: ""
 	}
 }
 

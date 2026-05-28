@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -27,110 +27,109 @@ internal class ButtonHandler
     public static Asset<Texture2D> ButtonPanel;
     public static Asset<Texture2D> ButtonPanel_Highlight;
 
-    public static Asset<Texture2D> Shop;
-    private static Rectangle _shopFrame;
-    private static Func<float> _shopCustomOffset;
-    public static Asset<Texture2D> Extra;
-    private static Rectangle _extraFrame;
-    private static Func<float> _extraCustomOffset;
-
     private static bool moveOnBackButton;
     private static bool moveOnHappinessButton;
-    private static bool moveOnShopButton;
-    private static bool moveOnExtraButton;
+    private static bool moveOnHousingButton;
+    private static Dictionary<NPCInteraction, bool> _interactionHoverStates = new();
 
-    public static void DrawButtons(int statY, string focusText, string focusText2) {
+    public const int SideButtonSize = 44;
+
+    public static void DrawButtons(int statY) {
         int talk = Main.LocalPlayer.talkNPC;
-        NPCLoader.SetChatButtons(ref focusText, ref focusText2);
 
-        bool showHappinessReport = Main.LocalPlayer.sign == -1 &&
-                                   Main.LocalPlayer.currentShoppingSettings.HappinessReport != "" &&
-                                   Main.npc[Main.LocalPlayer.talkNPC].townNPC;
-        // 返回按钮，小动物由于没有幸福值，所以返回按钮要长一点。由于返回按钮总会显示，就不考虑手柄了
-        DrawBackButton(statY, !showHappinessReport);
-        if (moveOnBackButton && Main.mouseLeft && Main.mouseLeftRelease) return; // 按下返回按钮后应该停止绘制了，防止数组超限
-        if (showHappinessReport) {
+        bool isHomeless = talk >= 0 && NPC.CanShowHomelessText(talk);
+        bool hasHappinessReport = Main.LocalPlayer.sign == -1 &&
+                                  Main.LocalPlayer.currentShoppingSettings.HappinessReport != "" &&
+                                  Main.npc[talk].townNPC;
+
+        bool showAnySideButton = isHomeless || hasHappinessReport;
+        // 返回按钮，小动物由于没有幸福值/住房按钮，所以返回按钮要长一点。由于返回按钮总会显示，就不考虑手柄了
+        DrawBackButton(statY, !showAnySideButton);
+        if (moveOnBackButton && Main.mouseLeft && Main.mouseLeftRelease) return;
+
+        if (isHomeless) {
+            DrawHousingButton(statY);
+        }
+        else if (hasHappinessReport) {
             DrawHappinessButton(statY);
         }
-        else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = false; // 考虑手柄
+        else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = false;
 
-        // 该NPC所有可用的额外按钮
-        int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[talk].type; // 为了标牌特判
-        bool useShopButton = !string.IsNullOrWhiteSpace(focusText);
-        bool useExtraButton = !string.IsNullOrWhiteSpace(focusText2);
-        List<int> buttons = new(); // 所有该NPC可用额外按钮的index，直接调用HandleAssets.ButtonInfos里的值
-        foreach (int i in from a in HandleAssets.ButtonInfos
-                 where a.NPCTypes.Contains(type) && a.Available()
-                 select HandleAssets.ButtonInfos.IndexOf(a))
-            buttons.Add(i);
-        int buttonCounts = buttons.Count + useShopButton.ToInt() + useExtraButton.ToInt();
-        if (buttonCounts == 0) return;
-        int spacing = 10; // 按扭之间的间隔
-        int buttonWidth = 375 / buttonCounts - spacing; // 每个按钮的宽度，+2是加上，-10是去除了按钮之间的间隔
-
-        // 决定图标
-        ChatMethods.HandleButtonIcon(type, out Shop, out _shopFrame, out _shopCustomOffset, out Extra, out _extraFrame,
-            out _extraCustomOffset);
-
-        int offsetX = 0;
-        var bottom = new Vector2(ScreenWidth / 2f, statY + 64);
-
-        Vector2 GetDrawPosition() => new(ChatUI.PanelPosition.X + 122 + offsetX, statY + 10);
-
-        if (useExtraButton) {
-            var pos = GetDrawPosition();
-            DrawMainButton(_extraFrame, Extra.Value, pos, bottom, buttonWidth, focusText2.Trim(), ExtraButtonCallback,
-                _extraCustomOffset, ref moveOnExtraButton);
-            offsetX += buttonWidth + spacing;
-
-            // 手柄支持，这个是右中
-            UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat2, pos);
-            UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = true;
-            // 原版的奇妙操作，无论怎样NPC都会同时存在NPCChat0和NPCChat1的选项，这里用特判让第二个按钮定位到此按钮
-            if (!UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle) {
-                UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat1, pos);
-                UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = true;
-                UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = false;
-            }
+        // 获取该NPC的所有可用原生交互按钮
+        int type;
+        if (Main.LocalPlayer.sign != -1) {
+            type = 0; // native sign registration type
         }
-        else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight = false; // 考虑手柄
-
-        if (useShopButton) {
-            var pos = GetDrawPosition();
-            DrawMainButton(_shopFrame, Shop.Value, pos, bottom, buttonWidth, focusText.Trim(), ShopButtonCallback,
-                _shopCustomOffset, ref moveOnShopButton);
-            offsetX += buttonWidth + spacing;
-
-            // 手柄支持，这个是最右边
-            UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat3, pos);
-            UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight2 = true;
-            // 原版的奇妙操作，无论怎样NPC都会同时存在NPCChat0和NPCChat1的选项，这里用特判让第二个按钮定位到此按钮
-            if (!UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle) {
-                UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat1, pos);
-                UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = true;
-                UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight2 = false;
-            }
+        else {
+            type = Main.npc[talk].type;
         }
-        else UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsRight2 = false; // 考虑手柄
 
-        foreach (var button in from i in buttons select HandleAssets.ButtonInfos[i]) {
-            if (!button.Available.Invoke()) continue;
+        var entries = Main.NPCInteractionDB.GetInteractionEntries(type);
+        if (entries == null) return;
 
-            var pos = GetDrawPosition();
-            var text = button.ButtonText?.Invoke() ?? "";
+        // 过滤：排除侧按钮对应的实例，只保留启用且满足条件的
+        var drawEntries = entries.Where(e =>
+            e.Enabled &&
+            e.NPCInteraction.Condition() &&
+            e.NPCInteraction != NPCInteractionDatabase.CloseButton &&
+            e.NPCInteraction != NPCInteractionDatabase.HappinessButton &&
+            e.NPCInteraction != NPCInteractionDatabase.HousingButton
+        ).ToList();
 
-            bool useIcon = button.IconTexture != "";
-            var iconTexture = useIcon
-                ? ModContent.Request<Texture2D>(button.IconTexture, AssetRequestMode.ImmediateLoad).Value
-                : null;
-            var frame = new Rectangle();
-            if (useIcon) {
-                frame = button.Frame?.Invoke() ?? new Rectangle(0, 0, iconTexture.Width, iconTexture.Height);
+        if (drawEntries.Count == 0) return;
+
+        int spacing = 10;
+        int firstRowMax = showAnySideButton ? 2 : 3; // 有侧按钮时第一行最多2个，没有侧按钮时最多3个
+        int otherRowMax = 3; // 后续行最多3个
+
+        // 第一行主按钮区域：从侧按钮右侧到面板右侧，宽度375
+        const int firstRowStartX = 122; // offset from PanelPosition.X
+        const int firstRowWidth = 365;
+        // 后续行：占用整行（包括侧按钮位置），左右边界对齐第一行
+        const int otherRowStartX = 16; // offset from PanelPosition.X (侧按钮位置)
+        int otherRowWidth = firstRowWidth + (firstRowStartX - otherRowStartX); // 481
+
+        int entryIndex = 0;
+        int row = 0;
+        int head = -1;
+        if (talk >= 0) {
+            var npc = Main.npc[talk];
+            head = !TownNPCProfiles.Instance.GetProfile(npc, out var profile)
+                ? NPC.TypeToDefaultHeadIndex(type)
+                : profile.GetHeadTextureIndex(npc);
+        }
+
+        while (entryIndex < drawEntries.Count) {
+            int maxThisRow = row == 0 ? firstRowMax : otherRowMax;
+            int remaining = drawEntries.Count - entryIndex;
+            int countInRow = Math.Min(remaining, maxThisRow);
+
+            int rowStartX = row == 0 ? firstRowStartX : otherRowStartX;
+            int rowWidth = row == 0 ? firstRowWidth : otherRowWidth;
+            int buttonWidth = (rowWidth - (countInRow - 1) * spacing) / countInRow;
+
+            float rowY = statY + 10 + row * 54; // 每行高度44 + 10间距
+            var bottom = new Vector2(ScreenWidth / 2f, rowY + 54);
+
+            for (int col = 0; col < countInRow; col++) {
+                var interaction = drawEntries[entryIndex].NPCInteraction;
+                var pos = new Vector2(ChatUI.PanelPosition.X + rowStartX + col * (buttonWidth + spacing), rowY);
+                string text = interaction.GetText();
+
+                ChatMethods.ResolveInteractionIcon(interaction, type, head,
+                    out var texAsset, out var frame, out var customOffset);
+
+                _interactionHoverStates.TryAdd(interaction, false);
+                bool hoverState = _interactionHoverStates[interaction];
+
+                DrawMainButton(frame, texAsset.Value, pos, bottom, buttonWidth, text.Trim(),
+                    interaction, customOffset, ref hoverState);
+
+                _interactionHoverStates[interaction] = hoverState;
+                entryIndex++;
             }
 
-            DrawMainButton(frame, iconTexture, pos, bottom, buttonWidth, text.Trim(), button.HoverAction,
-                button.CustomOffset, ref button.Focused);
-            offsetX += buttonWidth + spacing;
+            row++;
         }
     }
 
@@ -145,10 +144,10 @@ internal class ButtonHandler
     /// <param name="panelBottom">整个对话框面板的底部</param>
     /// <param name="width">按钮的宽</param>
     /// <param name="buttonText">按钮显示的文字</param>
-    /// <param name="hoverOnButtonCallback">鼠标悬停在按钮上时执行的事件</param>
+    /// <param name="interaction">按钮对应的NPCInteraction</param>
     /// <param name="moveOnButton">判断是否移动到按钮上的bool字段</param>
     private static void DrawMainButton(Rectangle frame, Texture2D tex, Vector2 drawPosition, Vector2 panelBottom,
-        int width, string buttonText, Action hoverOnButtonCallback, Func<float> customTextOffset,
+        int width, string buttonText, NPCInteraction interaction, Func<float> customTextOffset,
         ref bool moveOnButton) {
         bool useText = !string.IsNullOrWhiteSpace(buttonText); // 确实有文本
         bool useIcon = tex is not null;
@@ -156,7 +155,7 @@ internal class ButtonHandler
         var size = new Vector2(width, height);
         var customOffset = customTextOffset?.Invoke();
 
-        // 按钮
+        // 按钮背景
         DrawPanel(SpriteBatch, ButtonPanel.Value, drawPosition, size, Color.White);
 
         // 对应图像（即icon）
@@ -164,6 +163,7 @@ internal class ButtonHandler
         if (useIcon) {
             // If offset is there, the fixed offset will be ignored and the icon is centered on the space between the left border and the text(offset)
             if (customOffset is not null) {
+                iconOffset.X = customOffset.Value;
                 // 高度居中，但左侧固定和框有个距离
                 var origin = frame.Size() / 2f;
                 var iconPosition = drawPosition + new Vector2(customOffset.Value, height) / 2f;
@@ -190,21 +190,34 @@ internal class ButtonHandler
             }
         }
 
-        var buttonRectangle = new Rectangle((int) drawPosition.X, (int) drawPosition.Y, width, height);
-        MainButtonLogic(buttonRectangle, drawPosition, size, hoverOnButtonCallback, ref moveOnButton);
+        var buttonRectangle = new Rectangle((int)drawPosition.X, (int)drawPosition.Y, width, height);
+        MainButtonLogic(buttonRectangle, drawPosition, size, HoverOnButtonCallback, ref moveOnButton);
+        
+        drawPosition.X += iconOffset.X;
 
         // 还有一个文字提示
         if (useText) {
-            if (customOffset is not null) {
-                iconOffset.X = customOffset.Value;
-            }
-            drawPosition.X += iconOffset.X;
             // 为什么要-8? 去除按钮板的边框大小
-            width -= (int) iconOffset.X + 8;
+            width -= (int)iconOffset.X + 8;
+            if (interaction.ShowExcalmation) {
+                width -= 10;
+            }
             height -= 8;
-            buttonRectangle = new Rectangle((int) drawPosition.X, (int) drawPosition.Y, width, height);
-            MainButtonText(buttonRectangle, buttonText, panelBottom, moveOnButton, customOffset is not null);
+            buttonRectangle = new Rectangle((int)drawPosition.X, (int)drawPosition.Y, width, height);
+            MainButtonText(buttonRectangle, buttonText, panelBottom, moveOnButton, customOffset is not null,
+                out var textEnd);
+            drawPosition = textEnd;
         }
+        else {
+            drawPosition.Y += height / 2f + 4;
+        }
+
+        if (interaction.ShowExcalmation) {
+            Utils.DrawNotificationIcon(SpriteBatch, drawPosition + new Vector2(4, 0), 0f);
+        }
+        
+        return;
+        void HoverOnButtonCallback() => HandleInteractionClick(interaction);
     }
 
     private static void MainButtonLogic(Rectangle buttonRectangle, Vector2 pos, Vector2 size,
@@ -228,27 +241,25 @@ internal class ButtonHandler
     }
 
     private static void MainButtonText(Rectangle boundingBox, string buttonText, Vector2 panelBottom,
-        bool moveOnButton, bool useCustomOffset) {
-        // Utils.DrawBorderString(SpriteBatch, "⏹", boundingBox.Location.ToVector2(), Color.White);
-        // Utils.DrawBorderString(SpriteBatch, "⏹", boundingBox.BottomRight(), Color.White);
-
-        var textColor = new Color(Main.mouseTextColor, (int) (Main.mouseTextColor / 1.1), Main.mouseTextColor / 2,
+        bool moveOnButton, bool useCustomOffset, out Vector2 endPosition) {
+        var textColor = new Color(Main.mouseTextColor, (int)(Main.mouseTextColor / 1.1), Main.mouseTextColor / 2,
             Main.mouseTextColor);
         var shadowColor = !moveOnButton ? Color.Black : Color.Brown;
         var font = FontAssets.MouseText.Value;
         float scaleX = DecideTextScale(buttonText, font, boundingBox.Width);
         var scale = new Vector2(scaleX, 1f);
         var stringSize = ChatManager.GetStringSize(font, buttonText, scale);
-
+        
         var pos = boundingBox.Center();
         pos.X -= stringSize.X / 2f;
         pos.Y -= font.LineSpacing / 4f;
         if (!useCustomOffset && stringSize.X < boundingBox.Width * 0.7f && stringSize.X < 100f) {
             pos.X -= 10f - stringSize.X * 0.1f;
         }
-        // Main.NewText(stringSize);
 
         DrawButtonText(buttonText, moveOnButton ? 2 : 1.5f, shadowColor, textColor, scale, pos);
+        endPosition = pos + new Vector2(stringSize.X + 4, stringSize.Y / 2f - 2);
+
         if (scaleX <= 0.7f && moveOnButton) {
             // 缩放程度太高的放在上面时会在面板下方显示文本
             panelBottom.X -= ChatManager.GetStringSize(font, buttonText, Vector2.One).X / 2f;
@@ -256,38 +267,29 @@ internal class ButtonHandler
         }
     }
 
-    private static void ExtraButtonCallback() {
+    private static void HandleInteractionClick(NPCInteraction interaction) {
         if (!Main.mouseLeft || !Main.mouseLeftRelease) return;
 
-        ChatMethods.HandleExtraButtonClicled(Main.npc[Main.LocalPlayer.talkNPC]);
-    }
-
-    private static void ShopButtonCallback() {
-        if (!Main.mouseLeft || !Main.mouseLeftRelease) return;
-
-        if (Main.LocalPlayer.sign == -1)
-            ChatMethods.HandleShop(Main.npc[Main.LocalPlayer.talkNPC]);
-        else {
-            if (Main.editSign)
-                Main.SubmitSignText();
-            else
-                IngameFancyUI.OpenVirtualKeyboard(1);
+        if (NPCLoader.PreChatButtonClicked(interaction)) {
+            interaction.Interact();
+            NPCLoader.OnChatButtonClicked(interaction);
         }
     }
 
     #endregion
 
-    #region 侧按钮 (幸福度和返回按钮)
+    #region 侧按钮 (住房、幸福度和返回按钮)
 
     private static void DrawBackButton(float statY, bool longer) {
         Rectangle buttonRectangle =
-            new Rectangle((int) ChatUI.PanelPosition.X + 16, (int) statY + 10, longer ? 98 : 44, 44);
+            new Rectangle((int)ChatUI.PanelPosition.X + 16, (int)statY + 10, longer ? 98 : 44, 44);
         var value = ModAsset.Button_Back.Value;
         Rectangle frame = value.Frame();
         // ModCall
-        int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[Main.LocalPlayer.talkNPC].type; // 为了标牌特判
+        int type = Main.LocalPlayer.sign != -1 ? 0 : Main.npc[Main.LocalPlayer.talkNPC].type;
         foreach (var info in from a in HandleAssets.IconInfos
-                 where a.NPCTypes.Contains(type) && a.Available() && a.Texture != "" && a.IconType == IconType.Back
+                 where a.NPCTypes.Contains(type) && a.Available() && a.Texture != ""
+                       && a.InteractionTypeName == "CloseChat"
                  select a) {
             value = ModContent.Request<Texture2D>(info.Texture).Value;
             frame = info.Frame?.Invoke() ?? value.Frame();
@@ -295,7 +297,7 @@ internal class ButtonHandler
 
         DrawPanel(SpriteBatch, ButtonPanel.Value, buttonRectangle.Location.ToVector2(), buttonRectangle.Size(),
             Color.White);
-        SpriteBatch.Draw(value, buttonRectangle.Location.ToVector2() + buttonRectangle.Size() / 2f, frame,
+        SpriteBatch.Draw(value, buttonRectangle.Center(), frame,
             Color.White * 0.9f, 0f, frame.Size() / 2f, 1f, SpriteEffects.None, 0f);
 
         if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
@@ -309,13 +311,16 @@ internal class ButtonHandler
             Main.LocalPlayer.mouseInterface = true;
 
             if (Main.mouseLeft && Main.mouseLeftRelease) {
-                Main.CloseNPCChatOrSign();
-                SoundEngine.PlaySound(SoundID.MenuClose);
+                NPCInteractionDatabase.CloseButton.Interact();
             }
         }
         else if (moveOnBackButton) {
             moveOnBackButton = false;
             SoundEngine.PlaySound(SoundID.MenuTick);
+        }
+
+        if (NPCInteractionDatabase.CloseButton.ShowExcalmation) {
+            Utils.DrawNotificationIcon(SpriteBatch, buttonRectangle.TopRight() + new Vector2(-10f, 20f), 0f);
         }
 
         // 手柄支持，这个是最左边
@@ -330,19 +335,21 @@ internal class ButtonHandler
         Rectangle frame = value.Frame();
 
         // ModCall
-        int type = Main.LocalPlayer.sign != -1 ? -1 : Main.npc[Main.LocalPlayer.talkNPC].type; // 为了标牌特判
+        int type = Main.LocalPlayer.sign != -1 ? 0 : Main.npc[Main.LocalPlayer.talkNPC].type;
         foreach (var info in from a in HandleAssets.IconInfos
-                 where a.NPCTypes.Contains(type) && a.Available() && a.Texture != "" && a.IconType == IconType.Happiness
+                 where a.NPCTypes.Contains(type) && a.Available() && a.Texture != ""
+                       && a.InteractionTypeName == "ReportHappiness"
                  select a) {
             value = ModContent.Request<Texture2D>(info.Texture).Value;
             frame = info.Frame?.Invoke() ?? value.Frame();
         }
 
-        DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(44, 44), Color.White);
-        SpriteBatch.Draw(value, pos, frame, Color.White * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(SideButtonSize), Color.White);
 
-        Rectangle buttonRectangle = new Rectangle((int) pos.X, (int) pos.Y, ModAsset.Button_Happiness.Width(),
-            ModAsset.Button_Happiness.Height());
+        var center = pos + new Vector2(SideButtonSize) / 2f;
+        SpriteBatch.Draw(value, center, frame, Color.White * 0.9f, 0f, value.Size() / 2f, 1f, SpriteEffects.None, 0f);
+
+        Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, SideButtonSize, SideButtonSize);
         if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
             if (!moveOnHappinessButton) {
                 SoundEngine.PlaySound(SoundID.MenuTick);
@@ -353,15 +360,66 @@ internal class ButtonHandler
             Main.LocalPlayer.mouseInterface = true;
 
             if (Main.mouseLeft && Main.mouseLeftRelease) {
-                Main.npcChatCornerItem = 0;
-                SoundEngine.PlaySound(SoundID.MenuTick);
-                Main.npcChatText = Main.LocalPlayer.currentShoppingSettings.HappinessReport;
+                NPCInteractionDatabase.HappinessButton.Interact();
                 TryDisplayNPCPreferences();
             }
         }
         else if (moveOnHappinessButton) {
             moveOnHappinessButton = false;
             SoundEngine.PlaySound(SoundID.MenuTick);
+        }
+
+        if (NPCInteractionDatabase.HappinessButton.ShowExcalmation) {
+            Utils.DrawNotificationIcon(SpriteBatch, buttonRectangle.TopRight() + new Vector2(-10f, 20f), 0f);
+        }
+
+        // 手柄支持，这个是左中
+        UILinkPointNavigator.SetPosition(GamepadPointID.NPCChat1, pos + buttonRectangle.Size() / 2f);
+        UILinkPointNavigator.Shortcuts.NPCCHAT_ButtonsMiddle = true;
+    }
+
+    private static void DrawHousingButton(float statY) {
+        Vector2 pos = new Vector2(ChatUI.PanelPosition.X + 68, statY + 10);
+        var value = ModContent.Request<Texture2D>("Terraria/Images/UI/DisplaySlots_5").Value;
+        Rectangle frame = value.Frame();
+
+        // ModCall
+        int type = Main.LocalPlayer.sign != -1 ? 0 : Main.npc[Main.LocalPlayer.talkNPC].type;
+        foreach (var info in from a in HandleAssets.IconInfos
+                 where a.NPCTypes.Contains(type) && a.Available() && a.Texture != ""
+                       && a.InteractionTypeName == "RequestHome"
+                 select a) {
+            value = ModContent.Request<Texture2D>(info.Texture).Value;
+            frame = info.Frame?.Invoke() ?? value.Frame();
+        }
+
+        DrawPanel(SpriteBatch, ButtonPanel.Value, pos, new Vector2(44, 44), Color.White);
+
+        var center = pos + new Vector2(SideButtonSize) / 2f;
+        SpriteBatch.Draw(value, center, frame, Color.White * 0.9f, 0f, value.Size() / 2f, 1f, SpriteEffects.None, 0f);
+
+        Rectangle buttonRectangle = new Rectangle((int)pos.X, (int)pos.Y, SideButtonSize, SideButtonSize);
+        if (buttonRectangle.Contains(new Point(MouseX, MouseY))) {
+            if (!moveOnHousingButton) {
+                SoundEngine.PlaySound(SoundID.MenuTick);
+                moveOnHousingButton = true;
+            }
+
+            DrawPanel(SpriteBatch, ButtonPanel_Highlight.Value, pos, new Vector2(44, 44), Color.White);
+            Main.LocalPlayer.mouseInterface = true;
+
+            if (Main.mouseLeft && Main.mouseLeftRelease) {
+                SoundEngine.PlaySound(SoundID.MenuTick);
+                NPCInteractionDatabase.HousingButton.Interact();
+            }
+        }
+        else if (moveOnHousingButton) {
+            moveOnHousingButton = false;
+            SoundEngine.PlaySound(SoundID.MenuTick);
+        }
+
+        if (NPCInteractionDatabase.HousingButton.ShowExcalmation) {
+            Utils.DrawNotificationIcon(SpriteBatch, buttonRectangle.TopRight() + new Vector2(-10f, 20f), 0f);
         }
 
         // 手柄支持，这个是左中
@@ -406,7 +464,7 @@ internal class ButtonHandler
     private static void DrawButtonText(string text, float spread, Color shadowColor, Color chatColor, Vector2 scale,
         Vector2 pos) {
         var font = FontAssets.MouseText.Value;
-        var array = ChatManager.ParseMessage(text, chatColor).ToArray();
+        var array = ChatManager.ParseMessage(text, chatColor);
         ChatManager.ConvertNormalSnippets(array);
         ChatManager.DrawColorCodedStringShadow(SpriteBatch, font, array, pos, shadowColor, 0f, Vector2.Zero, scale, -1,
             spread);
@@ -417,8 +475,8 @@ internal class ButtonHandler
     public static void DrawPanel(SpriteBatch spriteBatch, Texture2D texture, Vector2 position, Vector2 size,
         Color color, Color? cornerColor = null, int cornerSize = 6, int barSize = 32) {
         Color corner = cornerColor ?? color;
-        Point point = new Point((int) position.X, (int) position.Y);
-        Point point2 = new Point(point.X + (int) size.X - cornerSize, point.Y + (int) size.Y - cornerSize);
+        Point point = new Point((int)position.X, (int)position.Y);
+        Point point2 = new Point(point.X + (int)size.X - cornerSize, point.Y + (int)size.Y - cornerSize);
         int width = point2.X - point.X - cornerSize;
         int height = point2.Y - point.Y - cornerSize;
         spriteBatch.Draw(texture, new Rectangle(point.X, point.Y, cornerSize, cornerSize),

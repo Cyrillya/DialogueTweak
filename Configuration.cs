@@ -6,21 +6,6 @@ namespace DialogueTweak;
 
 public class Configuration : ModConfig
 {
-    public enum PortraitStyle : int
-    {
-        LiveReaction,
-        Portrait,
-        Retro,
-        Profile
-    }
-
-    public enum PortraitFallbackStyle : int
-    {
-        LiveReaction,
-        Retro,
-        Profile
-    }
-
     public enum TextScrollingSpeed : int
     {
         Slow,
@@ -48,14 +33,6 @@ public class Configuration : ModConfig
 
     [DefaultValue(true)]
     public bool ShowSwapButton;
-
-    [DefaultValue(PortraitStyle.LiveReaction)]
-    [DrawTicks]
-    public PortraitStyle PortraitDrawStyle;
-
-    [DefaultValue(PortraitFallbackStyle.LiveReaction)]
-    [DrawTicks]
-    public PortraitFallbackStyle PortraitFbStyle;
 
     [DefaultValue(true)]
     public bool PortraitAnimation;

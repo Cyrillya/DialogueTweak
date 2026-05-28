@@ -65,7 +65,7 @@ internal static class DrawingHelper
         // 描边
         Main.spriteBatch.End(); // End后Begin来使用shader绘制描边
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, Main.UIScaleMatrix);
-        GameShaders.Armor.Apply(ContentSamples.CommonlyUsedContentSamples.ColorOnlyShaderIndex, shaderEntity, null);
+        GameShaders.Armor.Apply(ContentSamples.DyeShaderIDs.ColorOnlyShaderIndex, shaderEntity, null);
         for (int k = -1; k <= 1; k++) {
             for (int l = -1; l <= 1; l++) {
                 if (Math.Abs(k) + Math.Abs(l) == 1) {
